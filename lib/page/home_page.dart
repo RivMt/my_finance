@@ -9,11 +9,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  /// Triggers on menu button pressed
+  void onMenuPressed() {
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => onMenuPressed(),
+        ),
       ),
     );
   }
