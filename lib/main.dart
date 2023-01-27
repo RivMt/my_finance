@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_api/my_api.dart';
 import 'package:my_finance/page/home_page.dart';
 
 void main() {
@@ -11,10 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      title: 'MyFinance',
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       home: const HomePage(),
     );
   }
