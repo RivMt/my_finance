@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:my_api/my_api.dart';
-import 'package:my_finance/page/home_page.dart';
+import 'package:my_finance/my_app.dart';
 
 void main() {
+  // Lazy
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyFinance',
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      home: const HomePage(),
-    );
-  }
 }
