@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final client = ApiClient();
       await client.init(
+        filename: 'assets/key/server.json',
         onLoginRequired: () => openPage(const LoginPage()),
       );
     } on Exception catch(e) {
