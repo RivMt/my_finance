@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   my_api:
     path: ../my_api
+  hooks_riverpod:
+  easy_localization:
 
 dev_dependencies:
   flutter_test:
@@ -22,4 +24,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+    - assets/key/
+    - assets/locale/

@@ -1,0 +1,8 @@
+{
+  "account": {
+    "zero": "Account",
+    "one": "Account",
+    "many": "Accounts",
+    "other": "Accounts"
+  }
+}

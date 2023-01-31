@@ -45,3 +45,6 @@ app.*.map.json
 
 # Secret files
 /assets/key/*
+
+# Generated files
+/lib/generated/*
