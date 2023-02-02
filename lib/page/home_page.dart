@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/page/accounts_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -111,6 +112,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           GroupCard(
             title: LocaleKeys.account.plural(1),
             count: accounts.length,
+            onMorePressed: () => openPage(const AccountsPage()),
             build: (BuildContext context, int index) {
               return AccountCard(
                 data: accounts[index],

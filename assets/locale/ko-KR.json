@@ -10,6 +10,24 @@
     "other": "결제 수단"
   },
 
+  "add": "추가",
+
+  "accountTypeSaving": "저축",
+  "accountTypeAccount": "일반",
+  "accountTypeCash": "현금",
+  "accountTypePoint": "포인트",
+  "accountTypeLimitedLoan": "대출",
+  "accountTypeTransportationCard": "교통카드",
+  "accountTypeShared": "공유",
+  "accountTypeVirtual": "가상",
+  "accountTypeInvestment": "투자",
+  "accountTypePrepaid": "선불",
+  "accountTypeMileage": "마일리지",
+
   "currentMonthExpense": "이번 달 지출",
-  "amountBePaid": "지불할 대금"
+  "amountBePaid": "지불할 대금",
+
+  "totalBalance": "총 자산",
+
+  "pageAccounts": "계좌"
 }

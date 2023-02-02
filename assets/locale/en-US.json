@@ -12,6 +12,24 @@
     "other": "Payments"
   },
 
+  "add": "Add",
+
+  "accountTypeSavings": "Savings",
+  "accountTypeAccount": "Normal",
+  "accountTypeCash": "Cash",
+  "accountTypePoint": "Points",
+  "accountTypeLimitedLoan": "Loans",
+  "accountTypeTransportationCard": "Transportation Card",
+  "accountTypeShared": "Shared",
+  "accountTypeVirtual": "Virtual",
+  "accountTypeInvestment": "Investments",
+  "accountTypePrepaid": "Prepaid",
+  "accountTypeMileage": "Mileage",
+
   "currentMonthExpense": "Expenses of current month",
-  "amountBePaid": "Amount to be paid"
+  "amountBePaid": "Amount to be paid",
+
+  "totalBalance": "Total balance",
+
+  "pageAccounts": "Accounts"
 }
