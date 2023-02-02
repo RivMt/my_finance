@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -66,8 +68,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   /// Get [GridView] cross axis count
+  ///
+  /// Value is always bigger than `0`
   int getCrossAxisCount(BuildContext context) {
-    return MediaQuery.of(context).size.width~/GroupCard.width;
+    return max(1, MediaQuery.of(context).size.width~/GroupCard.width);
   }
 
   /// Get [GridView] child aspect ratio
@@ -120,16 +124,16 @@ class _HomePageState extends ConsumerState<HomePage> {
               switch(index) {
                 case 0:
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
-                    subtitle: LocaleKeys.currentMonthExpense.tr(),
+                    title: LocaleKeys.currentMonthExpense.tr(),
+                    subtitle: Currency.won.format(ref.watch(FinanceProvider.expenses)),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.payments_outlined,
                   );
                 case 1:
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
-                    subtitle: LocaleKeys.amountBePaid.tr(),
+                    title: LocaleKeys.amountBePaid.tr(),
+                    subtitle: Currency.won.format(ref.watch(FinanceProvider.expenses)),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.calendar_today_outlined,
