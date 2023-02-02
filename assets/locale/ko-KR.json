@@ -3,5 +3,13 @@
     "zero": "계좌",
     "one": "계좌",
     "other": "계좌"
-  }
+  },
+  "payment": {
+    "zero": "결제 수단",
+    "one": "결제 수단",
+    "other": "결제 수단"
+  },
+
+  "currentMonthExpense": "이번 달 지출",
+  "amountBePaid": "지불할 대금"
 }

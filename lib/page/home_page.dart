@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/provider/finance_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -46,18 +45,34 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Request data
   void request() async {
+    // Account
     ref.read(FinanceProvider.accounts.notifier).request(
-      {
-        Account.keyBalance: [
-          "0.0",
-        ],
-      },
+      {},
       ApiClient().buildOptions(
         limit: 3,
         sortOrderType: SortOrderType.asc,
         sortOrderAttribute: Account.keyPriority,
       ),
     );
+    // Payment
+    ref.read(FinanceProvider.payments.notifier).request(
+      {},
+      ApiClient().buildOptions(
+        limit: 3,
+        sortOrderType: SortOrderType.asc,
+        sortOrderAttribute: Payment.keyPriority,
+      ),
+    );
+  }
+
+  /// Get [GridView] cross axis count
+  int getCrossAxisCount(BuildContext context) {
+    return MediaQuery.of(context).size.width~/GroupCard.width;
+  }
+
+  /// Get [GridView] child aspect ratio
+  double getChildAspectRatio(BuildContext context) {
+    return (MediaQuery.of(context).size.width / getCrossAxisCount(context)) / GroupCard.height;
   }
 
   @override
@@ -82,22 +97,49 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            GroupCard(
-              title: LocaleKeys.account.plural(1),
-              count: accounts.length,
-              build: (BuildContext context, int index) {
-                return AccountCard(
-                  data: accounts[index],
-                );
-              },
-            ),
-          ],
+      body: GridView(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: getCrossAxisCount(context),
+          childAspectRatio: getChildAspectRatio(context),
+          mainAxisSpacing: 8,
         ),
+        children: [
+          GroupCard(
+            title: LocaleKeys.account.plural(1),
+            count: accounts.length,
+            build: (BuildContext context, int index) {
+              return AccountCard(
+                data: accounts[index],
+              );
+            },
+          ),
+          GroupCard(
+            title: LocaleKeys.payment.plural(1),
+            count: 3,
+            build: (BuildContext context, int index) {
+              switch(index) {
+                case 0:
+                  return WalletItemCard(
+                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    subtitle: LocaleKeys.currentMonthExpense.tr(),
+                    foreground: Colors.white,
+                    background: Theme.of(context).primaryColor,
+                    icon: Icons.payments_outlined,
+                  );
+                case 1:
+                  return WalletItemCard(
+                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    subtitle: LocaleKeys.amountBePaid.tr(),
+                    foreground: Colors.white,
+                    background: Theme.of(context).primaryColor,
+                    icon: Icons.calendar_today_outlined,
+                  );
+                default:
+                  return const SizedBox();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

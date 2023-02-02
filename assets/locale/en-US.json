@@ -4,5 +4,14 @@
     "one": "Account",
     "many": "Accounts",
     "other": "Accounts"
-  }
+  },
+  "payment": {
+    "zero": "Payment",
+    "one": "Payment",
+    "many": "Payments",
+    "other": "Payments"
+  },
+
+  "currentMonthExpense": "Expenses of current month",
+  "amountBePaid": "Amount to be paid"
 }
