@@ -9,9 +9,12 @@ class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
     super.key,
     this.onItemTap,
+    this.selected,
   });
 
   final Function(Account)? onItemTap;
+
+  final Account? selected;
 
   @override
   _AccountsFragmentState createState() => _AccountsFragmentState();
@@ -101,13 +104,15 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                 title: icon.key.tr(),
                 count: sublist.length,
                 build: (context, index) {
+                  final account = sublist[index];
                   return AccountCard(
-                    data: sublist[index],
+                    data: account,
+                    selected: widget.selected == account,
                     onTap: () {
                       if (widget.onItemTap == null) {
                         return;
                       }
-                      widget.onItemTap!(sublist[index]);
+                      widget.onItemTap!(account);
                     },
                   );
                 },
@@ -116,11 +121,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           ),
           // Add
           ListTailButton(
-            leading: WalletItemIcon(
-              icon: Icons.add,
-              foreground: Colors.white,
-              background: Theme.of(context).primaryColor,
-            ),
+            icon: Icons.add,
             title: LocaleKeys.add.tr(),
           ),
         ],

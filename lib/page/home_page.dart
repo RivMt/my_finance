@@ -113,7 +113,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             build: (BuildContext context, int index) {
               final account = accounts[index];
               return AccountCard(
-                data: accounts[index],
+                data: account,
+                onTap: () => openPage(AccountDetailsPage(pid: account.pid)),
               );
             },
           ),
