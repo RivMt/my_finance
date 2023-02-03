@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -71,9 +70,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Get [GridView] cross axis count
   ///
   /// Value is always bigger than `0`
-  int getCrossAxisCount(BuildContext context) {
-    return max(1, MediaQuery.of(context).size.width~/GroupCard.width);
-  }
+  int getCrossAxisCount(BuildContext context) => InterfaceConstructor.panelNumber(context);
 
   /// Get [GridView] child aspect ratio
   double getChildAspectRatio(BuildContext context) {
@@ -114,6 +111,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             count: accounts.length,
             onMorePressed: () => openPage(const AccountsPage()),
             build: (BuildContext context, int index) {
+              final account = accounts[index];
               return AccountCard(
                 data: accounts[index],
               );
