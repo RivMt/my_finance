@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 
@@ -10,11 +11,14 @@ class TransactionsFragment extends ConsumerStatefulWidget {
     required this.condition,
     this.options = const {},
     this.shrinkWrap = false,
+    this.useSliver = false,
   });
 
   final Map<String, dynamic> condition, options;
 
   final bool shrinkWrap;
+
+  final bool useSliver;
 
   @override
   _TransactionsFragmentState createState() => _TransactionsFragmentState();
@@ -51,31 +55,48 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     request();
   }
 
+  DateTime groupBy(Transaction data) {
+    final date = data.paidDate;
+    return DateTime(date.year, date.month, date.day);
+  }
+
+  Widget groupSeparatorBuilder(DateTime date) => Text(
+    DateFormat.yMd().format(date),
+    style: Theme.of(context).textTheme.titleSmall,
+  );
+
+  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate);
+
+  Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) => TransactionCard(
+    data: data,
+    category: categories.firstWhere((element) {
+      return element.type == data.type && element.category == data.category;
+    }, orElse: () => Category.unknown),
+  );
+
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(FinanceProvider.transactions);
     final categories = ref.watch(FinanceProvider.categories);
+    // Return sliver grouped list view
+    if (widget.useSliver) {
+      return SliverGroupedListView<Transaction, DateTime>(
+        elements: transactions,
+        groupBy: groupBy,
+        order: GroupedListOrder.DESC,
+        groupSeparatorBuilder: groupSeparatorBuilder,
+        itemComparator: itemComparator,
+        itemBuilder: (context, data) => itemBuilder(context, data, categories),
+      );
+    }
     return GroupedListView<Transaction, DateTime>(
       shrinkWrap: widget.shrinkWrap,
       elements: transactions,
-      groupBy: (transaction) {
-        final date = transaction.paidDate;
-        return DateTime(date.year, date.month, date.day);
-      },
+      groupBy: groupBy,
       order: GroupedListOrder.DESC,
-      groupSeparatorBuilder: (DateTime date) => Text(
-        DateFormat.yMd().format(date),
-        style: Theme.of(context).textTheme.titleSmall,
-      ),
-      itemComparator: (item1, item2) => item1.paidDate.compareTo(item2.paidDate),
-      itemBuilder: (context, data) {
-        return TransactionCard(
-          data: data,
-          category: categories.firstWhere((element) {
-            return element.type == data.type && element.category == data.category;
-          }, orElse: () => Category.unknown),
-        );
-      },
+      groupSeparatorBuilder: groupSeparatorBuilder,
+      itemComparator: itemComparator,
+      itemBuilder: (context, data) => itemBuilder(context, data, categories),
     );
   }
 }
