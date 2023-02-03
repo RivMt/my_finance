@@ -13,6 +13,17 @@
   },
 
   "add": "Add",
+  "confirm": "Confirm",
+
+  "name": "Name",
+  "serialNumber": "Serial number",
+  "icon": "Icon",
+  "limitation": "Limitation",
+  "currency": "Currency",
+  "priority": "Priority",
+  "cash": "Cash",
+  "foreground": "Foreground",
+  "background": "Background",
 
   "accountTypeSavings": "Savings",
   "accountTypeAccount": "Normal",
@@ -25,6 +36,14 @@
   "accountTypeInvestment": "Investments",
   "accountTypePrepaid": "Prepaid",
   "accountTypeMileage": "Mileage",
+
+  "currencyTypeUnknown": "Unknown",
+  "currencyTypeWon": "Korean Won",
+  "currencyTypeYen": "Japanese Yen",
+  "currencyTypeDollar": "US Dollar",
+  "currencyTypeEuro": "Euro",
+  "currencyTypePoundSterling": "Pound Sterling",
+  "currencyTypeYuanRenminbi": "Yuan Renminbi",
 
   "currentMonthExpense": "Expenses of current month",
   "amountBePaid": "Amount to be paid",

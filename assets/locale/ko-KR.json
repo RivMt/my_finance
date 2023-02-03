@@ -11,9 +11,20 @@
   },
 
   "add": "추가",
+  "confirm": "확인",
+
+  "name": "이름",
+  "serialNumber": "일련번호",
+  "icon": "아이콘",
+  "limitation": "한도",
+  "currency": "통화",
+  "priority": "우선순위",
+  "cash": "현금",
+  "foreground": "전경색",
+  "background": "배경색",
 
   "accountTypeSaving": "저축",
-  "accountTypeAccount": "일반",
+  "accountTypeAccount": "예금",
   "accountTypeCash": "현금",
   "accountTypePoint": "포인트",
   "accountTypeLimitedLoan": "대출",
@@ -23,6 +34,14 @@
   "accountTypeInvestment": "투자",
   "accountTypePrepaid": "선불",
   "accountTypeMileage": "마일리지",
+
+  "currencyTypeUnknown": "알 수 없음",
+  "currencyTypeWon": "대한민국 원",
+  "currencyTypeYen": "일본 엔",
+  "currencyTypeDollar": "미국 달러",
+  "currencyTypeEuro": "유로",
+  "currencyTypePoundSterling": "영국 파운드",
+  "currencyTypeYuanRenminbi": "중국 위안",
 
   "currentMonthExpense": "이번 달 지출",
   "amountBePaid": "지불할 대금",
