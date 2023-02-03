@@ -126,16 +126,16 @@ class _HomePageState extends ConsumerState<HomePage> {
               switch(index) {
                 case 0:
                   return WalletItemCard(
-                    title: LocaleKeys.currentMonthExpense.tr(),
-                    subtitle: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    subtitle: LocaleKeys.currentMonthExpense.tr(),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.payments_outlined,
                   );
                 case 1:
                   return WalletItemCard(
-                    title: LocaleKeys.amountBePaid.tr(),
-                    subtitle: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    subtitle: LocaleKeys.amountBePaid.tr(),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.calendar_today_outlined,
