@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
+import 'package:my_finance/fragment/account_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountsFragment extends ConsumerStatefulWidget {
@@ -31,6 +32,37 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
         sortOrderAttribute: Account.keyIcon,
       ),
     );
+  }
+
+  /// Show account editing modal
+  void showAccountEditingModal(BuildContext context, [Account? account]) {
+    Account? editing = account;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        )
+      ),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: AccountEditFragment(
+            base: editing,
+            onModified: (account) => editing = account,
+          ),
+        );
+      }
+    );
+  }
+
+  /// Triggers on account add button pressed
+  void onAccountAddButtonPressed(BuildContext context) {
+    showAccountEditingModal(context);
   }
 
   @override
@@ -123,6 +155,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           ListTailButton(
             icon: Icons.add,
             title: LocaleKeys.add.tr(),
+            onTap: () => onAccountAddButtonPressed(context),
           ),
         ],
       ),
