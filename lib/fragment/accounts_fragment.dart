@@ -5,16 +5,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/fragment/account_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/provider/finance_provider.dart';
+
+final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
+  return FinanceModelState<Account>(ref);
+});
 
 class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
     super.key,
     this.onItemTap,
     this.selected,
+    this.onEditFinish,
   });
 
   final Function(Account)? onItemTap;
+
+  final Function(Account)? onEditFinish;
 
   final Account? selected;
 
@@ -26,7 +32,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
   /// Request all accounts ordered by icon
   void request() {
-    ref.read(FinanceProvider.accounts.notifier).request(
+    ref.read(_accounts.notifier).request(
       [{
         FinanceModel.keyDeleted: false,
       }],
@@ -55,6 +61,9 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
       }
     ).then((account) {
       request();
+      if (widget.onEditFinish != null && account != null) {
+        widget.onEditFinish!(account);
+      }
     });
   }
 
@@ -77,7 +86,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(FinanceProvider.accounts);
+    final accounts = ref.watch(_accounts);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(8),
       child: Column(

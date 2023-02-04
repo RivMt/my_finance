@@ -4,7 +4,14 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
-import 'package:my_finance/provider/finance_provider.dart';
+
+final _transactions = StateNotifierProvider<FinanceModelState<Transaction>, List<Transaction>>((ref) {
+  return FinanceModelState<Transaction>(ref);
+});
+
+final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Category>>((ref) {
+  return FinanceModelState<Category>(ref);
+});
 
 class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
@@ -36,12 +43,12 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       sortOrderType: SortOrderType.desc,
     ) : widget.options;
     // Get transactions
-    ref.read(FinanceProvider.transactions.notifier).request(
+    ref.read(_transactions.notifier).request(
       [widget.condition],
       options,
     );
     // Get categories
-    ref.read(FinanceProvider.categories.notifier).request([{}]);
+    ref.read(_categories.notifier).request([{}]);
   }
 
   @override
@@ -77,8 +84,8 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = ref.watch(FinanceProvider.transactions);
-    final categories = ref.watch(FinanceProvider.categories);
+    final transactions = ref.watch(_transactions);
+    final categories = ref.watch(_categories);
     // Return sliver grouped list view
     if (widget.useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(

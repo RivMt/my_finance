@@ -6,7 +6,10 @@ import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
-import 'package:my_finance/provider/finance_provider.dart';
+
+final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
+  return FinanceModelState<Account>(ref);
+});
 
 final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   final now = DateTime.now();
@@ -85,7 +88,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Request data
   void request() async {
     // Account
-    ref.read(FinanceProvider.accounts.notifier).request(
+    ref.read(_accounts.notifier).request(
       [{
         FinanceModel.keyDeleted: false,
       }],
@@ -96,7 +99,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
     // Payment
-    ref.read(FinanceProvider.payments.notifier).request(
+    ref.read(_accounts.notifier).request(
       [{
         FinanceModel.keyDeleted: false,
       }],
@@ -138,7 +141,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(FinanceProvider.accounts);
+    final accounts = ref.watch(_accounts);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

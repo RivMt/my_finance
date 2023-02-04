@@ -5,7 +5,10 @@ import 'package:my_api/my_api.dart';
 import 'package:my_finance/fragment/account_details_fragment.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/provider/finance_provider.dart';
+
+final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
+  return FinanceModelState<Account>(ref);
+});
 
 class AccountDetailsPage extends ConsumerStatefulWidget {
   const AccountDetailsPage({
@@ -23,7 +26,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   
   /// Request account using [widget.pid]
   void request() {
-    ref.read(FinanceProvider.accounts.notifier).request([{
+    ref.read(_accounts.notifier).request([{
       FinanceModel.keyPid: widget.pid,
     }]);
   }
@@ -43,8 +46,8 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   @override
   Widget build(BuildContext context) {
     late Account? account;
-    if (ref.watch(FinanceProvider.accounts).isNotEmpty) {
-      account = ref.watch(FinanceProvider.accounts)[0];
+    if (ref.watch(_accounts).isNotEmpty) {
+      account = ref.watch(_accounts)[0];
     } else {
       account = null;
     }

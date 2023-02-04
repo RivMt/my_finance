@@ -62,6 +62,9 @@ class _AccountsPageState extends State<AccountsPage> {
             width: width,
             child: AccountsFragment(
               onItemTap: onAccountSelected,
+              onEditFinish: (account) => setState(() {
+                selected = account;
+              }),
             ),
           ),
           Visibility(
