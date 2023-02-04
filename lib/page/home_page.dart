@@ -59,6 +59,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (onPageFinished != null) {
         onPageFinished(value);
       }
+    }).then((value) {
+      request();
     });
   }
 
@@ -121,8 +123,16 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    init();
+    request();
+  }
+
+
+  @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
     request();
   }
 
