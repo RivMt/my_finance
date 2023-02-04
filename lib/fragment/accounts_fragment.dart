@@ -100,13 +100,15 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                   itemCount: Currency.values.length,
                   itemBuilder: (context, index) {
                     final currency = Currency.values[index];
+                    bool exist = false;
                     final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
                       if (account.currency == currency) {
+                        exist = true;
                         return total + account.balance;
                       }
                       return total;
                     });
-                    if (sum == Decimal.zero) {
+                    if (!exist) {
                       return const SizedBox();
                     }
                     return Text(
