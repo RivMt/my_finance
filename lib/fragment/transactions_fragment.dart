@@ -4,6 +4,7 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
+import 'package:my_finance/provider/finance_provider.dart';
 
 class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({

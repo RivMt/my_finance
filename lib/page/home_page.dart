@@ -5,6 +5,7 @@ import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/provider/finance_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

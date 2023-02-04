@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/fragment/account_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/provider/finance_provider.dart';
 
 class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
