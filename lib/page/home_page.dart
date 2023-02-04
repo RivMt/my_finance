@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,6 +7,39 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/provider/finance_provider.dart';
+
+final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  final now = DateTime.now();
+  return CalculateValueState<Transaction>(ref,
+    condition: {
+      Transaction.keyType: TransactionType.expense,
+      Transaction.keyPaidDate: [
+        DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
+        DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
+      ],
+      Transaction.keyIncluded: true,
+      FinanceModel.keyDeleted: false,
+    },
+    type: CalculationType.sum,
+    attribute: Transaction.keyAmount,
+  );
+});
+
+final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  final now = DateTime.now();
+  return CalculateValueState<Transaction>(ref,
+    condition: {
+      Transaction.keyType: TransactionType.expense,
+      Transaction.keyCalculatedDate: [
+        now.millisecondsSinceEpoch,
+      ],
+      Transaction.keyIncluded: true,
+      FinanceModel.keyDeleted: false,
+    },
+    type: CalculationType.sum,
+    attribute: Transaction.keyAmount,
+  );
+});
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -70,6 +104,10 @@ class _HomePageState extends ConsumerState<HomePage> {
         sortOrderAttribute: Payment.keyPriority,
       ),
     );
+    // Current month expense
+    ref.read(_currentMonthExpenses.notifier).request();
+    // Amount to be paid
+    ref.read(_amountBePaid.notifier).request();
   }
 
   /// Get [GridView] cross axis count
@@ -130,7 +168,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               switch(index) {
                 case 0:
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    title: Currency.won.format(ref.watch(_currentMonthExpenses)),
                     subtitle: LocaleKeys.currentMonthExpense.tr(),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
@@ -138,7 +176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   );
                 case 1:
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(FinanceProvider.expenses)),
+                    title: Currency.won.format(ref.watch(_amountBePaid)),
                     subtitle: LocaleKeys.amountBePaid.tr(),
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,

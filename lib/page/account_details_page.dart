@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/fragment/account_details_fragment.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
+import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/provider/finance_provider.dart';
 
 class AccountDetailsPage extends ConsumerStatefulWidget {
@@ -21,9 +23,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   
   /// Request account using [widget.pid]
   void request() {
-    ref.read(FinanceProvider.account.notifier).request({
-      FinanceModel.keyPid: widget.pid
-    });
+    ref.read(FinanceProvider.accounts.notifier).request([{
+      FinanceModel.keyPid: widget.pid,
+    }]);
   }
 
   @override
@@ -40,31 +42,49 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Account account = ref.watch(FinanceProvider.account) ?? Account.unknown;
+    late Account? account;
+    if (ref.watch(FinanceProvider.accounts).isNotEmpty) {
+      account = ref.watch(FinanceProvider.accounts)[0];
+    } else {
+      account = null;
+    }
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: Text(account.descriptions),
-            floating: true,
+      body: IndexedStack(
+        index: account == null ? 0 : 1,
+        children: [
+          // 0: No account
+          MessageBox(
+            icon: Icons.question_mark_outlined,
+            message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+              "object": LocaleKeys.account.plural(1),
+            }),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
-            sliver: SliverToBoxAdapter(
-              child: AccountDetailsFragment(
-                account: account,
+          // 1: Account details
+          CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                title: Text(account!.descriptions),
+                floating: true,
               ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(8),
-            sliver: TransactionsFragment(
-              useSliver: true,
-              condition: {
-                Transaction.keyAccountID: account.pid,
-              },
-            ),
-          ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                sliver: SliverToBoxAdapter(
+                  child: AccountDetailsFragment(
+                    account: account,
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.all(8),
+                sliver: TransactionsFragment(
+                  useSliver: true,
+                  condition: {
+                    Transaction.keyAccountID: account.pid,
+                  },
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );

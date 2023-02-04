@@ -28,6 +28,9 @@
   "foreground": "전경색",
   "background": "배경색",
 
+  "msgPleaseSelect_object": "{object}를 선택해주세요",
+  "msgError": "에러가 발생했습니다\n{}",
+
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
   "accountTypeCash": "현금",

@@ -68,23 +68,36 @@ class _AccountsPageState extends State<AccountsPage> {
             visible: transactionsVisible,
             child: SizedBox(
               width: width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: IndexedStack(
+                index: account == Account.unknown ? 0 : 1,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: AccountDetailsFragment(
-                      account: account,
-                    ),
+                  // 0: No account
+                  MessageBox(
+                    icon: Icons.question_mark_outlined,
+                    message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                      "object": LocaleKeys.account.plural(1),
+                    }),
                   ),
-                  Expanded(
-                    child: TransactionsFragment(
-                      condition: {
-                        Transaction.keyAccountID: account.pid,
-                      },
-                    ),
-                  ),
+                  // 1: Account details and transactions
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: AccountDetailsFragment(
+                          account: account,
+                        ),
+                      ),
+                      Expanded(
+                        child: TransactionsFragment(
+                          condition: {
+                            Transaction.keyAccountID: account.pid,
+                          },
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
