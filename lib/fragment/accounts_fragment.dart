@@ -39,21 +39,14 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
     Account? editing = account;
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        )
-      ),
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
       ),
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(16),
           child: AccountEditFragment(
             base: editing,
-            onModified: (account) => editing = account,
           ),
         );
       }

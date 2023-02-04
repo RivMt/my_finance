@@ -11,7 +11,11 @@
   },
 
   "add": "추가",
+  "edit": "수정",
   "confirm": "확인",
+  "cancel": "취소",
+
+  "object_action": "{object} {action}",
 
   "name": "이름",
   "serialNumber": "일련번호",

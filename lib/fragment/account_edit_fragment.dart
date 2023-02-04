@@ -9,13 +9,10 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 class AccountEditFragment extends StatefulWidget {
   const AccountEditFragment({
     super.key,
-    required this.onModified,
     this.base,
   });
 
   final Account? base;
-
-  final Function(Account) onModified;
 
   @override
   _AccountEditFragmentState createState() => _AccountEditFragmentState();
@@ -28,6 +25,9 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   final TextEditingController serialNumberController = TextEditingController();
   
   final TextEditingController limitationController = TextEditingController();
+
+  /// Is this fragment editing [Account]
+  bool get isEdit => widget.base != null;
 
   /// [Account] which is now editing
   Account editing = Account({});
@@ -104,24 +104,32 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
     return result ?? color;
   }
 
+  /// Triggers on cancel button pressed
+  void onCancelButtonPressed(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  /// Triggers on confirm button pressed
+  void onConfirmButtonPressed(BuildContext context) {
+
+    Navigator.pop(context, editing);
+  }
+
   /// Triggers on description changed
   void onDescriptionChanged(String desc) {
     editing.descriptions = desc;
-    widget.onModified(editing);
     setState(() {});
   }
 
   /// Triggers on description changed
   void onSerialNumberChanged(String serial) {
     editing.serialNumber = serial;
-    widget.onModified(editing);
     setState(() {});
   }
 
   /// Triggers on limitation changed
   void onLimitationChanged(String lim) {
     editing.limitation = Decimal.parse(lim);
-    widget.onModified(editing);
     setState(() {});
   }
 
@@ -133,7 +141,6 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
       AccountIcon.values,
     );
     editing.icon = icon;
-    widget.onModified(editing);
     setState(() {});
   }
 
@@ -145,28 +152,24 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
       Currency.values,
     );
     editing.currency = currency;
-    widget.onModified(editing);
     setState(() {});
   }
 
   /// Triggers on cash checkboxes value changed
   void onCashValueChanged(bool value) {
     editing.isCash = value;
-    widget.onModified(editing);
     setState(() {});
   }
 
   /// Triggers on foreground color button pressed
   void onForegroundPressed(BuildContext context) async {
     editing.foreground = await showColorPicker(context, editing.foreground);
-    widget.onModified(editing);
     setState(() {});
   }
 
   /// Triggers on background color button pressed
   void onBackgroundPressed(BuildContext context) async {
     editing.background = await showColorPicker(context, editing.background);
-    widget.onModified(editing);
     setState(() {});
   }
 
@@ -183,6 +186,25 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(),
+              Text(
+                LocaleKeys.object_action.tr(namedArgs: {
+                  "object": LocaleKeys.account.plural(1),
+                  "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+                }),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              TextButton(
+                onPressed: () => onConfirmButtonPressed(context),
+                child: Text(LocaleKeys.confirm.tr()),
+              ),
+            ],
+          ),
           // Description
           TextField(
             controller: descriptionController,
@@ -200,6 +222,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
             controller: serialNumberController,
             decoration: InputDecoration(
               labelText: LocaleKeys.serialNumber.tr(),
+              prefixIcon: const Icon(Icons.numbers_outlined)
             ),
             onChanged: onSerialNumberChanged,
           ),
@@ -209,10 +232,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
             decoration: InputDecoration(
               labelText: LocaleKeys.limitation.tr(),
               prefixIcon: IconButton(
-                icon: Text(
-                  editing.currency.symbol,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                icon: Text(editing.currency.symbol),
                 onPressed: () => onCurrencyButtonPressed(),
               )
             ),
@@ -223,9 +243,21 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
             onChanged: onLimitationChanged,
           ),
           // Is cash checkbox
-          Checkbox(
-            value: editing.isCash,
-            onChanged: (value) => onCashValueChanged(value ?? false),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Checkbox(
+                  value: editing.isCash,
+                  onChanged: (value) => onCashValueChanged(value ?? false),
+                ),
+                Text(
+                  LocaleKeys.cash.tr(),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
           ),
           // Foreground
           Row(

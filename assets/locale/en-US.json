@@ -13,7 +13,11 @@
   },
 
   "add": "Add",
+  "edit": "Edit",
   "confirm": "Confirm",
+  "cancel": "Cancel",
+
+  "object_action": "{action} {object}",
 
   "name": "Name",
   "serialNumber": "Serial number",
