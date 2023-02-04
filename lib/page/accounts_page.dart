@@ -91,7 +91,6 @@ class _AccountsPageState extends State<AccountsPage> {
                       ),
                       Expanded(
                         child: TransactionsFragment(
-                          currency: account.currency,
                           condition: {
                             Transaction.keyAccountID: account.pid,
                           },

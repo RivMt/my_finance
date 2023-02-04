@@ -78,7 +78,6 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
                 padding: const EdgeInsets.all(8),
                 sliver: TransactionsFragment(
                   useSliver: true,
-                  currency: account.currency,
                   condition: {
                     Transaction.keyAccountID: account.pid,
                   },
