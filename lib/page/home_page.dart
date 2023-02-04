@@ -50,7 +50,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   void request() async {
     // Account
     ref.read(FinanceProvider.accounts.notifier).request(
-      {},
+      [{
+        FinanceModel.keyDeleted: false,
+      }],
       ApiClient().buildOptions(
         limit: 3,
         sortOrderType: SortOrderType.asc,
@@ -59,7 +61,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
     // Payment
     ref.read(FinanceProvider.payments.notifier).request(
-      {},
+      [{
+        FinanceModel.keyDeleted: false,
+      }],
       ApiClient().buildOptions(
         limit: 3,
         sortOrderType: SortOrderType.asc,

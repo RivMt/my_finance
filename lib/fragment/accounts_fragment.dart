@@ -27,7 +27,9 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   /// Request all accounts ordered by icon
   void request() {
     ref.read(FinanceProvider.accounts.notifier).request(
-      {},
+      [{
+        FinanceModel.keyDeleted: false,
+      }],
       ApiClient().buildOptions(
         sortOrderType: SortOrderType.asc,
         sortOrderAttribute: Account.keyIcon,

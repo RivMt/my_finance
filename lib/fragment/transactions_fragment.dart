@@ -37,11 +37,11 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     ) : widget.options;
     // Get transactions
     ref.read(FinanceProvider.transactions.notifier).request(
-      widget.condition,
+      [widget.condition],
       options,
     );
     // Get categories
-    ref.read(FinanceProvider.categories.notifier).request({});
+    ref.read(FinanceProvider.categories.notifier).request([{}]);
   }
 
   @override
