@@ -285,6 +285,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                   ),
                   onChanged: onDescriptionChanged,
                 ),
+                const SizedBox(height: 4,),
                 // Serial Number
                 TextField(
                   controller: serialNumberController,
@@ -297,6 +298,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                   ],
                   onChanged: onSerialNumberChanged,
                 ),
+                const SizedBox(height: 4,),
                 // Limitation
                 TextField(
                   controller: limitationController,
