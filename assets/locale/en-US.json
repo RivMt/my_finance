@@ -16,6 +16,7 @@
   "edit": "Edit",
   "confirm": "Confirm",
   "cancel": "Cancel",
+  "delete": "Delete",
 
   "object_action": "{action} {object}",
 

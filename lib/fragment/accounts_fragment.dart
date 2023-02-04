@@ -38,22 +38,24 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   }
 
   /// Show account editing modal
-  void showAccountEditingModal(BuildContext context, [Account? account]) {
+  void showAccountEditingModal(BuildContext context, [Account? account]) async {
     Account? editing = account;
-    showModalBottomSheet(
+    showModalBottomSheet<Account>(
       context: context,
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: AccountEditFragment(
-            base: editing,
-          ),
+        return AccountEditFragment(
+          base: editing,
+          onFinish: (account) {
+            Navigator.pop(context, account);
+          },
         );
       }
-    );
+    ).then((account) {
+      request();
+    });
   }
 
   /// Triggers on account add button pressed
@@ -141,6 +143,9 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                         return;
                       }
                       widget.onItemTap!(account);
+                    },
+                    onLongPress: () {
+                      showAccountEditingModal(context, account);
                     },
                   );
                 },

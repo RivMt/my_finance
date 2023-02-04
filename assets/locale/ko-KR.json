@@ -14,6 +14,7 @@
   "edit": "수정",
   "confirm": "확인",
   "cancel": "취소",
+  "delete": "삭제",
 
   "object_action": "{object} {action}",
 
