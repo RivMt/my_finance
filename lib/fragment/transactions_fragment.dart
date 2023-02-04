@@ -10,12 +10,15 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
     super.key,
     required this.condition,
+    required this.currency,
     this.options = const {},
     this.shrinkWrap = false,
     this.useSliver = false,
   });
 
   final Map<String, dynamic> condition, options;
+
+  final Currency currency;
 
   final bool shrinkWrap;
 
@@ -70,6 +73,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) => TransactionCard(
     data: data,
+    currency: widget.currency,
     category: categories.firstWhere((element) {
       return element.type == data.type && element.category == data.category;
     }, orElse: () => Category.unknown),
