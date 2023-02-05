@@ -15,7 +15,7 @@ final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transact
   final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
     condition: {
-      Transaction.keyType: TransactionType.expense,
+      Transaction.keyType: TransactionType.expense.code,
       Transaction.keyPaidDate: [
         DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
         DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
@@ -32,7 +32,7 @@ final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, De
   final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
     condition: {
-      Transaction.keyType: TransactionType.expense,
+      Transaction.keyType: TransactionType.expense.code,
       Transaction.keyCalculatedDate: [
         now.millisecondsSinceEpoch,
       ],
