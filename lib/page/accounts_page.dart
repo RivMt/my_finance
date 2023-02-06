@@ -61,6 +61,7 @@ class _AccountsPageState extends State<AccountsPage> {
           SizedBox(
             width: width,
             child: AccountsFragment(
+              selected: selected,
               onItemTap: onAccountSelected,
               onEditFinish: (account) => setState(() {
                 selected = account;
