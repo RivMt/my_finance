@@ -29,6 +29,28 @@
   "cash": "Cash",
   "foreground": "Foreground",
   "background": "Background",
+  "credit": "Credit",
+  "payDate": "Date of paid",
+  "payRange": "Range of each payment",
+  "payRangeBegin": "From",
+  "payRangeEnd": "To",
+
+  "month": "Month",
+  "nMonthBefore": {
+    "zero": "Current",
+    "one": "Last",
+    "many": "{} months before",
+    "other": "{} months before"
+  },
+  "day": "Day",
+  "nDay": {
+    "zero": "{}th",
+    "one": "{}st",
+    "two": "{}nd",
+    "three": "{}rd",
+    "many": "{}th",
+    "other": "{}th"
+  },
 
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",

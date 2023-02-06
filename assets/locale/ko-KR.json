@@ -27,6 +27,28 @@
   "cash": "현금",
   "foreground": "전경색",
   "background": "배경색",
+  "credit": "신용",
+  "payDate": "결제일",
+  "payRange": "이용기간",
+  "payRangeBegin": "시작",
+  "payRangeEnd": "끝",
+
+  "month": "월",
+  "nMonthBefore": {
+    "zero": "당월",
+    "one": "전월",
+    "two": "전전월",
+    "many": "{}개월 전",
+    "other": "{}개월 전"
+  },
+  "day": "일",
+  "nDay": {
+    "zero": "{}일",
+    "one": "{}일",
+    "two": "{}일",
+    "many": "{}일",
+    "other": "{}일"
+  },
 
   "msgPleaseSelect_object": "{object}를 선택해주세요",
   "msgError": "에러가 발생했습니다\n{}",

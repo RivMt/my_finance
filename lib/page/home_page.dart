@@ -6,6 +6,7 @@ import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/page/payments_page.dart';
 
 final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
   return FinanceModelState<Account>(ref);
@@ -186,6 +187,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.payments_outlined,
+                    onTap: () => openPage(PaymentsPage(
+                      condition: ref.watch(_currentMonthExpenses.notifier).condition,
+                    )),
                   );
                 case 1:
                   return WalletItemCard(
@@ -194,6 +198,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.calendar_today_outlined,
+                    onTap: () => openPage(PaymentsPage(
+                      condition: ref.watch(_amountBePaid.notifier).condition,
+                    )),
                   );
                 default:
                   return const SizedBox();
