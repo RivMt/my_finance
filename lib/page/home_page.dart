@@ -200,7 +200,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 color: Theme.of(context).textTheme.titleMedium?.color,
               ),
               onSelected: onPaymentGroupButtonPressed,
-              itemBuilder: (BuildContext context) => Currency.values.map((currency) {
+              itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
                 return PopupMenuItem(
                   value: currency,
                   child: ListTile(

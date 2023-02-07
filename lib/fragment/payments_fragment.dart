@@ -143,7 +143,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
                       color: Theme.of(context).textTheme.titleMedium?.color,
                     ),
                     onSelected: onCurrencyButtonPressed,
-                    itemBuilder: (BuildContext context) => Currency.values.map((currency) {
+                    itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
                       return PopupMenuItem(
                         value: currency,
                         child: ListTile(
