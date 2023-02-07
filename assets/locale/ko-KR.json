@@ -9,14 +9,26 @@
     "one": "결제 수단",
     "other": "결제 수단"
   },
+  "transaction": {
+    "zero": "거래",
+    "one": "거래",
+    "other": "거래"
+  },
+  "category": {
+    "zero": "카테고리",
+    "one": "카테고리",
+    "other": "카테고리"
+  },
 
   "add": "추가",
   "edit": "수정",
   "confirm": "확인",
   "cancel": "취소",
   "delete": "삭제",
+  "refresh": "새로고침",
 
   "object_action": "{object} {action}",
+  "full_name": "{last}{first}",
 
   "name": "이름",
   "serialNumber": "일련번호",
@@ -34,6 +46,11 @@
   "payRangeEnd": "끝",
   "basicInfo": "기본 정보",
   "color": "색상",
+  "settings": "설정",
+  "expense": "지출",
+  "income": "수입",
+  "included": "통계에 포함",
+  "type": "유형",
 
   "month": "월",
   "nMonthBefore": {

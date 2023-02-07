@@ -11,14 +11,28 @@
     "many": "Payments",
     "other": "Payments"
   },
+  "transaction": {
+    "zero": "Transaction",
+    "one": "Transaction",
+    "many": "Transactions",
+    "other": "Transactions"
+  },
+  "category": {
+    "zero": "Category",
+    "one": "Category",
+    "many": "Categories",
+    "other": "Categories"
+  },
 
   "add": "Add",
   "edit": "Edit",
   "confirm": "Confirm",
   "cancel": "Cancel",
   "delete": "Delete",
+  "refresh": "Refresh",
 
   "object_action": "{action} {object}",
+  "full_name": "{first} {last}",
 
   "name": "Name",
   "serialNumber": "Serial number",
@@ -36,6 +50,11 @@
   "payRangeEnd": "To",
   "basicInfo": "Basic information",
   "color": "Color",
+  "settings": "Settings",
+  "expense": "Expense",
+  "income": "Income",
+  "included": "Include in statics",
+  "type": "Type",
 
   "month": "Month",
   "nMonthBefore": {
