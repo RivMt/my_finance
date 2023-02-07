@@ -54,6 +54,24 @@ class _PaymentsPageState extends State<PaymentsPage> {
     return number == 2;
   }
 
+  /// Condition for [TransactionsFragment]
+  List<Map<String, dynamic>> get transactionsCondition {
+    final con = {
+      Transaction.keyPaymentID: (selected == null) ? -1 : selected!.pid,
+    };
+    if (widget.condition == null) {
+      return [con];
+    }
+    final List<Map<String, dynamic>> result = widget.condition!;
+    for(int i=0; i < result.length; i++) {
+      result[i] = {
+        ...result[i],
+        ...con,
+      };
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context);
@@ -112,7 +130,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       ),
                       Expanded(
                         child: TransactionsFragment(
-                          conditions: widget.condition,
+                          conditions: transactionsCondition,
                         ),
                       ),
                     ],
