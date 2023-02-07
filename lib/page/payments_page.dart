@@ -62,7 +62,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
     if (widget.condition == null) {
       return [con];
     }
-    final List<Map<String, dynamic>> result = widget.condition!;
+    final List<Map<String, dynamic>> result = List.from(widget.condition!);
     for(int i=0; i < result.length; i++) {
       result[i] = {
         ...result[i],
@@ -93,6 +93,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
               children: [
                 PaymentsFragment(
                   selected: selected,
+                  conditions: widget.condition,
                   onItemTap: onPaymentSelected,
                   onEditFinish: (item) => setState(() {
                     selected = item;

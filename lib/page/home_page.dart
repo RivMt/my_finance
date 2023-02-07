@@ -13,33 +13,16 @@ final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account
 });
 
 final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
-    conditions: [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyPaidDate: [
-        DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
-        DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
-      ],
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-    }],
+    conditions: [],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
 });
 
 final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
-    conditions: [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyCalculatedDate: [
-        now.millisecondsSinceEpoch,
-      ],
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-    }],
+    conditions: [],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
@@ -57,6 +40,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   static const String _tag = "HomePage";
 
   final client = ApiClient();
+
+  /// Currently selected [Currency]
+  Currency currency = Currency.won;
 
   void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
@@ -88,6 +74,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Request data
   void request() async {
+    final now = DateTime.now();
     // Account
     ref.read(_accounts.notifier).request(
       [{
@@ -111,9 +98,34 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
     );
     // Current month expense
+    ref.read(_currentMonthExpenses.notifier).conditions = [{
+      Transaction.keyType: TransactionType.expense.code,
+      Transaction.keyPaidDate: [
+        DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
+        DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
+      ],
+      Transaction.keyCurrency: currency.value,
+      Transaction.keyIncluded: true,
+      FinanceModel.keyDeleted: false,
+    }];
     ref.read(_currentMonthExpenses.notifier).request();
     // Amount to be paid
+    ref.read(_amountBePaid.notifier).conditions = [{
+      Transaction.keyType: TransactionType.expense.code,
+      Transaction.keyCalculatedDate: [
+        now.millisecondsSinceEpoch,
+      ],
+      Transaction.keyCurrency: currency.value,
+      Transaction.keyIncluded: true,
+      FinanceModel.keyDeleted: false,
+    }];
     ref.read(_amountBePaid.notifier).request();
+  }
+
+  /// Triggers on payment group card button pressed
+  void onPaymentGroupButtonPressed(Currency currency) {
+    this.currency = currency;
+    request();
   }
 
   /// Get [GridView] cross axis count
@@ -166,7 +178,11 @@ class _HomePageState extends ConsumerState<HomePage> {
           GroupCard(
             title: LocaleKeys.account.plural(1),
             count: accounts.length,
-            onMorePressed: () => openPage(const AccountsPage()),
+            button: IconButton(
+              icon: const Icon(Icons.keyboard_arrow_right_outlined),
+              color: Theme.of(context).textTheme.titleMedium?.color,
+              onPressed: () => openPage(const AccountsPage()),
+            ),
             build: (BuildContext context, int index) {
               final account = accounts[index];
               return AccountCard(
@@ -178,13 +194,32 @@ class _HomePageState extends ConsumerState<HomePage> {
           GroupCard(
             title: LocaleKeys.payment.plural(1),
             count: 3,
+            button: PopupMenuButton(
+              icon: Icon(
+                Icons.more_vert,
+                color: Theme.of(context).textTheme.titleMedium?.color,
+              ),
+              onSelected: onPaymentGroupButtonPressed,
+              itemBuilder: (BuildContext context) => Currency.values.map((currency) {
+                return PopupMenuItem(
+                  value: currency,
+                  child: ListTile(
+                    leading: Text(
+                      currency.symbol,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    title: Text(currency.key.tr()),
+                  ),
+                );
+              }).toList(growable: false),
+            ),
             build: (BuildContext context, int index) {
               late String name;
               switch(index) {
                 case 0:
                   name = LocaleKeys.currentMonthExpense.tr();
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(_currentMonthExpenses)),
+                    title: currency.format(ref.watch(_currentMonthExpenses)),
                     subtitle: name,
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
@@ -197,7 +232,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 case 1:
                   name = LocaleKeys.amountBePaid.tr();
                   return WalletItemCard(
-                    title: Currency.won.format(ref.watch(_amountBePaid)),
+                    title: currency.format(ref.watch(_amountBePaid)),
                     subtitle: name,
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
