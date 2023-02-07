@@ -81,9 +81,10 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
                 padding: const EdgeInsets.all(8),
                 sliver: TransactionsFragment(
                   useSliver: true,
-                  condition: {
+                  conditions: [{
                     Transaction.keyPaymentID: payment.pid,
-                  },
+                    FinanceModel.keyDeleted: false,
+                  }],
                 ),
               ),
             ],

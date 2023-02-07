@@ -109,9 +109,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       ),
                       Expanded(
                         child: TransactionsFragment(
-                          condition: {
-                            Transaction.keyPaymentID: payment.pid,
-                          },
+                          conditions: widget.condition,
                         ),
                       ),
                     ],

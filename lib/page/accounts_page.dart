@@ -95,9 +95,10 @@ class _AccountsPageState extends State<AccountsPage> {
                       ),
                       Expanded(
                         child: TransactionsFragment(
-                          condition: {
+                          conditions: [{
                             Transaction.keyAccountID: account.pid,
-                          },
+                            FinanceModel.keyDeleted: false,
+                          }],
                         ),
                       ),
                     ],

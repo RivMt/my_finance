@@ -16,13 +16,15 @@ final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Cate
 class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
     super.key,
-    required this.condition,
+    this.conditions,
     this.options = const {},
     this.shrinkWrap = false,
     this.useSliver = false,
   });
 
-  final Map<String, dynamic> condition, options;
+  final List<Map<String, dynamic>>? conditions;
+
+  final Map<String, dynamic> options;
 
   final bool shrinkWrap;
 
@@ -44,7 +46,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     ) : widget.options;
     // Get transactions
     ref.read(_transactions.notifier).request(
-      [widget.condition],
+      widget.conditions ?? [],
       options,
     );
     // Get categories
