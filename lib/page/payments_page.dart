@@ -11,9 +11,12 @@ class PaymentsPage extends StatefulWidget {
   const PaymentsPage({
     super.key,
     this.condition,
+    this.title,
   });
 
   final List<Map<String, dynamic>>? condition;
+
+  final String? title;
 
   @override
   _PaymentsPageState createState() => _PaymentsPageState();
@@ -57,7 +60,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
     final payment = selected ?? Payment.unknown;
     return Scaffold(
       appBar: AppBar(
-        title: Text(LocaleKeys.payment.plural(2)),
+        title: Text(widget.title ?? LocaleKeys.payment.plural(2)),
       ),
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

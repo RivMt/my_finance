@@ -179,26 +179,31 @@ class _HomePageState extends ConsumerState<HomePage> {
             title: LocaleKeys.payment.plural(1),
             count: 3,
             build: (BuildContext context, int index) {
+              late String name;
               switch(index) {
                 case 0:
+                  name = LocaleKeys.currentMonthExpense.tr();
                   return WalletItemCard(
                     title: Currency.won.format(ref.watch(_currentMonthExpenses)),
-                    subtitle: LocaleKeys.currentMonthExpense.tr(),
+                    subtitle: name,
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.payments_outlined,
                     onTap: () => openPage(PaymentsPage(
+                      title: name,
                       condition: ref.watch(_currentMonthExpenses.notifier).conditions,
                     )),
                   );
                 case 1:
+                  name = LocaleKeys.amountBePaid.tr();
                   return WalletItemCard(
                     title: Currency.won.format(ref.watch(_amountBePaid)),
-                    subtitle: LocaleKeys.amountBePaid.tr(),
+                    subtitle: name,
                     foreground: Colors.white,
                     background: Theme.of(context).primaryColor,
                     icon: Icons.calendar_today_outlined,
                     onTap: () => openPage(PaymentsPage(
+                      title: name,
                       condition: ref.watch(_amountBePaid.notifier).conditions,
                     )),
                   );
