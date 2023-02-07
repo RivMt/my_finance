@@ -163,9 +163,9 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
           // List
           ListView.builder(
             shrinkWrap: true,
-            itemCount: PaymentIcon.values.length,
+            itemCount: PaymentSymbol.values.length,
             itemBuilder: (context, index) {
-              final icon = PaymentIcon.values[index];
+              final icon = PaymentSymbol.values[index];
               final sublist = payments.where((element) => (element.icon == icon)).toList(growable: false);
               // Hide when sublist is empty
               if (sublist.isEmpty) {

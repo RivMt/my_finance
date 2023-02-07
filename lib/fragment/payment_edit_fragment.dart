@@ -75,8 +75,8 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                       style: Theme.of(context).textTheme.titleMedium,
                     );
                     break;
-                  case PaymentIcon:
-                    title = (item as PaymentIcon).key.tr();
+                  case PaymentSymbol:
+                    title = (item as PaymentSymbol).key.tr();
                     icon = Icon(item.icon);
                     break;
                   default:
@@ -180,10 +180,10 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
 
   /// Triggers on [PaymentIcon] button pressed
   void onPaymentIconButtonPressed() async {
-    final icon = await showSelectDialog<PaymentIcon>(
+    final icon = await showSelectDialog<PaymentSymbol>(
       context,
       LocaleKeys.icon.tr(),
-      PaymentIcon.values,
+      PaymentSymbol.values,
     );
     editing.icon = icon;
     setState(() {});

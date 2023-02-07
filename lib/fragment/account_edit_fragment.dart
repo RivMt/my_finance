@@ -75,8 +75,8 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                       style: Theme.of(context).textTheme.titleMedium,
                     );
                     break;
-                  case AccountIcon:
-                    title = (item as AccountIcon).key.tr();
+                  case AccountSymbol:
+                    title = (item as AccountSymbol).key.tr();
                     icon = Icon(item.icon);
                     break;
                   default:
@@ -180,10 +180,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
 
   /// Triggers on [AccountIcon] button pressed
   void onAccountIconButtonPressed() async {
-    final icon = await showSelectDialog<AccountIcon>(
+    final icon = await showSelectDialog<AccountSymbol>(
       context,
       LocaleKeys.icon.tr(),
-      AccountIcon.values,
+      AccountSymbol.values,
     );
     editing.icon = icon;
     setState(() {});

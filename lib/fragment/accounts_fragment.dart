@@ -137,9 +137,9 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           // List
           ListView.builder(
             shrinkWrap: true,
-            itemCount: AccountIcon.values.length,
+            itemCount: AccountSymbol.values.length,
             itemBuilder: (context, index) {
-              final icon = AccountIcon.values[index];
+              final icon = AccountSymbol.values[index];
               final sublist = accounts.where((element) => (element.icon == icon)).toList(growable: false);
               // Hide when sublist is empty
               if (sublist.isEmpty) {
