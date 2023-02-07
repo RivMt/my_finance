@@ -72,7 +72,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
               children: [
                 PaymentsFragment(
                   selected: selected,
-                  onItemTap: (item) => onPaymentSelected,
+                  onItemTap: onPaymentSelected,
                   onEditFinish: (item) => setState(() {
                     selected = item;
                   }),
@@ -88,14 +88,14 @@ class _PaymentsPageState extends State<PaymentsPage> {
               child: IndexedStack(
                 index: payment == Payment.unknown ? 0 : 1,
                 children: [
-                  // 0: No account
+                  // 0: No payment
                   MessageBox(
                     icon: Icons.question_mark_outlined,
                     message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                       "object": LocaleKeys.payment.plural(1),
                     }),
                   ),
-                  // 1: Account details and transactions
+                  // 1: Payment details and transactions
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,

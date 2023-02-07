@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -8,7 +6,9 @@ import 'package:my_api/my_api.dart';
 final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   return CalculateValueState<Transaction>(
     ref,
-    conditions: [{}],
+    conditions: [{
+      FinanceModel.keyPid: -1,
+    }],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
@@ -43,15 +43,18 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
     }];
     // Merge custom condition
     if (widget.conditions != null) {
-      for(int i=0; i < min(conditions.length, widget.conditions!.length); i++) {
-        conditions[i] = {
-          ...conditions[i],
-          ...widget.conditions![i],
-        };
+      for(int i=0; i < conditions.length; i++) {
+        for(int j=0; j < widget.conditions!.length; j++) {
+          conditions[i] = {
+            ...conditions[i],
+            ...widget.conditions![j],
+          };
+        }
       }
     }
     // Refresh condition
     ref.read(_total.notifier).conditions = conditions;
+    ref.read(_total.notifier).request();
   }
 
   @override
