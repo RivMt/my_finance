@@ -65,6 +65,17 @@
   "accountTypePrepaid": "선불",
   "accountTypeMileage": "마일리지",
 
+  "paymentTypeCard": "카드",
+  "paymentTypeCash": "현금",
+  "paymentTypePoint": "포인트",
+  "paymentTypeTransportation": "교통카드",
+  "paymentTypeMembership": "멤버십",
+  "paymentTypeTransfer": "이체",
+  "paymentTypeMarket": "매장 카드",
+  "paymentTypePrepaid": "선불카드",
+  "paymentTypeMileage": "마일리지",
+  "paymentTypeToll": "통행료",
+
   "currencyTypeUnknown": "알 수 없음",
   "currencyTypeWon": "대한민국 원",
   "currencyTypeYen": "일본 엔",

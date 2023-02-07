@@ -67,6 +67,17 @@
   "accountTypePrepaid": "Prepaid",
   "accountTypeMileage": "Mileage",
 
+  "paymentTypeCard": "Card",
+  "paymentTypeCash": "Cash",
+  "paymentTypePoint": "Point",
+  "paymentTypeTransportation": "Transportation Card",
+  "paymentTypeMembership": "Membership",
+  "paymentTypeTransfer": "Transfer",
+  "paymentTypeMarket": "Store",
+  "paymentTypePrepaid": "Prepaid Card",
+  "paymentTypeMileage": "Mileage",
+  "paymentTypeToll": "Toll",
+
   "currencyTypeUnknown": "Unknown",
   "currencyTypeWon": "Korean Won",
   "currencyTypeYen": "Japanese Yen",
