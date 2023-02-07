@@ -56,6 +56,9 @@ class _PaymentsPageState extends State<PaymentsPage> {
     final width = MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context);
     final payment = selected ?? Payment.unknown;
     return Scaffold(
+      appBar: AppBar(
+        title: Text(LocaleKeys.payment.plural(2)),
+      ),
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

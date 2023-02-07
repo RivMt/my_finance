@@ -52,7 +52,7 @@ class _AccountsPageState extends State<AccountsPage> {
     final account = selected ?? Account.unknown;
     return Scaffold(
       appBar: AppBar(
-        title: Text(LocaleKeys.pageAccounts.tr()),
+        title: Text(LocaleKeys.account.plural(2)),
       ),
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
