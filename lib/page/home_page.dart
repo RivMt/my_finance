@@ -70,6 +70,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       Log.e(_tag, "Error: $e");
       return;
     }
+    request();
   }
 
   /// Request data
@@ -142,7 +143,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     init();
-    request();
   }
 
 
