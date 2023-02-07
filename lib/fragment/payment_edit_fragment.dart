@@ -262,7 +262,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                 TextButton(
                   onPressed: progressing ? null : onNegativeButtonPressed,
                   style: Theme.of(context).textButtonTheme.style?.copyWith(
-                    //TODO: Fix overlay color
+                    overlayColor: AppTheme.textButtonOverlay(AppTheme.errorPrimary),
                   ),
                   child: Text(
                     isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),

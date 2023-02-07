@@ -243,9 +243,15 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
               children: [
                 TextButton(
                   onPressed: progressing ? null : onNegativeButtonPressed,
+                  style: Theme.of(context).textButtonTheme.style?.copyWith(
+                    overlayColor: AppTheme.textButtonOverlay(AppTheme.errorPrimary),
+                  ),
                   child: Text(
                     isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-                    style: progressing ? null : Theme.of(context).textTheme.titleMedium?.copyWith(color: AppTheme.errorPrimary, inherit: true),
+                    style: progressing ? null : Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppTheme.errorPrimary,
+                      inherit: true,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -285,7 +291,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                   ),
                   onChanged: onDescriptionChanged,
                 ),
-                const SizedBox(height: 4,),
+                const SizedBox(height: 8,),
                 // Serial Number
                 TextField(
                   controller: serialNumberController,
@@ -298,7 +304,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                   ],
                   onChanged: onSerialNumberChanged,
                 ),
-                const SizedBox(height: 4,),
+                const SizedBox(height: 8,),
                 // Limitation
                 TextField(
                   controller: limitationController,
