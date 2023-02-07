@@ -13,7 +13,7 @@ class PaymentsPage extends StatefulWidget {
     this.condition,
   });
 
-  final Map<String, dynamic>? condition;
+  final List<Map<String, dynamic>>? condition;
 
   @override
   _PaymentsPageState createState() => _PaymentsPageState();
@@ -104,7 +104,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                         padding: const EdgeInsets.all(8),
                         child: PaymentDetailsFragment(
                           payment: payment,
-                          condition: widget.condition,
+                          conditions: widget.condition,
                         ),
                       ),
                       Expanded(

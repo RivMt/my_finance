@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -6,7 +8,7 @@ import 'package:my_api/my_api.dart';
 final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   return CalculateValueState<Transaction>(
     ref,
-    condition: {},
+    conditions: [{}],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
@@ -16,12 +18,12 @@ class PaymentDetailsFragment extends ConsumerStatefulWidget {
   const PaymentDetailsFragment({
     super.key,
     required this.payment,
-    this.condition,
+    this.conditions,
   });
 
   final Payment payment;
 
-  final Map<String, dynamic>? condition;
+  final List<Map<String, dynamic>>? conditions;
 
   @override
   _PaymentDetailsFragmentState createState() => _PaymentDetailsFragmentState();
@@ -34,20 +36,22 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
   /// This method changes [_total]'s condition.
   void request() {
     // Default condition
-    Map<String, dynamic> condition = {
+    List<Map<String, dynamic>> conditions = [{
       Transaction.keyPaymentID: widget.payment.pid,
       Transaction.keyType: TransactionType.expense.code,
       FinanceModel.keyDeleted: false,
-    };
+    }];
     // Merge custom condition
-    if (widget.condition != null) {
-      condition = {
-        ...condition,
-        ...widget.condition!
-      };
+    if (widget.conditions != null) {
+      for(int i=0; i < min(conditions.length, widget.conditions!.length); i++) {
+        conditions[i] = {
+          ...conditions[i],
+          ...widget.conditions![i],
+        };
+      }
     }
     // Refresh condition
-    ref.read(_total.notifier).condition = condition;
+    ref.read(_total.notifier).conditions = conditions;
   }
 
   @override

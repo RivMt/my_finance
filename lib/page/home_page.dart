@@ -15,7 +15,7 @@ final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account
 final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
-    condition: {
+    conditions: [{
       Transaction.keyType: TransactionType.expense.code,
       Transaction.keyPaidDate: [
         DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
@@ -23,7 +23,7 @@ final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transact
       ],
       Transaction.keyIncluded: true,
       FinanceModel.keyDeleted: false,
-    },
+    }],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
@@ -32,14 +32,14 @@ final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transact
 final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   final now = DateTime.now();
   return CalculateValueState<Transaction>(ref,
-    condition: {
+    conditions: [{
       Transaction.keyType: TransactionType.expense.code,
       Transaction.keyCalculatedDate: [
         now.millisecondsSinceEpoch,
       ],
       Transaction.keyIncluded: true,
       FinanceModel.keyDeleted: false,
-    },
+    }],
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
@@ -188,7 +188,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     background: Theme.of(context).primaryColor,
                     icon: Icons.payments_outlined,
                     onTap: () => openPage(PaymentsPage(
-                      condition: ref.watch(_currentMonthExpenses.notifier).condition,
+                      condition: ref.watch(_currentMonthExpenses.notifier).conditions,
                     )),
                   );
                 case 1:
@@ -199,7 +199,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     background: Theme.of(context).primaryColor,
                     icon: Icons.calendar_today_outlined,
                     onTap: () => openPage(PaymentsPage(
-                      condition: ref.watch(_amountBePaid.notifier).condition,
+                      condition: ref.watch(_amountBePaid.notifier).conditions,
                     )),
                   );
                 default:
