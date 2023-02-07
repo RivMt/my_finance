@@ -34,6 +34,8 @@
   "payRange": "Range of each payment",
   "payRangeBegin": "From",
   "payRangeEnd": "To",
+  "basicInfo": "Basic information",
+  "color": "Color",
 
   "month": "Month",
   "nMonthBefore": {

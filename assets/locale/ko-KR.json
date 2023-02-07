@@ -32,6 +32,8 @@
   "payRange": "이용기간",
   "payRangeBegin": "시작",
   "payRangeEnd": "끝",
+  "basicInfo": "기본 정보",
+  "color": "색상",
 
   "month": "월",
   "nMonthBefore": {

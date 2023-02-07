@@ -279,6 +279,12 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Basic information
+                Text(
+                  LocaleKeys.basicInfo.tr(),
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                const SizedBox(height: 8,),
                 // Description
                 TextField(
                   controller: descriptionController,
@@ -337,6 +343,11 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                       ),
                     ],
                   ),
+                ),
+                // Color
+                Text(
+                  LocaleKeys.color.tr(),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
                 // Foreground
                 Row(

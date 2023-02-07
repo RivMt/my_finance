@@ -297,6 +297,12 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Basic information
+                Text(
+                  LocaleKeys.basicInfo.tr(),
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                const SizedBox(height: 8,),
                 // Description
                 TextField(
                   controller: descriptionController,
@@ -363,6 +369,30 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Date
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            LocaleKeys.payDate.tr(),
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                          DropdownMenu<int>(
+                            initialSelection: editing.payDate,
+                            label: Text(LocaleKeys.day.tr()),
+                            dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                              final int value = index + 1;
+                              return DropdownMenuEntry<int>(
+                                value: value,
+                                label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                              );
+                            }).toList(growable: false),
+                            onSelected: (value) => onPayRangeBeginChanged(editing.payDate, value),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8,),
                       Text(
                         LocaleKeys.payRange.tr(),
                         style: Theme.of(context).textTheme.labelSmall,
@@ -454,6 +484,11 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                       ),
                     ],
                   ),
+                ),
+                // Color
+                Text(
+                  LocaleKeys.color.tr(),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
                 // Foreground
                 Row(

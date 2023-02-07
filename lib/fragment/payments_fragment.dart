@@ -1,4 +1,3 @@
-import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,18 +46,23 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
     Payment? editing = payment;
     showModalBottomSheet<Payment>(
-        context: context,
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
-        ),
-        builder: (context) {
-          return PaymentEditFragment(
-            base: editing,
-            onFinish: (payment) {
-              Navigator.pop(context, payment);
-            },
-          );
-        }
+      context: context,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+      ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            PaymentEditFragment(
+              base: editing,
+              onFinish: (payment) {
+                Navigator.pop(context, payment);
+              },
+            ),
+          ],
+        );
+      },
     ).then((payment) {
       request();
       if (widget.onEditFinish != null && payment != null) {

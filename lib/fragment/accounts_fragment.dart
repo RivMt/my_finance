@@ -48,17 +48,22 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
     Account? editing = account;
     showModalBottomSheet<Account>(
       context: context,
+      isScrollControlled: true,
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
       ),
       builder: (context) {
-        return AccountEditFragment(
-          base: editing,
-          onFinish: (account) {
-            Navigator.pop(context, account);
-          },
+        return Wrap(
+          children: [
+            AccountEditFragment(
+              base: editing,
+              onFinish: (account) {
+                Navigator.pop(context, account);
+              },
+            ),
+          ],
         );
-      }
+      },
     ).then((account) {
       request();
       if (widget.onEditFinish != null && account != null) {
