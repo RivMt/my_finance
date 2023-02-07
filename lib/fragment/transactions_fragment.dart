@@ -80,7 +80,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) => TransactionCard(
     data: data,
     category: categories.firstWhere((element) {
-      return element.type == data.type && element.category == data.category;
+      return element.type == data.type && element.pid == data.category;
     }, orElse: () => Category.unknown),
   );
 
