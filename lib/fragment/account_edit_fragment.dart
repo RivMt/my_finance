@@ -235,42 +235,16 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: progressing ? null : onNegativeButtonPressed,
-                  style: Theme.of(context).textButtonTheme.style?.copyWith(
-                    overlayColor: AppTheme.textButtonOverlay(AppTheme.errorPrimary),
-                  ),
-                  child: Text(
-                    isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-                    style: progressing ? null : Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.errorPrimary,
-                      inherit: true,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    LocaleKeys.object_action.tr(namedArgs: {
-                      "object": LocaleKeys.account.plural(1),
-                      "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-                    }),
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                TextButton(
-                  onPressed: progressing ? null : onConfirmButtonPressed,
-                  child: Text(LocaleKeys.confirm.tr()),
-                ),
-              ],
-            ),
+          ModalHeader(
+            disabled: progressing,
+            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+              "object": LocaleKeys.account.plural(1),
+              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+            }),
+            positiveButtonTitle: LocaleKeys.confirm.tr(),
+            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+            onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
+            onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
           ),
           // Body
           Padding(
