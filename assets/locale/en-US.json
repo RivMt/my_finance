@@ -55,6 +55,7 @@
   "income": "Income",
   "included": "Include in statics",
   "type": "Type",
+  "description": "Description",
 
   "month": "Month",
   "nMonthBefore": {

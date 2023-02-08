@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 
-class CategoriesFragment extends StatefulWidget {
+final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Category>>((ref) {
+  return FinanceModelState<Category>(ref);
+});
+
+class CategoriesFragment extends ConsumerStatefulWidget {
   const CategoriesFragment({
     super.key,
-    this.categories = const [],
+    this.conditions,
     this.onTap,
     this.onLongPress,
   });
 
-  final List<Category> categories;
+  final List<Map<String, dynamic>>? conditions;
 
   final Function(Category)? onTap;
 
@@ -19,14 +24,45 @@ class CategoriesFragment extends StatefulWidget {
   _CategoriesFragmentState createState() => _CategoriesFragmentState();
 }
 
-class _CategoriesFragmentState extends State<CategoriesFragment> {
+class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
+
+  /// Request categories
+  void request() {
+    // Categories
+    ref.read(_categories.notifier).request(widget.conditions ?? [{
+      FinanceModel.keyDeleted: false,
+    }], ApiClient().buildOptions(
+      sortOrderType: SortOrderType.asc,
+      sortOrderAttribute: FinanceModel.keyPid,
+    ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    request();
+  }
+
+  @override
+  void didUpdateWidget(CategoriesFragment oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    request();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.categories.length,
+    final categories = ref.watch(_categories);
+    final int panels = InterfaceConstructor.panelNumber(context);
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: panels,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: (MediaQuery.of(context).size.width / panels) / CategoryCard.height,
+      ),
+      itemCount: categories.length,
       itemBuilder: (context, index) {
-        final category = widget.categories[index];
+        final category = categories[index];
         return CategoryCard(
           category: category,
           onTap: () {

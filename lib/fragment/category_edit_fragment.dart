@@ -51,17 +51,17 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
     return await showDialog(
       context: context,
       builder: (context) {
-        const double size = 24;
+        const double size = 32;
         return AlertDialog(
           title: Text(title),
           content: SizedBox(
             width: (MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context)) * 0.8,
             height: MediaQuery.of(context).size.height * 0.7,
             child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width ~/ size,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: size,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
               ),
               itemCount: list.length,
               itemBuilder: (context, index) {
@@ -70,7 +70,10 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                   width: size,
                   height: size,
                   child: IconButton(
-                    icon: Icon(category.icon),
+                    icon: Icon(
+                      category.icon,
+                      color: Theme.of(context).textTheme.titleMedium?.color,
+                    ),
                     onPressed: () => Navigator.pop(context, category),
                   ),
                 );
@@ -166,6 +169,14 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   }
 
   @override
+  void didUpdateWidget(CategoryEditFragment oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    editing = widget.base ?? Category({});
+    nameController.text = editing.name;
+    descriptionController.text = editing.descriptions;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -224,26 +235,33 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                 ),
                 const SizedBox(height: 8,),
                 // Type
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.type.tr(),
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: TransactionType.values.map((type) {
-                        return ChoiceChip(
-                          label: Text(type.name.tr()),
-                          selected: type == editing.type,
-                          onSelected: (bool value) => onTypeChanged(type, value),
-                        );
-                      }).toList(growable: false),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.type.tr(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: TransactionType.values.map((type) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+                            child: ChoiceChip(
+                              label: Text(type.name.tr()),
+                              selected: type == editing.type,
+                              onSelected: (bool value) => onTypeChanged(type, value),
+                            ),
+                          );
+                        }).toList(growable: false),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 8,),
                 // Name
                 TextField(
                   controller: nameController,
@@ -261,7 +279,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(
-                      labelText: LocaleKeys.serialNumber.tr(),
+                      labelText: LocaleKeys.description.tr(),
                       prefixIcon: const Icon(Icons.notes_outlined)
                   ),
                   onChanged: onDescriptionsChanged,
@@ -278,7 +296,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                         onChanged: (value) => onIncludeValueChanged(value ?? false),
                       ),
                       Text(
-                        LocaleKeys.cash.tr(),
+                        LocaleKeys.included.tr(),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],

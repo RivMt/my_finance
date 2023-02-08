@@ -24,41 +24,44 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // User
-          ListTile(
-            leading: const Icon(Icons.account_circle_outlined),
-            title: Text(LocaleKeys.full_name.tr(namedArgs: {
-              "first": ApiCore().user.firstName,
-              "last": ApiCore().user.lastName,
-            })),
-            subtitle: Text(ApiCore().user.email),
-          ),
-          const Divider(),
-          // Refresh
-          ListTile(
-            leading: const Icon(Icons.refresh_outlined),
-            title: Text(LocaleKeys.refresh.tr()),
-          ),
-          const Divider(),
-          // Settings
-          ListTile(
-            leading: const Icon(Icons.category_outlined),
-            title: Text(LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.category.plural(2),
-              "action": LocaleKeys.edit.tr(),
-            })),
-            onTap: () => openPage(const CategoriesPage()),
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: Text(LocaleKeys.settings.tr()),
-          ),
-        ],
+    return AlertDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // User
+            ListTile(
+              leading: const Icon(Icons.account_circle_outlined),
+              title: Text(LocaleKeys.full_name.tr(namedArgs: {
+                "first": ApiCore().user.firstName,
+                "last": ApiCore().user.lastName,
+              })),
+              subtitle: Text(ApiCore().user.email),
+            ),
+            const Divider(),
+            // Refresh
+            ListTile(
+              leading: const Icon(Icons.refresh_outlined),
+              title: Text(LocaleKeys.refresh.tr()),
+              onTap: widget.onRefreshPressed,
+            ),
+            const Divider(),
+            // Settings
+            ListTile(
+              leading: const Icon(Icons.category_outlined),
+              title: Text(LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.category.plural(2),
+                "action": LocaleKeys.edit.tr(),
+              })),
+              onTap: () => openPage(const CategoriesPage()),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: Text(LocaleKeys.settings.tr()),
+            ),
+          ],
+        ),
       ),
     );
   }

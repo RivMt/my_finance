@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
+import 'package:my_finance/fragment/main_menu_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
@@ -52,11 +53,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     }).then((value) {
       request();
     });
-  }
-
-  /// Triggers on menu button pressed
-  void onAccountIconPressed() {
-    init();
   }
 
   /// Init API
@@ -123,6 +119,21 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.read(_amountBePaid.notifier).request();
   }
 
+  /// Triggers on menu button pressed
+  void onMenuButtonPressed() {
+    showDialog(
+      context: context,
+      builder: (context) => MainMenuDialog(
+        onRefreshPressed: () => request(),
+      ),
+    );
+  }
+
+  /// Triggers on account button pressed
+  void onAccountIconPressed() {
+    init();
+  }
+
   /// Triggers on payment group card button pressed
   void onPaymentGroupButtonPressed(Currency currency) {
     this.currency = currency;
@@ -158,8 +169,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: () => request(),
+          icon: const Icon(Icons.menu),
+          onPressed: onMenuButtonPressed,
         ),
         actions: [
           IconButton(
