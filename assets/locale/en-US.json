@@ -30,6 +30,7 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "refresh": "Refresh",
+  "select": "Select",
 
   "object_action": "{action} {object}",
   "full_name": "{first} {last}",
@@ -56,6 +57,12 @@
   "included": "Include in statics",
   "type": "Type",
   "description": "Description",
+  "noPayment": "No payment",
+  "paidAmount": "Paid amount",
+  "withdrawAmount": "Withdraw amount",
+  "transactionDate": "Transaction date",
+  "paidDate": "Paid date",
+  "utilityDays": "Utility days",
 
   "month": "Month",
   "nMonthBefore": {
@@ -73,6 +80,7 @@
     "many": "{}th",
     "other": "{}th"
   },
+  "date": "Date",
 
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",

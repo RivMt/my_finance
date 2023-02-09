@@ -26,6 +26,7 @@
   "cancel": "취소",
   "delete": "삭제",
   "refresh": "새로고침",
+  "select": "선택",
 
   "object_action": "{object} {action}",
   "full_name": "{last}{first}",
@@ -52,6 +53,12 @@
   "included": "통계에 포함",
   "type": "유형",
   "description": "설명",
+  "noPayment": "결제 수단 없음",
+  "paidAmount": "결제 금액",
+  "withdrawAmount": "출금 금액",
+  "transactionDate": "거래 날짜",
+  "paidDate": "결제 날짜",
+  "utilityDays": "효용 일수",
 
   "month": "월",
   "nMonthBefore": {
@@ -69,6 +76,7 @@
     "many": "{}일",
     "other": "{}일"
   },
+  "date": "날짜",
 
   "msgPleaseSelect_object": "{object}를 선택해주세요",
   "msgError": "에러가 발생했습니다\n{}",
