@@ -70,10 +70,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                 switch(T) {
                   case Currency:
                     title = (item as Currency).key.tr();
-                    icon = Text(
-                      item.symbol,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    );
+                    icon = Icon(item.icon);
                     break;
                   case AccountSymbol:
                     title = (item as AccountSymbol).key.tr();
@@ -263,11 +260,11 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                 TextField(
                   controller: descriptionController,
                   decoration: InputDecoration(
-                      labelText: LocaleKeys.name.tr(),
-                      prefixIcon: IconButton(
-                        icon: Icon(editing.icon.icon),
-                        onPressed: () => onAccountIconButtonPressed(),
-                      )
+                    labelText: LocaleKeys.name.tr(),
+                    prefixIcon: IconButton(
+                      icon: Icon(editing.icon.icon),
+                      onPressed: () => onAccountIconButtonPressed(),
+                    ),
                   ),
                   onChanged: onDescriptionChanged,
                 ),
@@ -289,11 +286,11 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                 TextField(
                   controller: limitationController,
                   decoration: InputDecoration(
-                      labelText: LocaleKeys.limitation.tr(),
-                      prefixIcon: IconButton(
-                        icon: Text(editing.currency.symbol),
-                        onPressed: () => onCurrencyButtonPressed(),
-                      )
+                    labelText: LocaleKeys.limitation.tr(),
+                    prefixIcon: IconButton(
+                      icon: Icon(editing.currency.icon),
+                      onPressed: () => onCurrencyButtonPressed(),
+                    ),
                   ),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(32),

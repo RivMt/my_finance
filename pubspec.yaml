@@ -29,3 +29,7 @@ flutter:
   assets:
     - assets/key/
     - assets/locale/
+  fonts:
+    - family: CurrencySymbol
+      fonts:
+        - asset: packages/my_api/fonts/CurrencySymbol.ttf

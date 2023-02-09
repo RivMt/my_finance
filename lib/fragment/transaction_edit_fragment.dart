@@ -527,8 +527,8 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     decoration: InputDecoration(
                       labelText: LocaleKeys.paidAmount.tr(),
                       prefixIcon: IconButton(
-                        icon: Text(editing.altCurrency == null ? "?" : editing.altCurrency!.symbol),
-                        onPressed: null,
+                        icon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
+                        onPressed: () {},
                       ),
                     ),
                     inputFormatters: [
@@ -545,8 +545,8 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                   decoration: InputDecoration(
                     labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
                     prefixIcon: IconButton(
-                      icon: Text(editing.currency.symbol),
-                      onPressed: null,
+                      icon: Icon(editing.currency.icon),
+                      onPressed: () {},
                     ),
                   ),
                   inputFormatters: [

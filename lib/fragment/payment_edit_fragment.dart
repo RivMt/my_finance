@@ -70,10 +70,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                 switch(T) {
                   case Currency:
                     title = (item as Currency).key.tr();
-                    icon = Text(
-                      item.symbol,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    );
+                    icon = Icon(item.icon);
                     break;
                   case PaymentSymbol:
                     title = (item as PaymentSymbol).key.tr();
@@ -309,7 +306,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                   decoration: InputDecoration(
                       labelText: LocaleKeys.limitation.tr(),
                       prefixIcon: IconButton(
-                        icon: Text(editing.currency.symbol),
+                        icon: Icon(editing.currency.icon),
                         onPressed: () => onCurrencyButtonPressed(),
                       )
                   ),
