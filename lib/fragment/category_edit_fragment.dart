@@ -156,7 +156,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
 
   /// Triggers on cash checkboxes value changed
   void onIncludeValueChanged(bool value) {
-    editing.included = value;
+    editing.isIncluded = value;
     setState(() {});
   }
 
@@ -266,7 +266,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Checkbox(
-                        value: editing.included,
+                        value: editing.isIncluded,
                         onChanged: (value) => onIncludeValueChanged(value ?? false),
                       ),
                       Text(

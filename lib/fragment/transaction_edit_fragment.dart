@@ -227,7 +227,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   void onCategoryChanged(Category category) {
     editing.category = category.pid;
     editing.type = category.type;
-    editing.included = category.included;
+    editing.isIncluded = category.isIncluded;
     if (editing.type == TransactionType.income) {
       onNoPaymentCheckboxChanged(true);
     }
@@ -283,7 +283,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Triggers on cash checkboxes value changed
   void onIncludedValueChanged(bool value) {
-    editing.included = value;
+    editing.isIncluded = value;
     setState(() {});
   }
 
@@ -596,7 +596,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Checkbox(
-                        value: editing.included,
+                        value: editing.isIncluded,
                         onChanged: (value) => onIncludedValueChanged(value ?? false),
                       ),
                       Text(
