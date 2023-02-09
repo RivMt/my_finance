@@ -99,40 +99,27 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Head
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  LocaleKeys.totalBalance.tr(),
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: Currency.values.length,
-                  itemBuilder: (context, index) {
-                    final currency = Currency.values[index];
-                    bool exist = false;
-                    final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
-                      if (account.currency == currency) {
-                        exist = true;
-                        return total + account.balance;
-                      }
-                      return total;
-                    });
-                    if (!exist) {
-                      return const SizedBox();
-                    }
-                    return Text(
-                      currency.format(sum),
-                      style: Theme.of(context).textTheme.displayLarge,
-                    );
-                  },
-                ),
-              ],
-            ),
+          GroupCard(
+            title: LocaleKeys.totalBalance.tr(),
+            count: Currency.values.length,
+            build: (context, index) {
+              final currency = Currency.values[index];
+              bool exist = false;
+              final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
+                if (account.currency == currency) {
+                  exist = true;
+                  return total + account.balance;
+                }
+                return total;
+              });
+              if (!exist) {
+                return const SizedBox();
+              }
+              return CurrencyCard(
+                data: currency,
+                amount: sum,
+              );
+            },
           ),
           // List
           ListView.builder(
