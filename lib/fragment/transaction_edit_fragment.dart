@@ -257,8 +257,8 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       return;
     }
     editing.paymentId = payment.pid;
-    editing.altCurrency = editing.currency == payment.currency ? null : payment.currency;
-    editing.altAmount = editing.currency == payment.currency ? null : Decimal.zero;
+    editing.altCurrency = (editing.currency == payment.currency) ? null : payment.currency;
+    editing.altAmount = (editing.currency == payment.currency) ? null : Decimal.zero;
     editing.calculatedDate = payment.isCredit ? payment.getCalculatedDate(editing.paidDate) : editing.paidDate;
     setState(() {});
   }
@@ -309,21 +309,27 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// Triggers on utility days value changed
   void onUtilityDaysValueChanged(String value) => editing.utilityDays = int.parse(value);
 
+  /// Apply [editing] to UI
+  void apply() {
+    descriptionController.text = editing.descriptions;
+    amountController.text = editing.amount.toString();
+    altAmountController.text = (editing.altAmount ?? Decimal.zero).toString();
+    utilityDaysController.text = editing.utilityDays.toString();
+  }
+
   @override
   void initState() {
     super.initState();
     editing = widget.base ?? Transaction({});
-    descriptionController.text = editing.descriptions;
-    amountController.text = editing.amount.toString();
-    altAmountController.text = editing.altAmount.toString();
-    utilityDaysController.text = editing.utilityDays.toString();
     request();
+    apply();
   }
 
   @override
   void didUpdateWidget(TransactionEditFragment oldWidget) {
     super.didUpdateWidget(oldWidget);
     request();
+    apply();
   }
 
   @override
@@ -342,7 +348,10 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       }
       return Payment.unknown;
     });
-    final bool useAlt = (payment != Payment.none) && (editing.altCurrency != null);
+    final bool useAlt = (payment != Payment.none) &&
+        (account != Account.unknown) &&
+        (editing.altCurrency != null) &&
+        (editing.altCurrency != editing.currency);
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -350,7 +359,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
         children: [
           // Header
           ModalHeader(
-            disabled: progressing,
+            disabled: progressing || !editing.isValid,
             headerTitle: LocaleKeys.object_action.tr(namedArgs: {
               "object": LocaleKeys.transaction.plural(1),
               "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
@@ -385,21 +394,24 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () => onPaidDateButtonPressed(context),
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            DateFormat.yMd().format(editing.paidDate),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(width: 8,),
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              DateFormat.yMd().format(editing.paidDate),
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(width: 8,),
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(width: 8,),
@@ -416,21 +428,24 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
                         onTap: () => onCalculatedDateButtonPressed(context),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat.yMd().format(editing.calculatedDate),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(width: 8,),
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                DateFormat.yMd().format(editing.calculatedDate),
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(width: 8,),
+                              Icon(
+                                Icons.calendar_today_outlined,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ],
+                          ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -520,7 +535,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       LengthLimitingTextInputFormatter(22),
                       FilteringTextInputFormatter(RegExp(r'[\d.]'), allow: true),
                     ],
-                    onChanged: onAmountChanged,
+                    onChanged: onAltAmountChanged,
                   ),
                 ),
                 const SizedBox(height: 8,),

@@ -141,6 +141,14 @@ class _HomePageState extends ConsumerState<HomePage> {
     request();
   }
 
+  /// Triggers on transaction created
+  void onTransactionCreated(Transaction? transaction) {
+    if (transaction != null) {
+      request();
+      setState(() {});
+    }
+  }
+
   /// Get [GridView] cross axis count
   ///
   /// Value is always bigger than `0`
@@ -156,7 +164,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
     init();
   }
-
 
   @override
   void didUpdateWidget(HomePage oldWidget) {
@@ -262,11 +269,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       floatingActionButton: TransactionAddButton(
-        onFinish: (item) {
-          setState(() {
-
-          });
-        },
+        onFinish: onTransactionCreated,
       ),
     );
   }
