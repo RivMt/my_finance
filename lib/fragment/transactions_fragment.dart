@@ -71,7 +71,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   }
 
   Widget groupSeparatorBuilder(DateTime date) => Text(
-    DateFormat.yMd().format(date),
+    DateFormat.yMd().format(date.toLocal()),
     style: Theme.of(context).textTheme.titleSmall,
   );
 
