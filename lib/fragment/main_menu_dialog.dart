@@ -7,8 +7,11 @@ import 'package:my_finance/page/categories_page.dart';
 class MainMenuDialog extends StatefulWidget {
   const MainMenuDialog({
     super.key,
+    this.onAccountButtonPressed,
     this.onRefreshPressed,
   });
+
+  final Function()? onAccountButtonPressed;
 
   final Function()? onRefreshPressed;
 
@@ -18,8 +21,15 @@ class MainMenuDialog extends StatefulWidget {
 
 class _MainMenuDialogState extends State<MainMenuDialog> {
 
-  void openPage(Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  /// Open [page]
+  ///
+  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
+      if (onPageFinished != null) {
+        onPageFinished(value);
+      }
+    });
   }
 
   @override
@@ -38,6 +48,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
                 "last": ApiCore().user.lastName,
               })),
               subtitle: Text(ApiCore().user.email),
+              onTap: widget.onAccountButtonPressed,
             ),
             const Divider(),
             // Refresh

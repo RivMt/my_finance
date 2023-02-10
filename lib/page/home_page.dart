@@ -46,6 +46,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Currently selected [Currency]
   Currency currency = Currency.won;
 
+  /// Open [page]
+  ///
+  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
   void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
       if (onPageFinished != null) {
@@ -125,14 +128,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     showDialog(
       context: context,
       builder: (context) => MainMenuDialog(
-        onRefreshPressed: () => request(),
+        onAccountButtonPressed: init,
+        onRefreshPressed: request,
       ),
     );
-  }
-
-  /// Triggers on account button pressed
-  void onAccountIconPressed() {
-    init();
   }
 
   /// Triggers on payment group card button pressed
@@ -182,8 +181,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () => onAccountIconPressed(),
+            icon: const Icon(Icons.search_outlined),
+            onPressed: () => {},
           ),
         ],
       ),
