@@ -265,13 +265,21 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Triggers on alt amount changed
   void onAltAmountChanged(String value) {
-    editing.altAmount = Decimal.parse(value);
+    if (editing.regex.hasMatch(value)) {
+      editing.altAmount = value == "" ? Decimal.zero :Decimal.parse(value);
+    } else {
+      altAmountController.text = editing.altAmount.toString();
+    }
     setState(() {});
   }
 
   /// Triggers on amount changed
   void onAmountChanged(String value) {
-    editing.amount = Decimal.parse(value);
+    if (editing.regex.hasMatch(value)) {
+      editing.amount = value == "" ? Decimal.zero :Decimal.parse(value);
+    } else {
+      amountController.text = editing.amount.toString();
+    }
     setState(() {});
   }
 
@@ -531,10 +539,6 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                         onPressed: () {},
                       ),
                     ),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(22),
-                      FilteringTextInputFormatter(RegExp(r'[\d.]'), allow: true),
-                    ],
                     onChanged: onAltAmountChanged,
                   ),
                 ),
@@ -549,10 +553,6 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       onPressed: () {},
                     ),
                   ),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(22),
-                    FilteringTextInputFormatter(RegExp(r'[\d.]'), allow: true),
-                  ],
                   onChanged: onAmountChanged,
                 ),
                 const SizedBox(height: 8,),

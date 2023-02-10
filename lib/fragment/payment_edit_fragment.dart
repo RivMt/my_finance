@@ -170,8 +170,12 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   }
 
   /// Triggers on limitation changed
-  void onLimitationChanged(String lim) {
-    editing.limitation = Decimal.parse(lim);
+  void onLimitationChanged(String value) {
+    if (editing.regex.hasMatch(value)) {
+      editing.limitation = value == "" ? Decimal.zero :Decimal.parse(value);
+    } else {
+      limitationController.text = editing.limitation.toString();
+    }
     setState(() {});
   }
 
@@ -200,6 +204,15 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   /// Triggers on cash checkboxes value changed
   void onCreditValueChanged(bool value) {
     editing.isCredit = value;
+    setState(() {});
+  }
+
+  /// Triggers on payment date value changed
+  void onPayDateChanged(int? day) {
+    if (day == null) {
+      return;
+    }
+    editing.payDate = day;
     setState(() {});
   }
 
@@ -251,7 +264,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
         children: [
           // Header
           ModalHeader(
-            disabled: progressing,
+            disabled: progressing || !editing.isValid,
             headerTitle: LocaleKeys.object_action.tr(namedArgs: {
               "object": LocaleKeys.payment.plural(1),
               "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
@@ -310,10 +323,6 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                         onPressed: () => onCurrencyButtonPressed(),
                       )
                   ),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(32),
-                    FilteringTextInputFormatter(RegExp(r'[\d.]'), allow: true),
-                  ],
                   onChanged: onLimitationChanged,
                 ),
                 // Is cash checkbox
@@ -359,7 +368,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                                 label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
                               );
                             }).toList(growable: false),
-                            onSelected: (value) => onPayRangeBeginChanged(editing.payDate, value),
+                            onSelected: onPayDateChanged,
                           ),
                         ],
                       ),
@@ -433,7 +442,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                                     label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
                                   );
                                 }).toList(growable: false),
-                                onSelected: (value) => onPayRangeEndChanged(value, editing.payBegin.day),
+                                onSelected: (value) => onPayRangeEndChanged(value, editing.payEnd.day),
                               ),
                               const SizedBox(width: 8,),
                               // Day
@@ -447,7 +456,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                                     label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
                                   );
                                 }).toList(growable: false),
-                                onSelected: (value) => onPayRangeEndChanged(editing.payBegin.month, value),
+                                onSelected: (value) => onPayRangeEndChanged(editing.payEnd.month, value),
                               ),
                             ],
                           ),

@@ -170,8 +170,12 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   }
 
   /// Triggers on limitation changed
-  void onLimitationChanged(String lim) {
-    editing.limitation = Decimal.parse(lim);
+  void onLimitationChanged(String value) {
+    if (editing.regex.hasMatch(value)) {
+      editing.limitation = value == "" ? Decimal.zero :Decimal.parse(value);
+    } else {
+      limitationController.text = editing.limitation.toString();
+    }
     setState(() {});
   }
 
@@ -233,7 +237,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
         children: [
           // Header
           ModalHeader(
-            disabled: progressing,
+            disabled: progressing || !editing.isValid,
             headerTitle: LocaleKeys.object_action.tr(namedArgs: {
               "object": LocaleKeys.account.plural(1),
               "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
@@ -292,10 +296,6 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                       onPressed: () => onCurrencyButtonPressed(),
                     ),
                   ),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(32),
-                    FilteringTextInputFormatter(RegExp(r'[\d.]'), allow: true),
-                  ],
                   onChanged: onLimitationChanged,
                 ),
                 // Is cash checkbox
