@@ -10,6 +10,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/payments_page.dart';
+import 'package:my_finance/preference_keys.dart';
 
 final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
   return ModelsState<Account>(ref);
@@ -29,10 +30,6 @@ final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, De
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
-});
-
-final _prefSelectedCurrency = StateNotifierProvider<ModelState<Preference>, Preference?>((ref) {
-  return ModelState<Preference>(ref);
 });
 
 class HomePage extends ConsumerStatefulWidget {
@@ -66,6 +63,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Init API
   void init() async {
+    // Login or authenticate
     try {
       await client.init(
         filename: 'assets/key/server.json',
@@ -75,6 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       Log.e(_tag, "Error: $e");
       return;
     }
+    // Request
     request();
   }
 
@@ -126,6 +125,10 @@ class _HomePageState extends ConsumerState<HomePage> {
       FinanceModel.keyDeleted: false,
     }];
     ref.read(_amountBePaid.notifier).request();
+    // Load required preferences
+    currency = Currency.fromValue((await ApiClient().getPreference(PreferenceKeys.defaultCurrency, "I0")).value);
+    // Refresh
+    setState(() {});
   }
 
   /// Triggers on menu button pressed
