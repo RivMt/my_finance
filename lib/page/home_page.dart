@@ -10,8 +10,8 @@ import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/payments_page.dart';
 
-final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
-  return FinanceModelState<Account>(ref);
+final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
+  return ModelsState<Account>(ref);
 });
 
 final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
@@ -28,6 +28,10 @@ final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, De
     type: CalculationType.sum,
     attribute: Transaction.keyAmount,
   );
+});
+
+final _prefSelectedCurrency = StateNotifierProvider<ModelState<Preference>, Preference?>((ref) {
+  return ModelState<Preference>(ref);
 });
 
 class HomePage extends ConsumerStatefulWidget {

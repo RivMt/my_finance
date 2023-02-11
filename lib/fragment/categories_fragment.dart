@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 
-final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Category>>((ref) {
-  return FinanceModelState<Category>(ref);
+final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
+  return ModelsState<Category>(ref);
 });
 
 class CategoriesFragment extends ConsumerStatefulWidget {

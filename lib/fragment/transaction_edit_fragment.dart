@@ -6,16 +6,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
-  return FinanceModelState<Account>(ref);
+final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
+  return ModelsState<Account>(ref);
 });
 
-final _payments = StateNotifierProvider<FinanceModelState<Payment>, List<Payment>>((ref) {
-  return FinanceModelState<Payment>(ref);
+final _payments = StateNotifierProvider<ModelsState<Payment>, List<Payment>>((ref) {
+  return ModelsState<Payment>(ref);
 });
 
-final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Category>>((ref) {
-  return FinanceModelState<Category>(ref);
+final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
+  return ModelsState<Category>(ref);
 });
 
 class TransactionEditFragment extends ConsumerStatefulWidget {

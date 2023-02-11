@@ -6,8 +6,8 @@ import 'package:my_finance/fragment/account_details_fragment.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-final _accounts = StateNotifierProvider<FinanceModelState<Account>, List<Account>>((ref) {
-  return FinanceModelState<Account>(ref);
+final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
+  return ModelsState<Account>(ref);
 });
 
 class AccountDetailsPage extends ConsumerStatefulWidget {

@@ -6,8 +6,8 @@ import 'package:my_api/my_api.dart';
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-final _payments = StateNotifierProvider<FinanceModelState<Payment>, List<Payment>>((ref) {
-  return FinanceModelState<Payment>(ref);
+final _payments = StateNotifierProvider<ModelsState<Payment>, List<Payment>>((ref) {
+  return ModelsState<Payment>(ref);
 });
 
 final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {

@@ -5,12 +5,12 @@ import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/my_api.dart';
 
-final _transactions = StateNotifierProvider<FinanceModelState<Transaction>, List<Transaction>>((ref) {
-  return FinanceModelState<Transaction>(ref);
+final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
+  return ModelsState<Transaction>(ref);
 });
 
-final _categories = StateNotifierProvider<FinanceModelState<Category>, List<Category>>((ref) {
-  return FinanceModelState<Category>(ref);
+final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
+  return ModelsState<Category>(ref);
 });
 
 class TransactionsFragment extends ConsumerStatefulWidget {
