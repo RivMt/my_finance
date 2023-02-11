@@ -3,7 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/core.dart';
+import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {

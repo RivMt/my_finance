@@ -1,7 +1,8 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/core.dart';
+import 'package:my_api/finance.dart';
 
 final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   return CalculateValueState<Transaction>(

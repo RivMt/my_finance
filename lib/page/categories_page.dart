@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/core.dart';
+import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/categories_fragment.dart';
 import 'package:my_finance/fragment/category_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';

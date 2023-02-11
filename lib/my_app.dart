@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/core.dart';
 import 'package:my_finance/page/home_page.dart';
 
 class MyApp extends ConsumerWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/finance.dart';
 
 class AccountDetailsFragment extends ConsumerWidget {
   const AccountDetailsFragment({

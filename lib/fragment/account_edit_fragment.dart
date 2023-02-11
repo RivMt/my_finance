@@ -3,7 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:my_api/my_api.dart';
+import 'package:my_api/core.dart';
+import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountEditFragment extends StatefulWidget {
