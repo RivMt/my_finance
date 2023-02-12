@@ -23,6 +23,11 @@
     "many": "Categories",
     "other": "Categories"
   },
+  "budget": {
+    "zero": "Budget",
+    "one": "Budget",
+    "other": "Budgets"
+  },
 
   "add": "Add",
   "edit": "Edit",
