@@ -82,6 +82,9 @@
   },
   "date": "Date",
 
+  "preferenceGeneral": "General",
+  "preferenceDefaultCurrency": "Default currency",
+
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",
 
