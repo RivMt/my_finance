@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
+import 'package:my_finance/page/preference_page.dart';
 
 class MainMenuDialog extends StatefulWidget {
   const MainMenuDialog({
@@ -41,13 +42,8 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // User
-            ListTile(
-              leading: const Icon(Icons.account_circle_outlined),
-              title: Text(LocaleKeys.full_name.tr(namedArgs: {
-                "first": ApiCore().user.firstName,
-                "last": ApiCore().user.lastName,
-              })),
-              subtitle: Text(ApiCore().user.email),
+            UserCard(
+              user: ApiCore().user,
               onTap: widget.onAccountButtonPressed,
             ),
             const Divider(),
@@ -70,6 +66,14 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(LocaleKeys.settings.tr()),
+              onTap: () => openPage(
+                const PreferencePage(),
+                (item) {
+                  if (widget.onRefreshPressed != null) {
+                    widget.onRefreshPressed!();
+                  }
+                },
+              ),
             ),
           ],
         ),
