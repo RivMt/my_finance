@@ -46,15 +46,15 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    late Account? account;
+    late Account account;
     if (ref.watch(_accounts).isNotEmpty) {
       account = ref.watch(_accounts)[0];
     } else {
-      account = null;
+      account = Account.unknown;
     }
     return Scaffold(
       body: IndexedStack(
-        index: account == null ? 0 : 1,
+        index: account == Account.unknown ? 0 : 1,
         children: [
           // 0: No account
           MessageBox(
@@ -67,7 +67,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
           CustomScrollView(
             slivers: [
               SliverAppBar(
-                title: Text(account!.descriptions),
+                title: Text(account.descriptions),
                 floating: true,
               ),
               SliverPadding(
