@@ -46,7 +46,20 @@ class _HomePageState extends ConsumerState<HomePage> {
   final client = ApiClient();
 
   /// Currently selected [Currency]
-  Currency currency = Currency.won;
+  ///
+  /// **DO NOT** access directly in [build]. Use [currency] alternatively.
+  Currency? _currency;
+
+  /// Currently selected [Currency]
+  Currency get currency {
+    if (_currency != null) {
+      return _currency!;
+    }
+    final prefs = ref.watch(preferenceProvider);
+    return Currency.fromValue(prefs[PreferenceKeys.defaultCurrency]?.value);
+  }
+
+  set currency(Currency c) => _currency = c;
 
   /// Open [page]
   ///
@@ -75,6 +88,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
     // Request
     request();
+    // Init preference
+    ref.read(preferenceProvider.notifier)
+      ..setDefaults({
+        PreferenceKeys.defaultCurrency: Currency.unknown.value,
+      })
+      ..request();
   }
 
   /// Request data
@@ -125,8 +144,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       FinanceModel.keyDeleted: false,
     }];
     ref.read(_amountBePaid.notifier).request();
-    // Load required preferences
-    currency = Currency.fromValue((await ApiClient().getPreference(PreferenceKeys.defaultCurrency, "I0")).value);
+    // Preference
+    ref.read(preferenceProvider.notifier).request();
     // Refresh
     setState(() {});
   }
