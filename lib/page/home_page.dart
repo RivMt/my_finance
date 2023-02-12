@@ -76,6 +76,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Init API
   void init() async {
+    // Init preference
+    ref.read(preferenceProvider.notifier).setDefaults({
+      PreferenceKeys.defaultCurrency: Currency.unknown.value,
+    });
     // Login or authenticate
     try {
       await client.init(
@@ -88,12 +92,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
     // Request
     request();
-    // Init preference
-    ref.read(preferenceProvider.notifier)
-      ..setDefaults({
-        PreferenceKeys.defaultCurrency: Currency.unknown.value,
-      })
-      ..request();
   }
 
   /// Request data
@@ -110,17 +108,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         sortOrderAttribute: Account.keyPriority,
       ),
     );
-    // Payment
-    ref.read(_accounts.notifier).request(
-      [{
-        FinanceModel.keyDeleted: false,
-      }],
-      ApiClient().buildOptions(
-        limit: 3,
-        sortOrderType: SortOrderType.asc,
-        sortOrderAttribute: Payment.keyPriority,
-      ),
-    );
+    // Preference
+    await ref.read(preferenceProvider.notifier).request();
     // Current month expense
     ref.read(_currentMonthExpenses.notifier).conditions = [{
       Transaction.keyType: TransactionType.expense.code,
@@ -144,9 +133,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       FinanceModel.keyDeleted: false,
     }];
     ref.read(_amountBePaid.notifier).request();
-    // Preference
-    ref.read(preferenceProvider.notifier).request();
-    // Refresh
     setState(() {});
   }
 
@@ -171,7 +157,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   void onTransactionCreated(Transaction? transaction) {
     if (transaction != null) {
       request();
-      setState(() {});
     }
   }
 

@@ -15,29 +15,31 @@ class PreferencePage extends ConsumerStatefulWidget {
 
 class _PreferencePageState extends ConsumerState<PreferencePage> {
 
+  /// Value updating preferences are progressing or not
+  bool progressing = false;
+
   /// Request preferences from server
   void request() {
     ref.read(preferenceProvider.notifier).request();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    ref.read(preferenceProvider.notifier).setDefaults({
-      PreferenceKeys.defaultCurrency: Currency.unknown,
-    });
-    request();
-  }
-
-  @override
-  void didUpdateWidget(PreferencePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
+  /// Set [value] as [key] to [preferenceProvider]
+  Future apply(String key, dynamic value) async {
+    progressing = true;
+    setState(() {});
+    await ref.read(preferenceProvider.notifier).set(Preference.fromKV(
+      {},
+      key: key,
+      value: value,
+    ));
+    progressing = false;
+    setState(() {});
+    return;
   }
 
   /// Triggers on default currency preference pressed
   void onDefaultCurrencyPressed(BuildContext context) async {
-    final Currency currency = await showDialog(
+    final Currency? currency = await showDialog(
       context: context,
       builder: (context) {
         final currencies = Currency.validValues;
@@ -62,12 +64,25 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
         );
       }
     );
-    ref.read(preferenceProvider.notifier).set(Preference.fromKV(
-      {},
-      key: PreferenceKeys.defaultCurrency,
-      value: currency.value,
-    ));
-    setState(() {});
+    if (currency == null) {
+      return;
+    }
+    await apply(PreferenceKeys.defaultCurrency, currency.value);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(preferenceProvider.notifier).setDefaults({
+      PreferenceKeys.defaultCurrency: Currency.unknown,
+    });
+    request();
+  }
+
+  @override
+  void didUpdateWidget(PreferencePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    request();
   }
 
   @override
@@ -77,6 +92,13 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.settings.tr()),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(6),
+          child: Visibility(
+            visible: progressing,
+            child: const LinearProgressIndicator(),
+          ),
+        ),
       ),
       body: Align(
         alignment: Alignment.topCenter,
