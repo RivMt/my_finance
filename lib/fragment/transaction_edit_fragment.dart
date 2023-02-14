@@ -302,7 +302,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       context: context,
       initialDateRange: DateTimeRange(
         start: editing.paidDate,
-        end: editing.paidDate.add(Duration(days: editing.utilityDays-1)),
+        end: editing.utilityEnd,
       ),
       firstDate: editing.paidDate,
       lastDate: Model.maxDate,
