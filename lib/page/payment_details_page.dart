@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/payment_details_fragment.dart';
+import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
@@ -30,6 +31,13 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     ref.read(_payments.notifier).request([{
       FinanceModel.keyPid: widget.pid,
     }]);
+  }
+
+  /// Triggers on transaction created
+  void onTransactionCreated(Transaction? transaction) {
+    if (transaction != null) {
+      request();
+    }
   }
 
   @override
@@ -91,6 +99,9 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
             ],
           )
         ],
+      ),
+      floatingActionButton: TransactionAddButton(
+        onFinish: onTransactionCreated,
       ),
     );
   }

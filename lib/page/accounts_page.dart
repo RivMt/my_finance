@@ -4,6 +4,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/account_details_fragment.dart';
 import 'package:my_finance/fragment/accounts_fragment.dart';
+import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
@@ -38,6 +39,13 @@ class _AccountsPageState extends State<AccountsPage> {
       setState(() {});
     } else {
       openPage(AccountDetailsPage(pid: account.pid));
+    }
+  }
+
+  /// Triggers on transaction created
+  void onTransactionCreated(Transaction? transaction) {
+    if (transaction != null) {
+      setState(() {});
     }
   }
 
@@ -109,6 +117,12 @@ class _AccountsPageState extends State<AccountsPage> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Visibility(
+        visible: InterfaceConstructor.isSidePanelVisible(context),
+        child: TransactionAddButton(
+          onFinish: onTransactionCreated,
+        ),
       ),
     );
   }
