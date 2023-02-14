@@ -5,6 +5,7 @@ import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/fragment/transaction_edit_fragment.dart';
 
 final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
   return ModelsState<Transaction>(ref);
@@ -21,11 +22,14 @@ class TransactionsFragment extends ConsumerStatefulWidget {
     this.options = const {},
     this.shrinkWrap = false,
     this.useSliver = false,
+    this.onEditFinish,
   });
 
   final List<Map<String, dynamic>>? conditions;
 
   final Map<String, dynamic> options;
+
+  final Function(Transaction)? onEditFinish;
 
   final bool shrinkWrap;
 
@@ -54,6 +58,35 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     ref.read(_categories.notifier).request([{}]);
   }
 
+  /// Show transaction editing modal
+  void showTransactionEditingModal(BuildContext context, [Transaction? transaction]) async {
+    Transaction? editing = transaction;
+    showModalBottomSheet<Transaction>(
+      context: context,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+      ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            TransactionEditFragment(
+              base: editing,
+              onFinish: (account) {
+                Navigator.pop(context, account);
+              },
+            ),
+          ],
+        );
+      },
+    ).then((transaction) {
+      request();
+      if (widget.onEditFinish != null && transaction != null) {
+        widget.onEditFinish!(transaction);
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -78,12 +111,15 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate);
 
-  Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) => TransactionCard(
-    data: data,
-    category: categories.firstWhere((element) {
-      return element.type == data.type && element.pid == data.category;
-    }, orElse: () => Category.unknown),
-  );
+  Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) {
+    return TransactionCard(
+      data: data,
+      category: categories.firstWhere((element) {
+        return element.type == data.type && element.pid == data.category;
+      }, orElse: () => Category.unknown),
+      onLongPress: () => showTransactionEditingModal(context, data),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -316,7 +316,12 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   }
 
   /// Triggers on utility days value changed
-  void onUtilityDaysValueChanged(String value) => editing.utilityDays = int.parse(value);
+  void onUtilityDaysValueChanged(String value) {
+    if (value.isEmpty) {
+      editing.utilityDays = 1;
+    }
+    editing.utilityDays = int.parse(value);
+  }
 
   /// Apply [editing] to UI
   void apply() {
