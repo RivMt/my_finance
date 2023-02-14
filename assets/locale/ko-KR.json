@@ -64,6 +64,7 @@
   "transactionDate": "거래 날짜",
   "paidDate": "결제 날짜",
   "utilityDays": "효용 일수",
+  "budgetLeft": "남은 예산",
 
   "month": "월",
   "nMonthBefore": {

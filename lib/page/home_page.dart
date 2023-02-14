@@ -32,6 +32,17 @@ final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, De
   );
 });
 
+final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  return CalculateValueState<Transaction>(ref,
+    conditions: [],
+    type: CalculationType.sum,
+    attribute: Transaction.keyAmount,
+    queries: {
+      "mode": "budget",
+    }
+  );
+});
+
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -79,6 +90,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Init preference
     ref.read(preferenceProvider.notifier).setDefaults({
       PreferenceKeys.defaultCurrency: Currency.unknown.value,
+      PreferenceKeys.budgets: {},
     });
     // Login or authenticate
     try {
@@ -133,6 +145,20 @@ class _HomePageState extends ConsumerState<HomePage> {
       FinanceModel.keyDeleted: false,
     }];
     ref.read(_amountBePaid.notifier).request();
+    // Budget expense
+    ref.read(_budgetExpensed.notifier).conditions = [{
+      Transaction.keyType: TransactionType.expense.code,
+      Transaction.keyCurrency: currency.value,
+      Transaction.keyIncluded: true,
+      FinanceModel.keyDeleted: false,
+      Transaction.keyPaidDate: {
+        "max": DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
+      },
+      Transaction.keyUtilityEnd: {
+        "min": DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
+      }
+    }];
+    ref.read(_budgetExpensed.notifier).request();
     setState(() {});
   }
 
@@ -272,8 +298,25 @@ class _HomePageState extends ConsumerState<HomePage> {
                       condition: ref.watch(_amountBePaid.notifier).conditions,
                     )),
                   );
-                default:
-                  return const SizedBox();
+                case 2:
+                  name = LocaleKeys.budgetLeft.tr();
+                  final budgetExpensed = ref.watch(_budgetExpensed);
+                  Decimal budget = Decimal.zero;
+                  final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
+                  if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
+                    budget = pref.value[currency.value];
+                  }
+                  return WalletItemCard(
+                    title: currency.format(budget - budgetExpensed),
+                    subtitle: name,
+                    foreground: Colors.white,
+                    background: Theme.of(context).primaryColor,
+                    icon: Icons.bar_chart_outlined,
+                    onTap: () => openPage(PaymentsPage(
+                      title: name,
+                      condition: ref.watch(_amountBePaid.notifier).conditions,
+                    )),
+                  );
               }
             },
           ),

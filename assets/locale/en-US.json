@@ -68,6 +68,7 @@
   "transactionDate": "Transaction date",
   "paidDate": "Paid date",
   "utilityDays": "Utility days",
+  "budgetLeft": "남은 예산",
 
   "month": "Month",
   "nMonthBefore": {
