@@ -271,53 +271,54 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
             build: (BuildContext context, int index) {
               late String name;
+              late IconData icon;
+              late Decimal amount;
+              late Function() onTap;
               switch(index) {
                 case 0:
                   name = LocaleKeys.currentMonthExpense.tr();
-                  return WalletItemCard(
-                    title: currency.format(ref.watch(_currentMonthExpenses)),
-                    subtitle: name,
-                    foreground: Colors.white,
-                    background: Theme.of(context).primaryColor,
-                    icon: Icons.payments_outlined,
-                    onTap: () => openPage(PaymentsPage(
-                      title: name,
-                      condition: ref.watch(_currentMonthExpenses.notifier).conditions,
-                    )),
-                  );
+                  icon = Icons.payments_outlined;
+                  amount = ref.watch(_currentMonthExpenses);
+                  onTap = () => openPage(PaymentsPage(
+                    title: name,
+                    condition: ref.watch(_currentMonthExpenses.notifier).conditions,
+                  ));
+                  break;
                 case 1:
                   name = LocaleKeys.amountBePaid.tr();
-                  return WalletItemCard(
-                    title: currency.format(ref.watch(_amountBePaid)),
-                    subtitle: name,
-                    foreground: Colors.white,
-                    background: Theme.of(context).primaryColor,
-                    icon: Icons.calendar_today_outlined,
-                    onTap: () => openPage(PaymentsPage(
-                      title: name,
-                      condition: ref.watch(_amountBePaid.notifier).conditions,
-                    )),
-                  );
+                  icon = Icons.calendar_today_outlined;
+                  amount = ref.watch(_amountBePaid);
+                  onTap = () => openPage(PaymentsPage(
+                    title: name,
+                    condition: ref.watch(_amountBePaid.notifier).conditions,
+                  ));
+                  break;
                 case 2:
                   name = LocaleKeys.budgetLeft.tr();
+                  icon = Icons.bar_chart_outlined;
+                  onTap = () => openPage(const PaymentsPage());
                   final budgetExpensed = ref.watch(_budgetExpensed);
-                  Decimal budget = Decimal.zero;
                   final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
                   if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
-                    budget = pref.value[currency.value];
+                    amount = pref.value[currency.value] - budgetExpensed;
+                  } else {
+                    amount  = Decimal.zero;
                   }
-                  return WalletItemCard(
-                    title: currency.format(budget - budgetExpensed),
-                    subtitle: name,
-                    foreground: Colors.white,
-                    background: Theme.of(context).primaryColor,
-                    icon: Icons.bar_chart_outlined,
-                    onTap: () => openPage(PaymentsPage(
-                      title: name,
-                      condition: ref.watch(_amountBePaid.notifier).conditions,
-                    )),
-                  );
+                  break;
+                default:
+                  name = "???";
+                  icon = Icons.question_mark_outlined;
+                  onTap = () {};
+                  amount = Decimal.zero;
               }
+              return WalletItemCard(
+                title: currency.format(amount),
+                subtitle: name,
+                foreground: Colors.white,
+                background: Theme.of(context).primaryColor,
+                icon: icon,
+                onTap: onTap,
+              );
             },
           ),
         ],
