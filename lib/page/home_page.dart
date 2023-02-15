@@ -280,7 +280,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   icon = Icons.payments_outlined;
                   amount = ref.watch(_currentMonthExpenses);
                   onTap = () => openPage(PaymentsPage(
-                    title: name,
+                    subtitle: name,
+                    currency: currency,
                     condition: ref.watch(_currentMonthExpenses.notifier).conditions,
                   ));
                   break;
@@ -289,20 +290,23 @@ class _HomePageState extends ConsumerState<HomePage> {
                   icon = Icons.calendar_today_outlined;
                   amount = ref.watch(_amountBePaid);
                   onTap = () => openPage(PaymentsPage(
-                    title: name,
+                    subtitle: name,
+                    currency: currency,
                     condition: ref.watch(_amountBePaid.notifier).conditions,
                   ));
                   break;
                 case 2:
                   name = LocaleKeys.budgetLeft.tr();
                   icon = Icons.bar_chart_outlined;
-                  onTap = () => openPage(const PaymentsPage());
+                  onTap = () => openPage(PaymentsPage(
+                    currency: currency,
+                  ));
                   final budgetExpensed = ref.watch(_budgetExpensed);
                   final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
                   if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
                     amount = pref.value[currency.value] - budgetExpensed;
                   } else {
-                    amount  = Decimal.zero;
+                    amount = Decimal.zero;
                   }
                   break;
                 default:

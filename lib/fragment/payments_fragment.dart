@@ -22,13 +22,19 @@ final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>
 class PaymentsFragment extends ConsumerStatefulWidget {
   const PaymentsFragment({
     super.key,
+    this.subtitle = "",
     this.selected,
+    this.currency = Currency.unknown,
     this.onItemTap,
     this.onEditFinish,
     this.conditions,
   });
 
   final Payment? selected;
+
+  final Currency currency;
+
+  final String subtitle;
 
   final Function(Payment)? onItemTap;
 
@@ -43,7 +49,19 @@ class PaymentsFragment extends ConsumerStatefulWidget {
 class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
 
   /// Currently selected [Currency]
-  Currency currency = Currency.won;
+  ///
+  /// **DO NOT** use this directly. Use [currency] than.
+  /// This save user selected currency. By the default, it is `null` and
+  /// user selects a currency, the value will be saved here.
+  Currency? _currency;
+
+  /// Currently selected [Currency]
+  ///
+  /// If [_currency] is `null`, return [widget.currency].
+  /// This i
+  Currency get currency => _currency ?? widget.currency;
+
+  set currency(Currency value) => _currency = value;
 
   /// Request all payments ordered by icon
   void request() {
@@ -51,6 +69,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     ref.read(_payments.notifier).request(
       [{
         FinanceModel.keyDeleted: false,
+        Payment.keyCurrency: currency.value,
       }],
       ApiClient().buildOptions(
         sortOrderType: SortOrderType.asc,
@@ -59,7 +78,11 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     );
     // Amount
     if (widget.conditions != null) {
-      ref.read(_amount.notifier).conditions = widget.conditions!;
+      final conditions = widget.conditions!;
+      for(Map map in conditions) {
+        map[Payment.keyCurrency] = currency.value;
+      }
+      ref.read(_amount.notifier).conditions = conditions;
       ref.read(_amount.notifier).request();
     }
   }
@@ -132,11 +155,24 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
               padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    currency.format(amount),
-                    style: Theme.of(context).textTheme.displayLarge,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Visibility(
+                        visible: widget.subtitle.isNotEmpty,
+                        child: Text(
+                          widget.subtitle,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ),
+                      Text(
+                        currency.format(amount),
+                        style: Theme.of(context).textTheme.displayLarge,
+                      ),
+                    ],
                   ),
                   PopupMenuButton(
                     icon: Icon(

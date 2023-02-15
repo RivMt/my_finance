@@ -13,12 +13,15 @@ class PaymentsPage extends StatefulWidget {
   const PaymentsPage({
     super.key,
     this.condition,
-    this.title,
+    this.subtitle = "",
+    this.currency = Currency.unknown,
   });
+
+  final String subtitle;
 
   final List<Map<String, dynamic>>? condition;
 
-  final String? title;
+  final Currency currency;
 
   @override
   _PaymentsPageState createState() => _PaymentsPageState();
@@ -87,7 +90,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
     final payment = selected ?? Payment.unknown;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title ?? LocaleKeys.payment.plural(2)),
+        title: Text(LocaleKeys.payment.plural(2)),
       ),
       body: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,8 +104,10 @@ class _PaymentsPageState extends State<PaymentsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 PaymentsFragment(
+                  subtitle: widget.subtitle,
                   selected: selected,
                   conditions: widget.condition,
+                  currency: widget.currency,
                   onItemTap: onPaymentSelected,
                   onEditFinish: (item) => setState(() {
                     selected = item;
