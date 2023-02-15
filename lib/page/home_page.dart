@@ -259,12 +259,9 @@ class _HomePageState extends ConsumerState<HomePage> {
               itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
                 return PopupMenuItem(
                   value: currency,
-                  child: ListTile(
-                    leading: Text(
-                      currency.symbol,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    title: Text(currency.key.tr()),
+                  child: CurrencyCard(
+                    data: currency,
+                    useIconBackground: false,
                   ),
                 );
               }).toList(growable: false),
