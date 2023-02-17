@@ -53,7 +53,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   }
 
   /// Show [T] item selection dialog
-  Future<T> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -187,8 +187,10 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
       LocaleKeys.icon.tr(),
       PaymentSymbol.values,
     );
-    editing.icon = icon;
-    setState(() {});
+    if (icon != null) {
+      editing.icon = icon;
+      setState(() {});
+    }
   }
 
   /// Triggers on [Currency] button pressed
@@ -198,8 +200,10 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
       LocaleKeys.icon.tr(),
       Currency.values,
     );
-    editing.currency = currency;
-    setState(() {});
+    if (currency != null) {
+      editing.currency = currency;
+      setState(() {});
+    }
   }
 
   /// Triggers on cash checkboxes value changed
@@ -259,259 +263,264 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          ModalHeader(
-            disabled: progressing || !editing.isValid,
-            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.payment.plural(1),
-              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-            }),
-            positiveButtonTitle: LocaleKeys.confirm.tr(),
-            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-            onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
-            onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
-          ),
-          // Body
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Basic information
-                Text(
-                  LocaleKeys.basicInfo.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 8,),
-                // Description
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.name.tr(),
-                      prefixIcon: IconButton(
-                        icon: Icon(editing.icon.icon),
-                        onPressed: () => onPaymentIconButtonPressed(),
-                      )
-                  ),
-                  onChanged: onDescriptionChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Serial Number
-                TextField(
-                  controller: serialNumberController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.serialNumber.tr(),
-                      prefixIcon: const Icon(Icons.numbers_outlined)
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter(RegExp(r'[\d\s.:;_,/*#()]'), allow: true),
-                  ],
-                  onChanged: onSerialNumberChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Limitation
-                TextField(
-                  controller: limitationController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.limitation.tr(),
-                      prefixIcon: IconButton(
-                        icon: Icon(editing.currency.icon),
-                        onPressed: () => onCurrencyButtonPressed(),
-                      )
-                  ),
-                  onChanged: onLimitationChanged,
-                ),
-                // Is cash checkbox
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: editing.isCredit,
-                        onChanged: (value) => onCreditValueChanged(value ?? false),
-                      ),
-                      Text(
-                        LocaleKeys.credit.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                // Payment
-                Visibility(
-                  visible: editing.isCredit,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Date
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            LocaleKeys.payDate.tr(),
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          DropdownMenu<int>(
-                            initialSelection: editing.payDate,
-                            label: Text(LocaleKeys.day.tr()),
-                            dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
-                              final int value = index + 1;
-                              return DropdownMenuEntry<int>(
-                                value: value,
-                                label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
-                              );
-                            }).toList(growable: false),
-                            onSelected: onPayDateChanged,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8,),
-                      Text(
-                        LocaleKeys.payRange.tr(),
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                      // From
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            LocaleKeys.payRangeBegin.tr(),
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              // Month
-                              DropdownMenu<int>(
-                                initialSelection: editing.payBegin.month,
-                                label: Text(LocaleKeys.month.tr()),
-                                dropdownMenuEntries: List.generate(4, (index) {
-                                  return DropdownMenuEntry<int>(
-                                    value: index,
-                                    label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
-                                  );
-                                }).toList(growable: false),
-                                onSelected: (value) => onPayRangeBeginChanged(value, editing.payBegin.day),
-                              ),
-                              const SizedBox(width: 8,),
-                              // Day
-                              DropdownMenu<int>(
-                                initialSelection: editing.payBegin.day,
-                                label: Text(LocaleKeys.day.tr()),
-                                dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
-                                  final int value = index + 1;
-                                  return DropdownMenuEntry<int>(
-                                    value: value,
-                                    label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
-                                  );
-                                }).toList(growable: false),
-                                onSelected: (value) => onPayRangeBeginChanged(editing.payBegin.month, value),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8,),
-                      // To
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            LocaleKeys.payRangeEnd.tr(),
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              // Month
-                              DropdownMenu<int>(
-                                initialSelection: editing.payEnd.month,
-                                label: Text(LocaleKeys.month.tr()),
-                                dropdownMenuEntries: List.generate(4, (index) {
-                                  return DropdownMenuEntry<int>(
-                                    value: index,
-                                    label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
-                                  );
-                                }).toList(growable: false),
-                                onSelected: (value) => onPayRangeEndChanged(value, editing.payEnd.day),
-                              ),
-                              const SizedBox(width: 8,),
-                              // Day
-                              DropdownMenu<int>(
-                                initialSelection: editing.payEnd.day,
-                                label: Text(LocaleKeys.day.tr()),
-                                dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
-                                  final int value = index + 1;
-                                  return DropdownMenuEntry<int>(
-                                    value: value,
-                                    label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
-                                  );
-                                }).toList(growable: false),
-                                onSelected: (value) => onPayRangeEndChanged(editing.payEnd.month, value),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Color
-                Text(
-                  LocaleKeys.color.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                // Foreground
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.foreground.tr(),
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.circle),
-                      color: editing.foreground,
-                      onPressed: () => onForegroundPressed(context),
-                    ),
-                  ],
-                ),
-                // Background
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.background.tr(),
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.circle),
-                      color: editing.background,
-                      onPressed: () => onBackgroundPressed(context),
-                    ),
-                  ],
-                ),
-              ],
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            ModalHeader(
+              disabled: progressing || !editing.isValid,
+              headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.payment.plural(1),
+                "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+              }),
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+              onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
+              onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
             ),
-          ),
-          // Progress
-          Visibility(
-            visible: progressing,
-            child: const LinearProgressIndicator(value: null,),
-          ),
-        ],
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Basic information
+                  Text(
+                    LocaleKeys.basicInfo.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Description
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.name.tr(),
+                        prefixIcon: IconButton(
+                          icon: Icon(editing.icon.icon),
+                          onPressed: () => onPaymentIconButtonPressed(),
+                        )
+                    ),
+                    onChanged: onDescriptionChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Serial Number
+                  TextField(
+                    controller: serialNumberController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.serialNumber.tr(),
+                        prefixIcon: const Icon(Icons.numbers_outlined)
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp(r'[\d\s.:;_,/*#()]'), allow: true),
+                    ],
+                    onChanged: onSerialNumberChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Limitation
+                  TextField(
+                    controller: limitationController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.limitation.tr(),
+                        prefixIcon: IconButton(
+                          icon: Icon(editing.currency.icon),
+                          onPressed: () => onCurrencyButtonPressed(),
+                        )
+                    ),
+                    onChanged: onLimitationChanged,
+                  ),
+                  // Is cash checkbox
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: editing.isCredit,
+                          onChanged: (value) => onCreditValueChanged(value ?? false),
+                        ),
+                        Text(
+                          LocaleKeys.credit.tr(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Payment
+                  Visibility(
+                    visible: editing.isCredit,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Date
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              LocaleKeys.payDate.tr(),
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                            DropdownMenu<int>(
+                              initialSelection: editing.payDate,
+                              label: Text(LocaleKeys.day.tr()),
+                              dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                                final int value = index + 1;
+                                return DropdownMenuEntry<int>(
+                                  value: value,
+                                  label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                                );
+                              }).toList(growable: false),
+                              onSelected: onPayDateChanged,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8,),
+                        Text(
+                          LocaleKeys.payRange.tr(),
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        // From
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              LocaleKeys.payRangeBegin.tr(),
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                // Month
+                                DropdownMenu<int>(
+                                  initialSelection: editing.payBegin.month,
+                                  label: Text(LocaleKeys.month.tr()),
+                                  dropdownMenuEntries: List.generate(4, (index) {
+                                    return DropdownMenuEntry<int>(
+                                      value: index,
+                                      label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
+                                    );
+                                  }).toList(growable: false),
+                                  onSelected: (value) => onPayRangeBeginChanged(value, editing.payBegin.day),
+                                ),
+                                const SizedBox(width: 8,),
+                                // Day
+                                DropdownMenu<int>(
+                                  initialSelection: editing.payBegin.day,
+                                  label: Text(LocaleKeys.day.tr()),
+                                  dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                                    final int value = index + 1;
+                                    return DropdownMenuEntry<int>(
+                                      value: value,
+                                      label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                                    );
+                                  }).toList(growable: false),
+                                  onSelected: (value) => onPayRangeBeginChanged(editing.payBegin.month, value),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8,),
+                        // To
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              LocaleKeys.payRangeEnd.tr(),
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                // Month
+                                DropdownMenu<int>(
+                                  initialSelection: editing.payEnd.month,
+                                  label: Text(LocaleKeys.month.tr()),
+                                  dropdownMenuEntries: List.generate(4, (index) {
+                                    return DropdownMenuEntry<int>(
+                                      value: index,
+                                      label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
+                                    );
+                                  }).toList(growable: false),
+                                  onSelected: (value) => onPayRangeEndChanged(value, editing.payEnd.day),
+                                ),
+                                const SizedBox(width: 8,),
+                                // Day
+                                DropdownMenu<int>(
+                                  initialSelection: editing.payEnd.day,
+                                  label: Text(LocaleKeys.day.tr()),
+                                  dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                                    final int value = index + 1;
+                                    return DropdownMenuEntry<int>(
+                                      value: value,
+                                      label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                                    );
+                                  }).toList(growable: false),
+                                  onSelected: (value) => onPayRangeEndChanged(editing.payEnd.month, value),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Color
+                  Text(
+                    LocaleKeys.color.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  // Foreground
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.foreground.tr(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.circle),
+                        color: editing.foreground,
+                        onPressed: () => onForegroundPressed(context),
+                      ),
+                    ],
+                  ),
+                  // Background
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.background.tr(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.circle),
+                        color: editing.background,
+                        onPressed: () => onBackgroundPressed(context),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Progress
+            Visibility(
+              visible: progressing,
+              child: const LinearProgressIndicator(value: null,),
+            ),
+          ],
+        ),
       ),
     );
   }

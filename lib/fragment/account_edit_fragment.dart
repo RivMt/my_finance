@@ -53,7 +53,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   }
 
   /// Show [T] item selection dialog
-  Future<T> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -187,8 +187,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
       LocaleKeys.icon.tr(),
       AccountSymbol.values,
     );
-    editing.icon = icon;
-    setState(() {});
+    if (icon != null) {
+      editing.icon = icon;
+      setState(() {});
+    }
   }
 
   /// Triggers on [Currency] button pressed
@@ -198,8 +200,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
       LocaleKeys.icon.tr(),
       Currency.values,
     );
-    editing.currency = currency;
-    setState(() {});
+    if (currency != null) {
+      editing.currency = currency;
+      setState(() {});
+    }
   }
 
   /// Triggers on cash checkboxes value changed
@@ -232,136 +236,141 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          ModalHeader(
-            disabled: progressing || !editing.isValid,
-            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.account.plural(1),
-              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-            }),
-            positiveButtonTitle: LocaleKeys.confirm.tr(),
-            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-            onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
-            onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
-          ),
-          // Body
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Basic information
-                Text(
-                  LocaleKeys.basicInfo.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 8,),
-                // Description
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                    labelText: LocaleKeys.name.tr(),
-                    prefixIcon: IconButton(
-                      icon: Icon(editing.icon.icon),
-                      onPressed: () => onAccountIconButtonPressed(),
-                    ),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            ModalHeader(
+              disabled: progressing || !editing.isValid,
+              headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.account.plural(1),
+                "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+              }),
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+              onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
+              onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
+            ),
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Basic information
+                  Text(
+                    LocaleKeys.basicInfo.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
-                  onChanged: onDescriptionChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Serial Number
-                TextField(
-                  controller: serialNumberController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.serialNumber.tr(),
-                      prefixIcon: const Icon(Icons.numbers_outlined)
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter(RegExp(r'[\d\s.:;_,/*#()]'), allow: true),
-                  ],
-                  onChanged: onSerialNumberChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Limitation
-                TextField(
-                  controller: limitationController,
-                  decoration: InputDecoration(
-                    labelText: LocaleKeys.limitation.tr(),
-                    prefixIcon: IconButton(
-                      icon: Icon(editing.currency.icon),
-                      onPressed: () => onCurrencyButtonPressed(),
-                    ),
-                  ),
-                  onChanged: onLimitationChanged,
-                ),
-                // Is cash checkbox
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: editing.isCash,
-                        onChanged: (value) => onCashValueChanged(value ?? false),
+                  const SizedBox(height: 8,),
+                  // Description
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.name.tr(),
+                      prefixIcon: IconButton(
+                        icon: Icon(editing.icon.icon),
+                        onPressed: () => onAccountIconButtonPressed(),
                       ),
+                    ),
+                    onChanged: onDescriptionChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Serial Number
+                  TextField(
+                    controller: serialNumberController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.serialNumber.tr(),
+                        prefixIcon: const Icon(Icons.numbers_outlined)
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp(r'[\d\s.:;_,/*#()]'), allow: true),
+                    ],
+                    onChanged: onSerialNumberChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Limitation
+                  TextField(
+                    controller: limitationController,
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.limitation.tr(),
+                      prefixIcon: IconButton(
+                        icon: Icon(editing.currency.icon),
+                        onPressed: () => onCurrencyButtonPressed(),
+                      ),
+                    ),
+                    onChanged: onLimitationChanged,
+                  ),
+                  // Is cash checkbox
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: editing.isCash,
+                          onChanged: (value) => onCashValueChanged(value ?? false),
+                        ),
+                        Text(
+                          LocaleKeys.cash.tr(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Color
+                  Text(
+                    LocaleKeys.color.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  // Foreground
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
                       Text(
-                        LocaleKeys.cash.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        LocaleKeys.foreground.tr(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.circle),
+                        color: editing.foreground,
+                        onPressed: () => onForegroundPressed(context),
                       ),
                     ],
                   ),
-                ),
-                // Color
-                Text(
-                  LocaleKeys.color.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                // Foreground
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.foreground.tr(),
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.circle),
-                      color: editing.foreground,
-                      onPressed: () => onForegroundPressed(context),
-                    ),
-                  ],
-                ),
-                // Background
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.background.tr(),
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.circle),
-                      color: editing.background,
-                      onPressed: () => onBackgroundPressed(context),
-                    ),
-                  ],
-                ),
-              ],
+                  // Background
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.background.tr(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.circle),
+                        color: editing.background,
+                        onPressed: () => onBackgroundPressed(context),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Progress
-          Visibility(
-            visible: progressing,
-            child: const LinearProgressIndicator(value: null,),
-          ),
-        ],
+            // Progress
+            Visibility(
+              visible: progressing,
+              child: const LinearProgressIndicator(value: null,),
+            ),
+          ],
+        ),
       ),
     );
   }

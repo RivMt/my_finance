@@ -92,7 +92,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   }
 
   /// Show [T] item selection dialog
-  Future<T> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -203,7 +203,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       "object": LocaleKeys.category.plural(1),
       "action": LocaleKeys.select.tr(),
     }), categories);
-    onCategoryChanged(category);
+    if (category != null) {
+      onCategoryChanged(category);
+    }
   }
   
   /// Triggers on account card tapped
@@ -212,7 +214,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       "object": LocaleKeys.account.plural(1),
       "action": LocaleKeys.select.tr(),
     }), accounts);
-    onAccountChanged(account);
+    if (account != null) {
+      onAccountChanged(account);
+    }
   }
 
   /// Triggers on payment card tapped
@@ -221,7 +225,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       "object": LocaleKeys.payment.plural(1),
       "action": LocaleKeys.select.tr(),
     }), payments);
-    onPaymentChanged(payment);
+    if (payment != null) {
+      onPaymentChanged(payment);
+    }
   }
 
   /// Triggers on category changed
@@ -367,88 +373,58 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
         (editing.altCurrency != null) &&
         (editing.altCurrency != editing.currency);
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          ModalHeader(
-            disabled: progressing || !editing.isValid,
-            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.transaction.plural(1),
-              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-            }),
-            positiveButtonTitle: LocaleKeys.confirm.tr(),
-            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-            onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
-            onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
-          ),
-          // Body
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Date
-                Text(
-                  LocaleKeys.date.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      payment.isCredit
-                          ? LocaleKeys.transactionDate.tr()
-                          : LocaleKeys.paidDate.tr(),
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () => onPaidDateButtonPressed(context),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat.yMd().format(editing.paidDate),
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(width: 8,),
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 8,),
-                Visibility(
-                  visible: payment.isCredit,
-                  child: Row(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            ModalHeader(
+              disabled: progressing || !editing.isValid,
+              headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.transaction.plural(1),
+                "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+              }),
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+              onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
+              onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
+            ),
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Date
+                  Text(
+                    LocaleKeys.date.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        LocaleKeys.paidDate.tr(),
+                        payment.isCredit
+                            ? LocaleKeys.transactionDate.tr()
+                            : LocaleKeys.paidDate.tr(),
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        onTap: () => onCalculatedDateButtonPressed(context),
+                        onTap: () => onPaidDateButtonPressed(context),
                         child: Padding(
                           padding: const EdgeInsets.all(8),
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Text(
-                                DateFormat.yMd().format(editing.calculatedDate),
+                                DateFormat.yMd().format(editing.paidDate),
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(width: 8,),
@@ -462,180 +438,215 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 8,),
-                // Category
-                Text(
-                  LocaleKeys.category.plural(1),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                CategoryCard(
-                  category: category,
-                  unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                    "object": LocaleKeys.category.plural(1),
-                  }),
-                  onTap: () => onCategoryCardTapped(ref.watch(_categories)),
-                ),
-                const SizedBox(height: 8,),
-                // Account
-                Text(
-                  LocaleKeys.account.plural(1),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                AccountCard(
-                  data: account,
-                  showBalance: false,
-                  unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                    "object": LocaleKeys.account.plural(1),
-                  }),
-                  onTap: () => onAccountCardTapped(ref.watch(_accounts)),
-                ),
-                const SizedBox(height: 8,),
-                // Payment
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      LocaleKeys.payment.plural(1),
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                  const SizedBox(width: 8,),
+                  Visibility(
+                    visible: payment.isCredit,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Checkbox(
-                          value: payment == Payment.none,
-                          tristate: false,
-                          onChanged: (value) => onNoPaymentCheckboxChanged(value!),
-                        ),
                         Text(
-                          LocaleKeys.noPayment.plural(1),
-                          style: Theme.of(context).textTheme.labelSmall,
+                          LocaleKeys.paidDate.tr(),
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () => onCalculatedDateButtonPressed(context),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  DateFormat.yMd().format(editing.calculatedDate),
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(width: 8,),
+                                Icon(
+                                  Icons.calendar_today_outlined,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
-                    )
-                  ],
-                ),
-                Visibility(
-                  visible: payment != Payment.none,
-                  child: PaymentCard(
-                    data: payment,
-                    unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                      "object": LocaleKeys.payment.plural(1),
-                    }),
-                    onTap: () => onPaymentCardTapped(ref.watch(_payments)),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8,),
-                // Basic information
-                Text(
-                  LocaleKeys.basicInfo.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 8,),
-                // Alt amount
-                Visibility(
-                  visible: useAlt,
-                  child: TextField(
-                    controller: altAmountController,
+                  const SizedBox(height: 8,),
+                  // Category
+                  Text(
+                    LocaleKeys.category.plural(1),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  CategoryCard(
+                    category: category,
+                    unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                      "object": LocaleKeys.category.plural(1),
+                    }),
+                    onTap: () => onCategoryCardTapped(ref.watch(_categories)),
+                  ),
+                  const SizedBox(height: 8,),
+                  // Account
+                  Text(
+                    LocaleKeys.account.plural(1),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  AccountCard(
+                    data: account,
+                    showBalance: false,
+                    unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                      "object": LocaleKeys.account.plural(1),
+                    }),
+                    onTap: () => onAccountCardTapped(ref.watch(_accounts)),
+                  ),
+                  const SizedBox(height: 8,),
+                  // Payment
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        LocaleKeys.payment.plural(1),
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: payment == Payment.none,
+                            tristate: false,
+                            onChanged: (value) => onNoPaymentCheckboxChanged(value!),
+                          ),
+                          Text(
+                            LocaleKeys.noPayment.plural(1),
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  Visibility(
+                    visible: payment != Payment.none,
+                    child: PaymentCard(
+                      data: payment,
+                      unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                        "object": LocaleKeys.payment.plural(1),
+                      }),
+                      onTap: () => onPaymentCardTapped(ref.watch(_payments)),
+                    ),
+                  ),
+                  const SizedBox(height: 8,),
+                  // Basic information
+                  Text(
+                    LocaleKeys.basicInfo.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Alt amount
+                  Visibility(
+                    visible: useAlt,
+                    child: TextField(
+                      controller: altAmountController,
+                      decoration: InputDecoration(
+                        labelText: LocaleKeys.paidAmount.tr(),
+                        prefixIcon: IconButton(
+                          icon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
+                          onPressed: () {},
+                        ),
+                      ),
+                      onChanged: onAltAmountChanged,
+                    ),
+                  ),
+                  const SizedBox(height: 8,),
+                  // Amount
+                  TextField(
+                    controller: amountController,
                     decoration: InputDecoration(
-                      labelText: LocaleKeys.paidAmount.tr(),
+                      labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
                       prefixIcon: IconButton(
-                        icon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
+                        icon: Icon(editing.currency.icon),
                         onPressed: () {},
                       ),
                     ),
-                    onChanged: onAltAmountChanged,
+                    onChanged: onAmountChanged,
                   ),
-                ),
-                const SizedBox(height: 8,),
-                // Amount
-                TextField(
-                  controller: amountController,
-                  decoration: InputDecoration(
-                    labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
-                    prefixIcon: IconButton(
-                      icon: Icon(editing.currency.icon),
-                      onPressed: () {},
+                  const SizedBox(height: 8,),
+                  // Description
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.description.tr(),
+                      prefixIcon: const Icon(Icons.notes),
                     ),
+                    onChanged: onDescriptionChanged,
                   ),
-                  onChanged: onAmountChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Description
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                    labelText: LocaleKeys.description.tr(),
-                    prefixIcon: const Icon(Icons.notes),
-                  ),
-                  onChanged: onDescriptionChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Efficient days
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        LocaleKeys.utilityDays.tr(),
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: TextField(
-                        controller: utilityDaysController,
-                        textAlign: TextAlign.end,
-                        decoration: InputDecoration(
-                          labelText: LocaleKeys.utilityDays.tr(),
-                          prefixIcon: IconButton(
-                            icon: const Icon(Icons.calendar_month_outlined),
-                            onPressed: () => onUtilityDaysCalculateButtonPressed(context),
-                          ),
-                          suffixText: LocaleKeys.day.plural(
-                            editing.utilityDays%10,
-                            args: [editing.utilityDays.toString()],
-                          ),
-                        ),
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(5),
-                          FilteringTextInputFormatter(RegExp(r"\d"), allow: true),
-                        ],
-                        onChanged: onUtilityDaysValueChanged,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8,),
-                // Included checkbox
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
+                  const SizedBox(height: 8,),
+                  // Efficient days
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Checkbox(
-                        value: editing.isIncluded,
-                        onChanged: (value) => onIncludedValueChanged(value ?? false),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          LocaleKeys.utilityDays.tr(),
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
                       ),
-                      Text(
-                        LocaleKeys.included.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Expanded(
+                        flex: 1,
+                        child: TextField(
+                          controller: utilityDaysController,
+                          textAlign: TextAlign.end,
+                          decoration: InputDecoration(
+                            labelText: LocaleKeys.utilityDays.tr(),
+                            prefixIcon: IconButton(
+                              icon: const Icon(Icons.calendar_month_outlined),
+                              onPressed: () => onUtilityDaysCalculateButtonPressed(context),
+                            ),
+                            suffixText: LocaleKeys.day.plural(
+                              editing.utilityDays%10,
+                              args: [editing.utilityDays.toString()],
+                            ),
+                          ),
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(5),
+                            FilteringTextInputFormatter(RegExp(r"\d"), allow: true),
+                          ],
+                          onChanged: onUtilityDaysValueChanged,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8,),
+                  // Included checkbox
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: editing.isIncluded,
+                          onChanged: (value) => onIncludedValueChanged(value ?? false),
+                        ),
+                        Text(
+                          LocaleKeys.included.tr(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // Progress
-          Visibility(
-            visible: progressing,
-            child: const LinearProgressIndicator(value: null,),
-          ),
-        ],
+            // Progress
+            Visibility(
+              visible: progressing,
+              child: const LinearProgressIndicator(value: null,),
+            ),
+          ],
+        ),
       ),
     );
   }
