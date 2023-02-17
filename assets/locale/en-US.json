@@ -94,7 +94,7 @@
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",
 
-  "accountTypeSavings": "Savings",
+  "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
   "accountTypeCash": "Cash",
   "accountTypePoint": "Points",
