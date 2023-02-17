@@ -92,69 +92,71 @@ class _PaymentsPageState extends State<PaymentsPage> {
       appBar: AppBar(
         title: Text(LocaleKeys.payment.plural(2)),
       ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Payments
-          SizedBox(
-            width: width,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PaymentsFragment(
-                  subtitle: widget.subtitle,
-                  selected: selected,
-                  conditions: widget.condition,
-                  currency: widget.currency,
-                  onItemTap: onPaymentSelected,
-                  onEditFinish: (item) => setState(() {
-                    selected = item;
-                  }),
-                ),
-              ],
-            ),
-          ),
-          // Transactions
-          Visibility(
-            visible: transactionsVisible,
-            child: SizedBox(
+      body: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Payments
+            SizedBox(
               width: width,
-              child: IndexedStack(
-                index: payment == Payment.unknown ? 0 : 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 0: No payment
-                  MessageBox(
-                    icon: Icons.question_mark_outlined,
-                    message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                      "object": LocaleKeys.payment.plural(1),
+                  PaymentsFragment(
+                    subtitle: widget.subtitle,
+                    selected: selected,
+                    conditions: widget.condition,
+                    currency: widget.currency,
+                    onItemTap: onPaymentSelected,
+                    onEditFinish: (item) => setState(() {
+                      selected = item;
                     }),
                   ),
-                  // 1: Payment details and transactions
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: PaymentDetailsFragment(
-                          payment: payment,
-                          conditions: widget.condition,
-                        ),
-                      ),
-                      Expanded(
-                        child: TransactionsFragment(
-                          conditions: transactionsCondition,
-                        ),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),
-          ),
-        ],
+            // Transactions
+            Visibility(
+              visible: transactionsVisible,
+              child: SizedBox(
+                width: width,
+                child: IndexedStack(
+                  index: payment == Payment.unknown ? 0 : 1,
+                  children: [
+                    // 0: No payment
+                    MessageBox(
+                      icon: Icons.question_mark_outlined,
+                      message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                        "object": LocaleKeys.payment.plural(1),
+                      }),
+                    ),
+                    // 1: Payment details and transactions
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: PaymentDetailsFragment(
+                            payment: payment,
+                            conditions: widget.condition,
+                          ),
+                        ),
+                        Expanded(
+                          child: TransactionsFragment(
+                            conditions: transactionsCondition,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Visibility(
         visible: InterfaceConstructor.isSidePanelVisible(context),

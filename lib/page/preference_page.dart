@@ -182,48 +182,50 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           ),
         ),
       ),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: width,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // General
-                PreferenceHeader(
-                  title: LocaleKeys.preferenceGeneral.tr(),
-                ),
-                PreferenceTile(
-                  title: LocaleKeys.preferenceDefaultCurrency.tr(),
-                  subtitle: Currency.fromValue(preferences[PreferenceKeys.defaultCurrency]?.value).key.tr(),
-                  onTap: () => onDefaultCurrencyPressed(context),
-                ),
-                // Budgets
-                PreferenceHeader(
-                  title: LocaleKeys.budget.plural(1),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.add_circle_outline_outlined),
-                    color: Theme.of(context).primaryColor,
-                    onPressed: () => onBudgetAddButtonPressed(context),
+      body: SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: width,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // General
+                  PreferenceHeader(
+                    title: LocaleKeys.preferenceGeneral.tr(),
                   ),
-                ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: budgets.keys.length,
-                  itemBuilder: (context, index) {
-                    final key = budgets.keys.toList(growable: false)[index];
-                    final value = budgets[key];
-                    final currency = Currency.fromValue(key);
-                    return PreferenceTile(
-                      title: currency.key.tr(),
-                      subtitle: currency.format(value ?? Decimal.zero),
-                      onTap: () => showBudgetEditingModal(currency, value),
-                    );
-                  },
-                ),
-              ],
+                  PreferenceTile(
+                    title: LocaleKeys.preferenceDefaultCurrency.tr(),
+                    subtitle: Currency.fromValue(preferences[PreferenceKeys.defaultCurrency]?.value).key.tr(),
+                    onTap: () => onDefaultCurrencyPressed(context),
+                  ),
+                  // Budgets
+                  PreferenceHeader(
+                    title: LocaleKeys.budget.plural(1),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add_circle_outline_outlined),
+                      color: Theme.of(context).primaryColor,
+                      onPressed: () => onBudgetAddButtonPressed(context),
+                    ),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: budgets.keys.length,
+                    itemBuilder: (context, index) {
+                      final key = budgets.keys.toList(growable: false)[index];
+                      final value = budgets[key];
+                      final currency = Currency.fromValue(key);
+                      return PreferenceTile(
+                        title: currency.key.tr(),
+                        subtitle: currency.format(value ?? Decimal.zero),
+                        onTap: () => showBudgetEditingModal(currency, value),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

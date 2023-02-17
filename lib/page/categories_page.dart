@@ -62,12 +62,14 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
           onTap: (index) => setState(() {}),
         ),
       ),
-      body: CategoriesFragment(
-        conditions: [{
-          Category.keyType: tabController.index,
-          FinanceModel.keyDeleted: false,
-        }],
-        onTap: showCategoryEditingModal,
+      body: SafeArea(
+        child: CategoriesFragment(
+          conditions: [{
+            Category.keyType: tabController.index,
+            FinanceModel.keyDeleted: false,
+          }],
+          onTap: showCategoryEditingModal,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showCategoryEditingModal(),

@@ -224,105 +224,107 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         ],
       ),
-      body: GridView(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: getCrossAxisCount(context),
-          childAspectRatio: getChildAspectRatio(context),
-          mainAxisSpacing: 8,
-        ),
-        children: [
-          GroupCard(
-            title: LocaleKeys.account.plural(1),
-            count: accounts.length,
-            button: IconButton(
-              icon: const Icon(Icons.keyboard_arrow_right_outlined),
-              color: Theme.of(context).textTheme.titleMedium?.color,
-              onPressed: () => openPage(const AccountsPage()),
-            ),
-            build: (BuildContext context, int index) {
-              final account = accounts[index];
-              return AccountCard(
-                data: account,
-                onTap: () => openPage(AccountDetailsPage(pid: account.pid)),
-              );
-            },
+      body: SafeArea(
+        child: GridView(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: getCrossAxisCount(context),
+            childAspectRatio: getChildAspectRatio(context),
+            mainAxisSpacing: 8,
           ),
-          GroupCard(
-            title: LocaleKeys.payment.plural(1),
-            count: 3,
-            button: PopupMenuButton(
-              icon: Icon(
-                Icons.more_vert,
+          children: [
+            GroupCard(
+              title: LocaleKeys.account.plural(1),
+              count: accounts.length,
+              button: IconButton(
+                icon: const Icon(Icons.keyboard_arrow_right_outlined),
                 color: Theme.of(context).textTheme.titleMedium?.color,
+                onPressed: () => openPage(const AccountsPage()),
               ),
-              onSelected: onPaymentGroupButtonPressed,
-              itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
-                return PopupMenuItem(
-                  value: currency,
-                  child: CurrencyCard(
-                    data: currency,
-                    useIconBackground: false,
-                  ),
+              build: (BuildContext context, int index) {
+                final account = accounts[index];
+                return AccountCard(
+                  data: account,
+                  onTap: () => openPage(AccountDetailsPage(pid: account.pid)),
                 );
-              }).toList(growable: false),
+              },
             ),
-            build: (BuildContext context, int index) {
-              late String name;
-              late IconData icon;
-              late Decimal amount;
-              late Function() onTap;
-              switch(index) {
-                case 0:
-                  name = LocaleKeys.currentMonthExpense.tr();
-                  icon = Icons.payments_outlined;
-                  amount = ref.watch(_currentMonthExpenses);
-                  onTap = () => openPage(PaymentsPage(
-                    subtitle: name,
-                    currency: currency,
-                    condition: ref.watch(_currentMonthExpenses.notifier).conditions,
-                  ));
-                  break;
-                case 1:
-                  name = LocaleKeys.amountBePaid.tr();
-                  icon = Icons.calendar_today_outlined;
-                  amount = ref.watch(_amountBePaid);
-                  onTap = () => openPage(PaymentsPage(
-                    subtitle: name,
-                    currency: currency,
-                    condition: ref.watch(_amountBePaid.notifier).conditions,
-                  ));
-                  break;
-                case 2:
-                  name = LocaleKeys.budgetLeft.tr();
-                  icon = Icons.bar_chart_outlined;
-                  onTap = () => openPage(PaymentsPage(
-                    currency: currency,
-                  ));
-                  final budgetExpensed = ref.watch(_budgetExpensed);
-                  final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
-                  if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
-                    amount = pref.value[currency.value] - budgetExpensed;
-                  } else {
+            GroupCard(
+              title: LocaleKeys.payment.plural(1),
+              count: 3,
+              button: PopupMenuButton(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: Theme.of(context).textTheme.titleMedium?.color,
+                ),
+                onSelected: onPaymentGroupButtonPressed,
+                itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
+                  return PopupMenuItem(
+                    value: currency,
+                    child: CurrencyCard(
+                      data: currency,
+                      useIconBackground: false,
+                    ),
+                  );
+                }).toList(growable: false),
+              ),
+              build: (BuildContext context, int index) {
+                late String name;
+                late IconData icon;
+                late Decimal amount;
+                late Function() onTap;
+                switch(index) {
+                  case 0:
+                    name = LocaleKeys.currentMonthExpense.tr();
+                    icon = Icons.payments_outlined;
+                    amount = ref.watch(_currentMonthExpenses);
+                    onTap = () => openPage(PaymentsPage(
+                      subtitle: name,
+                      currency: currency,
+                      condition: ref.watch(_currentMonthExpenses.notifier).conditions,
+                    ));
+                    break;
+                  case 1:
+                    name = LocaleKeys.amountBePaid.tr();
+                    icon = Icons.calendar_today_outlined;
+                    amount = ref.watch(_amountBePaid);
+                    onTap = () => openPage(PaymentsPage(
+                      subtitle: name,
+                      currency: currency,
+                      condition: ref.watch(_amountBePaid.notifier).conditions,
+                    ));
+                    break;
+                  case 2:
+                    name = LocaleKeys.budgetLeft.tr();
+                    icon = Icons.bar_chart_outlined;
+                    onTap = () => openPage(PaymentsPage(
+                      currency: currency,
+                    ));
+                    final budgetExpensed = ref.watch(_budgetExpensed);
+                    final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
+                    if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
+                      amount = pref.value[currency.value] - budgetExpensed;
+                    } else {
+                      amount = Decimal.zero;
+                    }
+                    break;
+                  default:
+                    name = "???";
+                    icon = Icons.question_mark_outlined;
+                    onTap = () {};
                     amount = Decimal.zero;
-                  }
-                  break;
-                default:
-                  name = "???";
-                  icon = Icons.question_mark_outlined;
-                  onTap = () {};
-                  amount = Decimal.zero;
-              }
-              return WalletItemCard(
-                title: currency.format(amount),
-                subtitle: name,
-                foreground: Colors.white,
-                background: Theme.of(context).primaryColor,
-                icon: icon,
-                onTap: onTap,
-              );
-            },
-          ),
-        ],
+                }
+                return WalletItemCard(
+                  title: currency.format(amount),
+                  subtitle: name,
+                  foreground: Colors.white,
+                  background: Theme.of(context).primaryColor,
+                  icon: icon,
+                  onTap: onTap,
+                );
+              },
+            ),
+          ],
+        ),
       ),
       floatingActionButton: TransactionAddButton(
         onFinish: onTransactionCreated,
