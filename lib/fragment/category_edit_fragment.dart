@@ -48,7 +48,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   }
 
   /// Show [CategoryIcon] item selection dialog
-  Future<CategorySymbol> showSelectDialog(BuildContext context, String title, List<CategorySymbol> list) async {
+  Future<CategorySymbol?> showSelectDialog(BuildContext context, String title, List<CategorySymbol> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -151,8 +151,10 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
       LocaleKeys.icon.tr(),
       CategorySymbol.values,
     );
-    editing.icon = icon;
-    setState(() {});
+    if (icon != null) {
+      editing.icon = icon;
+      setState(() {});
+    }
   }
 
   /// Triggers on cash checkboxes value changed
@@ -180,112 +182,117 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          ModalHeader(
-            disabled: progressing,
-            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.category.plural(1),
-              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-            }),
-            positiveButtonTitle: LocaleKeys.confirm.tr(),
-            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-            onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
-            onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
-          ),
-          // Body
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Basic information
-                Text(
-                  LocaleKeys.basicInfo.tr(),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 8,),
-                // Type
-                Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        LocaleKeys.type.tr(),
-                        style: Theme.of(context).textTheme.labelMedium,
-                      ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: TransactionType.values.map((type) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
-                            child: ChoiceChip(
-                              label: Text(type.name.tr()),
-                              selected: type == editing.type,
-                              onSelected: (bool value) => onTypeChanged(type, value),
-                            ),
-                          );
-                        }).toList(growable: false),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8,),
-                // Name
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.name.tr(),
-                      prefixIcon: IconButton(
-                        icon: Icon(editing.icon.icon),
-                        onPressed: () => onCategoryIconButtonPressed(),
-                      )
-                  ),
-                  onChanged: onNameChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Description
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                      labelText: LocaleKeys.description.tr(),
-                      prefixIcon: const Icon(Icons.notes_outlined)
-                  ),
-                  onChanged: onDescriptionsChanged,
-                ),
-                const SizedBox(height: 8,),
-                // Included checkbox
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: editing.isIncluded,
-                        onChanged: (value) => onIncludeValueChanged(value ?? false),
-                      ),
-                      Text(
-                        LocaleKeys.included.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            ModalHeader(
+              disabled: progressing,
+              headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.category.plural(1),
+                "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+              }),
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+              onPositiveButtonPressed: progressing ? null : onConfirmButtonPressed,
+              onNegativeButtonPressed: progressing ? null : onNegativeButtonPressed,
             ),
-          ),
-          // Progress
-          Visibility(
-            visible: progressing,
-            child: const LinearProgressIndicator(value: null,),
-          ),
-        ],
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Basic information
+                  Text(
+                    LocaleKeys.basicInfo.tr(),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Type
+                  Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          LocaleKeys.type.tr(),
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: TransactionType.values.map((type) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+                              child: ChoiceChip(
+                                label: Text(type.name.tr()),
+                                selected: type == editing.type,
+                                onSelected: (bool value) => onTypeChanged(type, value),
+                              ),
+                            );
+                          }).toList(growable: false),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8,),
+                  // Name
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.name.tr(),
+                        prefixIcon: IconButton(
+                          icon: Icon(editing.icon.icon),
+                          onPressed: () => onCategoryIconButtonPressed(),
+                        )
+                    ),
+                    onChanged: onNameChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Description
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                        labelText: LocaleKeys.description.tr(),
+                        prefixIcon: const Icon(Icons.notes_outlined)
+                    ),
+                    onChanged: onDescriptionsChanged,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Included checkbox
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: editing.isIncluded,
+                          onChanged: (value) => onIncludeValueChanged(value ?? false),
+                        ),
+                        Text(
+                          LocaleKeys.included.tr(),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Progress
+            Visibility(
+              visible: progressing,
+              child: const LinearProgressIndicator(value: null,),
+            ),
+          ],
+        ),
       ),
     );
   }
