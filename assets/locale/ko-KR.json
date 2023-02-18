@@ -65,6 +65,8 @@
   "paidDate": "결제 날짜",
   "utilityDays": "효용 일수",
   "budgetLeft": "남은 예산",
+  "testMode": "테스트 모드",
+  "productionMode": "프로덕션 모드",
 
   "month": "월",
   "nMonthBefore": {
