@@ -228,7 +228,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                         ),
                         Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
-                          children: TransactionType.values.map((type) {
+                          children: TransactionType.types.map((type) {
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
                               child: ChoiceChip(
