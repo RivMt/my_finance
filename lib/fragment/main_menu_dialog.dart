@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
@@ -33,6 +37,17 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
     });
   }
 
+  /// Triggers on test mode tile tapped
+  void onTestModeTapped() async {
+    final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
+    await ApiClient().init(
+      onLoginRequired: () {},
+      preferences: prefs,
+      useTest: ApiClient().serverType == ServerType.production,
+    );
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -45,6 +60,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             UserCard(
               user: ApiCore().user,
               onTap: widget.onAccountButtonPressed,
+              onLongPress: () => openPage(const LoginPage()),
             ),
             const Divider(),
             // Refresh
@@ -62,6 +78,21 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
                 "action": LocaleKeys.edit.tr(),
               })),
               onTap: () => openPage(const CategoriesPage()),
+            ),
+            const Divider(),
+            Visibility(
+              visible: kDebugMode,
+              child: ListTile(
+                leading: Icon(ApiClient().serverType == ServerType.production
+                    ? Icons.work_outline_outlined
+                    : Icons.adb_outlined
+                ),
+                title: Text(ApiClient().serverType == ServerType.production
+                    ? LocaleKeys.productionMode.tr()
+                    : LocaleKeys.testMode.tr()
+                ),
+                onTap: onTestModeTapped,
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.settings_outlined),

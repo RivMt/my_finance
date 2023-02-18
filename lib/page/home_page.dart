@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
@@ -94,9 +97,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
     // Login or authenticate
     try {
+      final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
       await client.init(
-        filename: 'assets/key/server.json',
         onLoginRequired: () => openPage(const LoginPage(), (value) => request()),
+        preferences: prefs,
       );
     } on Exception catch(e) {
       Log.e(_tag, "Error: $e");
