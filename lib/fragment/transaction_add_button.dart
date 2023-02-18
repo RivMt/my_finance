@@ -16,7 +16,7 @@ class TransactionAddButton extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+        maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) => TransactionEditFragment(
         onFinish: (item) => Navigator.pop(context, item),

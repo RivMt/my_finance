@@ -23,7 +23,7 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+        maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) => Wrap(
         children: [

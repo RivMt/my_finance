@@ -68,7 +68,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
               "action": LocaleKeys.select.tr(),
             })),
             content: SizedBox(
-              width: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+              width: ScreenPlanner(context).dialogWidth,
               child: ListView.builder(
                 itemCount: currencies.length,
                 itemBuilder: (context, index) {
@@ -91,7 +91,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+        maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) {
         return Wrap(
@@ -168,7 +168,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context);
+    final width = ScreenPlanner(context).panelWidth;
     final Map<String, Preference> preferences = ref.watch(preferenceProvider);
     final budgets = preferences[PreferenceKeys.budgets]?.value ?? {};
     return Scaffold(

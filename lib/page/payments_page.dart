@@ -45,7 +45,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
   /// If [transactionVisible] is `true`, show transactions on right side,
   /// otherwise, open [PaymentDetailsPage]
   void onPaymentSelected(Payment payment) {
-    if (transactionsVisible) {
+    if (ScreenPlanner(context).isSidePanelVisible) {
       selected = payment;
       setState(() {});
     } else {
@@ -58,12 +58,6 @@ class _PaymentsPageState extends State<PaymentsPage> {
     if (transaction != null) {
       setState(() {});
     }
-  }
-
-  /// Value of right side panel is visible or not
-  bool get transactionsVisible {
-    final int number = InterfaceConstructor.panelNumber(context);
-    return number == 2;
   }
 
   /// Condition for [TransactionsFragment]
@@ -86,7 +80,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context);
+    final width = ScreenPlanner(context).panelWidth;
     final payment = selected ?? Payment.unknown;
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +113,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
             ),
             // Transactions
             Visibility(
-              visible: transactionsVisible,
+              visible: ScreenPlanner(context).isSidePanelVisible,
               child: SizedBox(
                 width: width,
                 child: IndexedStack(
@@ -159,7 +153,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
         ),
       ),
       floatingActionButton: Visibility(
-        visible: InterfaceConstructor.isSidePanelVisible(context),
+        visible: ScreenPlanner(context).isSidePanelVisible,
         child: TransactionAddButton(
           onFinish: onTransactionCreated,
         ),

@@ -34,7 +34,7 @@ class _AccountsPageState extends State<AccountsPage> {
   /// If [transactionVisible] is `true`, show transactions on right side,
   /// otherwise, open [AccountDetailsPage]
   void onAccountSelected(Account account) {
-    if (transactionsVisible) {
+    if (ScreenPlanner(context).isSidePanelVisible) {
       selected = account;
       setState(() {});
     } else {
@@ -49,15 +49,9 @@ class _AccountsPageState extends State<AccountsPage> {
     }
   }
 
-  /// Value of right side panel is visible or not
-  bool get transactionsVisible {
-    final int number = InterfaceConstructor.panelNumber(context);
-    return number == 2;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width/(transactionsVisible ? 2 : 1);
+    final width = ScreenPlanner(context).panelWidth;
     final account = selected ?? Account.unknown;
     return Scaffold(
       appBar: AppBar(
@@ -79,7 +73,7 @@ class _AccountsPageState extends State<AccountsPage> {
               ),
             ),
             Visibility(
-              visible: transactionsVisible,
+              visible: ScreenPlanner(context).isSidePanelVisible,
               child: SizedBox(
                 width: width,
                 child: IndexedStack(
@@ -121,7 +115,7 @@ class _AccountsPageState extends State<AccountsPage> {
         ),
       ),
       floatingActionButton: Visibility(
-        visible: InterfaceConstructor.isSidePanelVisible(context),
+        visible: ScreenPlanner(context).isSidePanelVisible,
         child: TransactionAddButton(
           onFinish: onTransactionCreated,
         ),

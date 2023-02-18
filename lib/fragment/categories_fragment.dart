@@ -53,7 +53,7 @@ class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(_categories);
-    final int panels = InterfaceConstructor.panelNumber(context);
+    final int panels = ScreenPlanner(context).panelNumber;
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: panels,

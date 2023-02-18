@@ -193,7 +193,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Get [GridView] cross axis count
   ///
   /// Value is always bigger than `0`
-  int getCrossAxisCount(BuildContext context) => InterfaceConstructor.panelNumber(context);
+  int getCrossAxisCount(BuildContext context) => ScreenPlanner(context).panelNumber;
 
   /// Get [GridView] child aspect ratio
   double getChildAspectRatio(BuildContext context) {

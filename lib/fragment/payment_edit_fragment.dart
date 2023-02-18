@@ -60,7 +60,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
         return AlertDialog(
           title: Text(title),
           content: SizedBox(
-            width: (MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context)) * 0.8,
+            width: ScreenPlanner(context).dialogWidth,
             height: MediaQuery.of(context).size.height * 0.7,
             child: ListView.builder(
               itemCount: list.length,

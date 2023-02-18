@@ -94,7 +94,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width / InterfaceConstructor.panelNumber(context),
+        maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) {
         return Wrap(
