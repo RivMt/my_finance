@@ -37,9 +37,10 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
       [{
         FinanceModel.keyDeleted: false,
       }],
-      ApiClient().buildOptions(
-        sortOrderType: SortOrderType.asc,
-        sortOrderAttribute: Account.keyIcon,
+      ApiClient.buildOptions(
+        sorts: [
+          const Sort(Account.keyIcon, SortType.asc),
+        ],
       ),
     );
   }

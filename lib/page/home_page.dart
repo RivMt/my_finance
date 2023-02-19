@@ -118,10 +118,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       [{
         FinanceModel.keyDeleted: false,
       }],
-      ApiClient().buildOptions(
+      ApiClient.buildOptions(
         limit: 3,
-        sortOrderType: SortOrderType.asc,
-        sortOrderAttribute: Account.keyPriority,
+        sorts: [
+          const Sort(Account.keyPriority, SortType.asc),
+        ],
       ),
     );
     // Preference

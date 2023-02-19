@@ -45,9 +45,10 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   void request() {
     // Build options if it is empty
     final options = widget.options.isEmpty
-        ? ApiClient().buildOptions(
-      sortOrderAttribute: Transaction.keyPaidDate,
-      sortOrderType: SortOrderType.desc,
+        ? ApiClient.buildOptions(
+      sorts: [
+        const Sort(Transaction.keyPaidDate, SortType.desc),
+      ],
     ) : widget.options;
     // Get transactions
     ref.read(_transactions.notifier).request(

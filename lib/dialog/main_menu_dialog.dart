@@ -58,7 +58,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
           children: [
             // User
             UserCard(
-              user: ApiCore().user,
+              user: ApiClient().user,
               onTap: widget.onAccountButtonPressed,
               onLongPress: () => openPage(const LoginPage()),
             ),

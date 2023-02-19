@@ -71,9 +71,10 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
         FinanceModel.keyDeleted: false,
         Payment.keyCurrency: currency.value,
       }],
-      ApiClient().buildOptions(
-        sortOrderType: SortOrderType.asc,
-        sortOrderAttribute: Payment.keyIcon,
+      ApiClient.buildOptions(
+        sorts: [
+          const Sort(Payment.keyIcon, SortType.asc),
+        ],
       ),
     );
     // Amount

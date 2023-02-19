@@ -32,9 +32,10 @@ class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
     // Categories
     ref.read(_categories.notifier).request(widget.conditions ?? [{
       FinanceModel.keyDeleted: false,
-    }], ApiClient().buildOptions(
-      sortOrderType: SortOrderType.asc,
-      sortOrderAttribute: FinanceModel.keyPid,
+    }], ApiClient.buildOptions(
+      sorts: [
+        const Sort(FinanceModel.keyPid, SortType.asc),
+      ],
     ));
   }
 

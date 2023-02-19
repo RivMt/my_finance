@@ -72,23 +72,26 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     // Account
     ref.read(_accounts.notifier).request([{
       FinanceModel.keyDeleted: false,
-    }], ApiClient().buildOptions(
-      sortOrderType: SortOrderType.desc,
-      sortOrderAttribute: Account.keyPriority,
+    }], ApiClient.buildOptions(
+      sorts: [
+        const Sort(Account.keyPriority, SortType.desc),
+      ],
     ));
     // Payment
     ref.read(_payments.notifier).request([{
       FinanceModel.keyDeleted: false,
-    }], ApiClient().buildOptions(
-      sortOrderType: SortOrderType.desc,
-      sortOrderAttribute: Payment.keyPriority,
+    }], ApiClient.buildOptions(
+      sorts: [
+        const Sort(Payment.keyPriority, SortType.desc),
+      ],
     ));
     // Category
     ref.read(_categories.notifier).request([{
       FinanceModel.keyDeleted: false,
-    }], ApiClient().buildOptions(
-      sortOrderType: SortOrderType.desc,
-      sortOrderAttribute: FinanceModel.keyLastUsed,
+    }], ApiClient.buildOptions(
+      sorts: [
+        const Sort(FinanceModel.keyLastUsed, SortType.desc),
+      ],
     ));
   }
 
