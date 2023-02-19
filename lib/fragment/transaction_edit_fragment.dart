@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/dialog/category_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
@@ -117,17 +118,25 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       data: item as Payment,
                       onTap: () => Navigator.pop(context, item),
                     );
-                  case Category:
-                    return CategoryCard(
-                      category: item as Category,
-                      onTap: () => Navigator.pop(context, item),
-                    );
                   default:
                     return const SizedBox();
                 }
               },
             ),
           ),
+        );
+      },
+    );
+  }
+
+  /// Show [Category] item selection dialog
+  Future<Category?> showCategorySelectDialog(BuildContext context, List<Category> list) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return CategorySelectDialog(
+          list: list,
+          onTap: (item) => Navigator.pop(context, item),
         );
       },
     );
@@ -199,10 +208,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Triggers on category card tapped
   void onCategoryCardTapped(List<Category> categories) async {
-    final category = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
-      "object": LocaleKeys.category.plural(1),
-      "action": LocaleKeys.select.tr(),
-    }), categories);
+    final category = await showCategorySelectDialog(context, categories);
     if (category != null) {
       onCategoryChanged(category);
     }

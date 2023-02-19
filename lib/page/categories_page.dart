@@ -56,8 +56,8 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
         bottom: TabBar(
           controller: tabController,
           tabs: [
-            Tab(text: LocaleKeys.expense.tr(),),
-            Tab(text: LocaleKeys.income.tr(),),
+            Tab(text: LocaleKeys.transactionTypeExpense.tr(),),
+            Tab(text: LocaleKeys.transactionTypeIncome.tr(),),
           ],
           onTap: (index) => setState(() {}),
         ),

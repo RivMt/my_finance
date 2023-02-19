@@ -57,8 +57,6 @@
   "basicInfo": "Basic information",
   "color": "Color",
   "settings": "Settings",
-  "expense": "Expense",
-  "income": "Income",
   "included": "Include in statics",
   "type": "Type",
   "description": "Description",
@@ -118,6 +116,9 @@
   "paymentTypePrepaid": "Prepaid Card",
   "paymentTypeMileage": "Mileage",
   "paymentTypeToll": "Toll",
+
+  "transactionTypeExpense": "Expense",
+  "transactionTypeIncome": "Income",
 
   "currencyTypeUnknown": "Unknown",
   "currencyTypeWon": "Korean Won",
