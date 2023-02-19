@@ -48,3 +48,6 @@ app.*.map.json
 
 # Generated files
 /lib/generated/*
+
+# Large size images
+assets/icon/*.png

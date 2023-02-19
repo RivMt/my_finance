@@ -68,7 +68,9 @@
   "transactionDate": "Transaction date",
   "paidDate": "Paid date",
   "utilityDays": "Utility days",
-  "budgetLeft": "남은 예산",
+  "budgetLeft": "Left budgets",
+  "testMode": "Test mode",
+  "productionMode": "Production mode",
 
   "month": "Month",
   "nMonthBefore": {
