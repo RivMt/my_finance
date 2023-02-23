@@ -32,7 +32,9 @@ class SearchFragment extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return const Text("Message");
+    return const Center(
+      child: Text("Message"),
+    );
   }
 
   @override

@@ -7,10 +7,14 @@ import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/account_details_page.dart';
 
 class AccountsPage extends StatefulWidget {
-  const AccountsPage({super.key});
+  const AccountsPage({
+    super.key,
+    this.init,
+  });
+
+  final Account? init;
 
   @override
   _AccountsPageState createState() => _AccountsPageState();
@@ -29,17 +33,22 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
-  /// Triggers on [Account] selected
-  ///
-  /// If [transactionVisible] is `true`, show transactions on right side,
-  /// otherwise, open [AccountDetailsPage]
-  void onAccountSelected(Account account) {
-    if (ScreenPlanner(context).isSidePanelVisible) {
-      selected = account;
-      setState(() {});
-    } else {
-      openPage(AccountDetailsPage(pid: account.pid));
+  /// Triggers on back button pressed
+  void onBackButtonPressed(BuildContext context) {
+    if (!ScreenPlanner(context).isSidePanelVisible) {
+      if (selected != null) {
+        selected = null;
+        setState(() {});
+        return;
+      }
     }
+    Navigator.pop(context);
+  }
+
+  /// Triggers on [Account] selected
+  void onAccountSelected(Account account) {
+    selected = account;
+    setState(() {});
   }
 
   /// Triggers on transaction created
@@ -50,30 +59,42 @@ class _AccountsPageState extends State<AccountsPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    selected = widget.init;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final account = selected ?? Account.unknown;
+    final sideVisible = ScreenPlanner(context).isSidePanelVisible;
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.account.plural(2)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_outlined),
+          onPressed: () => onBackButtonPressed(context),
+        ),
       ),
       body: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: width,
-              child: AccountsFragment(
-                selected: selected,
-                onItemTap: onAccountSelected,
-                onEditFinish: (account) => setState(() {
-                  selected = account;
-                }),
+            Visibility(
+              visible: sideVisible || account == Account.unknown,
+              child: SizedBox(
+                width: width,
+                child: AccountsFragment(
+                  selected: selected,
+                  onItemTap: onAccountSelected,
+                  onEditFinish: onAccountSelected,
+                ),
               ),
             ),
             Visibility(
-              visible: ScreenPlanner(context).isSidePanelVisible,
+              visible: sideVisible || account != Account.unknown,
               child: SizedBox(
                 width: width,
                 child: IndexedStack(

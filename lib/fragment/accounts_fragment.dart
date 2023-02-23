@@ -14,8 +14,8 @@ final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((re
 class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
     super.key,
-    this.onItemTap,
     this.selected,
+    this.onItemTap,
     this.onEditFinish,
   });
 
