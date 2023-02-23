@@ -7,12 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/condition_builder.dart';
 import 'package:my_finance/dialog/main_menu_dialog.dart';
 import 'package:my_finance/fragment/search_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/account_details_page.dart';
-import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/payments_page.dart';
 import 'package:my_finance/preference_keys.dart';
 
@@ -48,7 +48,12 @@ final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, 
 });
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+    required this.router,
+  });
+
+  final RouterDelegate router;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -79,14 +84,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Open [page]
   ///
   /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
-  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
-      if (onPageFinished != null) {
-        onPageFinished(value);
-      }
-    }).then((value) {
-      request();
-    });
+  void openPage(RoutePath path, [Function(dynamic)? onPageFinished]) {
+    widget.router.setNewRoutePath(path).then((value) => request());
   }
 
   /// Init API
@@ -100,7 +99,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     try {
       final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
       await client.init(
-        onLoginRequired: () => openPage(const LoginPage(), (value) => request()),
+        onLoginRequired: () => openPage(RoutePath.login, (value) => request()),
         preferences: prefs,
       );
     } on Exception catch(e) {
@@ -113,7 +112,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Request data
   void request() async {
-    final now = DateTime.now();
     // Account
     ref.read(_accounts.notifier).request(
       [{
@@ -129,41 +127,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Preference
     await ref.read(preferenceProvider.notifier).request();
     // Current month expense
-    ref.read(_currentMonthExpenses.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyPaidDate: [
-        DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
-        DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
-      ],
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-    }];
+    ref.read(_currentMonthExpenses.notifier).conditions = ConditionBuilder.currentMonthExpense(currency);
     ref.read(_currentMonthExpenses.notifier).request();
     // Amount to be paid
-    ref.read(_amountBePaid.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyCalculatedDate: [
-        now.millisecondsSinceEpoch,
-      ],
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-    }];
+    ref.read(_amountBePaid.notifier).conditions = ConditionBuilder.amountToBePaid(currency);
     ref.read(_amountBePaid.notifier).request();
     // Budget expense
-    ref.read(_budgetExpensed.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-      Transaction.keyPaidDate: {
-        "max": DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
-      },
-      Transaction.keyUtilityEnd: {
-        "min": DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
-      }
-    }];
+    ref.read(_budgetExpensed.notifier).conditions = ConditionBuilder.budgets(currency);
     ref.read(_budgetExpensed.notifier).request();
     setState(() {});
   }
@@ -206,6 +176,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     init();
+    widget.router.addListener(() => request());
   }
 
   @override
@@ -247,13 +218,13 @@ class _HomePageState extends ConsumerState<HomePage> {
               button: IconButton(
                 icon: const Icon(Icons.keyboard_arrow_right_outlined),
                 color: Theme.of(context).textTheme.titleMedium?.color,
-                onPressed: () => openPage(const AccountsPage()),
+                onPressed: () => openPage(FinanceRoutePath.accounts),
               ),
               build: (BuildContext context, int index) {
                 final account = accounts[index];
                 return AccountCard(
                   data: account,
-                  onTap: () => openPage(AccountDetailsPage(pid: account.pid)),
+                  onTap: () => openPage(FinanceRoutePath.accounts.details(account.pid)),
                 );
               },
             ),
@@ -286,27 +257,33 @@ class _HomePageState extends ConsumerState<HomePage> {
                     name = LocaleKeys.currentMonthExpense.tr();
                     icon = Icons.payments_outlined;
                     amount = ref.watch(_currentMonthExpenses);
-                    onTap = () => openPage(PaymentsPage(
-                      subtitle: name,
-                      currency: currency,
-                      condition: ref.watch(_currentMonthExpenses.notifier).conditions,
+                    onTap = () => openPage(FinanceRoutePath.payments.extend(
+                      queries: {
+                        Payment.keyCurrency: currency.value,
+                        FinanceModel.keyDescriptions: name,
+                        FinanceRoutePath.keyMode: PaymentsPage.keyCurrentMonthExpense,
+                      },
                     ));
                     break;
                   case 1:
                     name = LocaleKeys.amountBePaid.tr();
                     icon = Icons.calendar_today_outlined;
                     amount = ref.watch(_amountBePaid);
-                    onTap = () => openPage(PaymentsPage(
-                      subtitle: name,
-                      currency: currency,
-                      condition: ref.watch(_amountBePaid.notifier).conditions,
+                    onTap = () => openPage(FinanceRoutePath.payments.extend(
+                      queries: {
+                        Payment.keyCurrency: currency.value,
+                        FinanceModel.keyDescriptions: name,
+                        FinanceRoutePath.keyMode: PaymentsPage.keyAmountToBePaid,
+                      },
                     ));
                     break;
                   case 2:
                     name = LocaleKeys.budgetLeft.tr();
                     icon = Icons.bar_chart_outlined;
-                    onTap = () => openPage(PaymentsPage(
-                      currency: currency,
+                    onTap = () => openPage(FinanceRoutePath.payments.extend(
+                      queries: {
+                        Payment.keyCurrency: currency.value,
+                      },
                     ));
                     final budgetExpensed = ref.watch(_budgetExpensed);
                     final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];

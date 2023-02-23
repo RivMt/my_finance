@@ -7,10 +7,19 @@ import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/account_details_page.dart';
 
 class AccountsPage extends StatefulWidget {
-  const AccountsPage({super.key});
+  const AccountsPage({
+    super.key,
+    required this.router,
+    this.pid,
+  });
+
+  final RouterDelegate router;
+
+  final int? pid;
 
   @override
   _AccountsPageState createState() => _AccountsPageState();
@@ -22,11 +31,8 @@ class _AccountsPageState extends State<AccountsPage> {
   Account? selected;
 
   /// Open page
-  void openPage(Widget page) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page),
-    );
+  void openPage(RoutePath path) {
+    widget.router.setNewRoutePath(path);
   }
 
   /// Triggers on [Account] selected
@@ -38,7 +44,7 @@ class _AccountsPageState extends State<AccountsPage> {
       selected = account;
       setState(() {});
     } else {
-      openPage(AccountDetailsPage(pid: account.pid));
+      openPage(FinanceRoutePath.accounts.details(account.pid));
     }
   }
 
@@ -46,6 +52,16 @@ class _AccountsPageState extends State<AccountsPage> {
   void onTransactionCreated(Transaction? transaction) {
     if (transaction != null) {
       setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pid != null) {
+      selected = Account({
+        FinanceModel.keyPid: widget.pid,
+      });
     }
   }
 
@@ -62,18 +78,21 @@ class _AccountsPageState extends State<AccountsPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: width,
-              child: AccountsFragment(
-                selected: selected,
-                onItemTap: onAccountSelected,
-                onEditFinish: (account) => setState(() {
-                  selected = account;
-                }),
+            Visibility(
+              visible: ScreenPlanner(context).isSidePanelVisible || account == Account.unknown,
+              child: SizedBox(
+                width: width,
+                child: AccountsFragment(
+                  selected: selected,
+                  onItemTap: onAccountSelected,
+                  onEditFinish: (account) => setState(() {
+                    selected = account;
+                  }),
+                ),
               ),
             ),
             Visibility(
-              visible: ScreenPlanner(context).isSidePanelVisible,
+              visible: ScreenPlanner(context).isSidePanelVisible || account != Account.unknown,
               child: SizedBox(
                 width: width,
                 child: IndexedStack(

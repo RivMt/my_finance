@@ -10,6 +10,13 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/payment_details_page.dart';
 
 class PaymentsPage extends StatefulWidget {
+
+  static const String keyCurrentMonthExpense = "current-month-expense";
+
+  static const String keyAmountToBePaid = "amount-to-be-paid";
+
+  static const String keyBudgets = "budgets";
+
   const PaymentsPage({
     super.key,
     this.condition,
