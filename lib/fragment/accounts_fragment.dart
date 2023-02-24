@@ -126,6 +126,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           // List
           ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: AccountSymbol.values.length,
             itemBuilder: (context, index) {
               final icon = AccountSymbol.values[index];

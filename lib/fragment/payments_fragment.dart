@@ -200,6 +200,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
           ),
           // List
           ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: PaymentSymbol.values.length,
             itemBuilder: (context, index) {
