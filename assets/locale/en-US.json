@@ -69,6 +69,9 @@
   "budgetLeft": "Left budgets",
   "testMode": "Test mode",
   "productionMode": "Production mode",
+  "calculatedDate": "Withdraw date",
+  "createdDate": "Created date",
+  "editedDate": "Edited date",
 
   "month": "Month",
   "nMonthBefore": {

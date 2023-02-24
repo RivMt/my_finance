@@ -65,6 +65,9 @@
   "budgetLeft": "남은 예산",
   "testMode": "테스트 모드",
   "productionMode": "프로덕션 모드",
+  "calculatedDate": "출금 날짜",
+  "createdDate": "작성 날짜",
+  "editedDate": "편집 날짜",
 
   "month": "월",
   "nMonthBefore": {

@@ -5,6 +5,7 @@ import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/fragment/transaction_edit_fragment.dart';
 
 final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
@@ -57,6 +58,16 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     );
     // Get categories
     ref.read(_categories.notifier).request([{}]);
+  }
+
+  /// Show transaction details dialog
+  void showTransactionDetailsDialog(BuildContext context, Transaction data) {
+    showDialog(
+      context: context,
+      builder: (context) => TransactionDetailsDialog(
+        data: data,
+      ),
+    );
   }
 
   /// Show transaction editing modal
@@ -118,6 +129,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       category: categories.firstWhere((element) {
         return element.type == data.type && element.pid == data.category;
       }, orElse: () => Category.unknown),
+      onTap: () => showTransactionDetailsDialog(context, data),
       onLongPress: () => showTransactionEditingModal(context, data),
     );
   }
