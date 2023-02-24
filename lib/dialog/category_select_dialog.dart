@@ -113,9 +113,9 @@ class _CategorySelectDialogState extends State<CategorySelectDialog> {
             // List of categories
             Expanded(
               child: ListView.builder(
-                itemCount: widget.list.length,
+                itemCount: categories.length,
                 itemBuilder: (context, index) {
-                  final item = widget.list[index];
+                  final item = categories[index];
                   return CategoryCard(
                     category: item,
                     onTap: () {

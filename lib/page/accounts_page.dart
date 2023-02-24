@@ -108,26 +108,27 @@ class _AccountsPageState extends State<AccountsPage> {
                       }),
                     ),
                     // 1: Account details and transactions
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: AccountDetailsFragment(
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AccountDetailsFragment(
                             account: account,
                           ),
-                        ),
-                        Expanded(
-                          child: TransactionsFragment(
-                            conditions: [{
-                              Transaction.keyAccountID: account.pid,
-                              FinanceModel.keyDeleted: false,
-                            }],
+                          const SizedBox(height: 8,),
+                          Expanded(
+                            child: TransactionsFragment(
+                              conditions: [{
+                                Transaction.keyAccountID: account.pid,
+                                FinanceModel.keyDeleted: false,
+                              }],
+                            ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
