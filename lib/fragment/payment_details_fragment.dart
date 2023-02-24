@@ -15,6 +15,10 @@ final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   );
 });
 
+final _payment = StateNotifierProvider<ModelState<Payment>, Payment>((ref) {
+  return ModelState<Payment>(ref, Payment.unknown);
+});
+
 class PaymentDetailsFragment extends ConsumerStatefulWidget {
   const PaymentDetailsFragment({
     super.key,
@@ -36,6 +40,10 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
   ///
   /// This method changes [_total]'s condition.
   void request() {
+    // Payment
+    ref.read(_payment.notifier).request({
+      FinanceModel.keyPid: widget.payment.pid,
+    });
     // Default condition
     List<Map<String, dynamic>> conditions = [{
       Transaction.keyPaymentID: widget.payment.pid,
@@ -73,6 +81,7 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
   @override
   Widget build(BuildContext context) {
     final amount = ref.watch(_total);
+    final payment = ref.watch(_payment);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -83,24 +92,24 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.payment.serialNumber,
+                payment.serialNumber,
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               Text(
-                widget.payment.currency.format(amount),
+                payment.currency.format(amount),
                 style: Theme.of(context).textTheme.displayLarge,
               ),
               Text(
-                widget.payment.descriptions,
+                payment.descriptions,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),
         ),
         WalletItemIcon(
-          icon: widget.payment.icon.icon,
-          foreground: widget.payment.foreground,
-          background: widget.payment.background,
+          icon: payment.icon.icon,
+          foreground: payment.foreground,
+          background: payment.background,
         ),
       ],
     );

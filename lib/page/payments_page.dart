@@ -7,11 +7,11 @@ import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/payment_details_page.dart';
 
 class PaymentsPage extends StatefulWidget {
   const PaymentsPage({
     super.key,
+    this.init,
     this.condition,
     this.subtitle = "",
     this.currency = Currency.unknown,
@@ -22,6 +22,8 @@ class PaymentsPage extends StatefulWidget {
   final List<Map<String, dynamic>>? condition;
 
   final Currency currency;
+
+  final Payment? init;
 
   @override
   _PaymentsPageState createState() => _PaymentsPageState();
@@ -40,17 +42,25 @@ class _PaymentsPageState extends State<PaymentsPage> {
     );
   }
 
+  /// Triggers on back button pressed
+  void onBackButtonPressed(BuildContext context) {
+    if (!ScreenPlanner(context).isSidePanelVisible) {
+      if (selected != null) {
+        selected = null;
+        setState(() {});
+        return;
+      }
+    }
+    Navigator.pop(context);
+  }
+
   /// Triggers on [Payment] selected
   ///
   /// If [transactionVisible] is `true`, show transactions on right side,
   /// otherwise, open [PaymentDetailsPage]
   void onPaymentSelected(Payment payment) {
-    if (ScreenPlanner(context).isSidePanelVisible) {
-      selected = payment;
-      setState(() {});
-    } else {
-      openPage(PaymentDetailsPage(pid: payment.pid));
-    }
+    selected = payment;
+    setState(() {});
   }
 
   /// Triggers on transaction created
@@ -82,9 +92,14 @@ class _PaymentsPageState extends State<PaymentsPage> {
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final payment = selected ?? Payment.unknown;
+    final sideVisible = ScreenPlanner(context).isSidePanelVisible;
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.payment.plural(2)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_outlined),
+          onPressed: () => onBackButtonPressed(context),
+        ),
       ),
       body: SafeArea(
         child: Row(
@@ -92,28 +107,31 @@ class _PaymentsPageState extends State<PaymentsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Payments
-            SizedBox(
-              width: width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PaymentsFragment(
-                    subtitle: widget.subtitle,
-                    selected: selected,
-                    conditions: widget.condition,
-                    currency: widget.currency,
-                    onItemTap: onPaymentSelected,
-                    onEditFinish: (item) => setState(() {
-                      selected = item;
-                    }),
-                  ),
-                ],
+            Visibility(
+              visible: sideVisible || payment == Payment.unknown,
+              child: SizedBox(
+                width: width,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PaymentsFragment(
+                      subtitle: widget.subtitle,
+                      selected: selected,
+                      conditions: widget.condition,
+                      currency: widget.currency,
+                      onItemTap: onPaymentSelected,
+                      onEditFinish: (item) => setState(() {
+                        selected = item;
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ),
             // Transactions
             Visibility(
-              visible: ScreenPlanner(context).isSidePanelVisible,
+              visible: sideVisible || payment != Payment.unknown,
               child: SizedBox(
                 width: width,
                 child: IndexedStack(
@@ -127,24 +145,25 @@ class _PaymentsPageState extends State<PaymentsPage> {
                       }),
                     ),
                     // 1: Payment details and transactions
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: PaymentDetailsFragment(
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PaymentDetailsFragment(
                             payment: payment,
                             conditions: widget.condition,
                           ),
-                        ),
-                        Expanded(
-                          child: TransactionsFragment(
-                            conditions: transactionsCondition,
+                          const SizedBox(height: 8,),
+                          Expanded(
+                            child: TransactionsFragment(
+                              conditions: transactionsCondition,
+                            ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

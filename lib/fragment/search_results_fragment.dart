@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/page/payments_page.dart';
 
 final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
   return SearchState<FinanceSearchResult>(ref);
@@ -58,8 +59,12 @@ class _SearchResultsFragmentState extends ConsumerState<SearchResultsFragment> {
             )),
           );
         } else if (item.group == Payment) {
+          final data = item.convert() as Payment;
           return PaymentCard(
-            data: item.convert() as Payment,
+            data: data,
+            onTap: () => openPage(PaymentsPage(
+              init: data,
+            )),
           );
         } else if (item.group == Transaction) {
           final data = item.convert() as Transaction;
