@@ -1,54 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
-import 'package:my_finance/fragment/search_results_fragment.dart';
+import 'package:my_api/finance.dart';
+import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/page/payments_page.dart';
 
-class SearchFragment extends SearchDelegate {
+final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
+  return SearchState<FinanceSearchResult>(ref);
+});
 
-  String text = "";
+class SearchFragment extends ConsumerStatefulWidget {
+  const SearchFragment({
+    super.key,
+    required this.query,
+  });
+
+  final String query;
 
   @override
-  void showResults(BuildContext context) {
-    text = query;
-    super.showResults(context);
+  _SearchResultsFragmentState createState() => _SearchResultsFragmentState();
+}
+
+class _SearchResultsFragmentState extends ConsumerState<SearchFragment> {
+
+  void openPage(Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  }
+
+  void request() async {
+    ref.read(_search.notifier).request(widget.query);
   }
 
   @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back_outlined),
-      onPressed: () => Navigator.pop(context),
-    );
+  void initState() {
+    super.initState();
+    request();
   }
 
   @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.search_outlined),
-        onPressed: () => showResults(context),
-      ),
-    ];
+  void didUpdateWidget(SearchFragment oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    request();
   }
 
   @override
-  Widget buildSuggestions(BuildContext context) {
-    return const Center(
-      child: Text("Message"),
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final width = ScreenPlanner(context).panelWidth;
-    final number = ScreenPlanner(context).panelNumber;
-    return Align(
-      alignment: number == 1 ? Alignment.topLeft : Alignment.topCenter,
-      child: SizedBox(
-        width: width,
-        child: SearchResultsFragment(
-          query: text,
-        ),
-      ),
+  Widget build(BuildContext context) {
+    final List<FinanceSearchResult> results = ref.watch(_search);
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final item = results[index];
+        if (item.group == Account) {
+          final data = item.convert() as Account;
+          return AccountCard(
+            data: data,
+            onTap: () => openPage(AccountsPage(
+              init: data,
+            )),
+          );
+        } else if (item.group == Payment) {
+          final data = item.convert() as Payment;
+          return PaymentCard(
+            data: data,
+            onTap: () => openPage(PaymentsPage(
+              init: data,
+            )),
+          );
+        } else if (item.group == Transaction) {
+          final data = item.convert() as Transaction;
+          return TransactionCard(
+            data: data,
+            category: Category.unknown,
+          );
+        }
+        return const SizedBox();
+      },
     );
   }
 }

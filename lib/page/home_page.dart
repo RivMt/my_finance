@@ -8,7 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/dialog/main_menu_dialog.dart';
-import 'package:my_finance/fragment/search_fragment.dart';
+import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/accounts_page.dart';
@@ -227,7 +227,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             icon: const Icon(Icons.search_outlined),
             onPressed: () => showSearch(
               context: context,
-              delegate: SearchFragment(),
+              delegate: SearchPage(),
             ),
           ),
         ],
