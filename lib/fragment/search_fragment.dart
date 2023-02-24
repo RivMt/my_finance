@@ -18,10 +18,10 @@ class SearchFragment extends ConsumerStatefulWidget {
   final String query;
 
   @override
-  _SearchResultsFragmentState createState() => _SearchResultsFragmentState();
+  _SearchFragmentState createState() => _SearchFragmentState();
 }
 
-class _SearchResultsFragmentState extends ConsumerState<SearchFragment> {
+class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
   void openPage(Widget page) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => page));
