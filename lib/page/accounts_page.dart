@@ -33,16 +33,22 @@ class _AccountsPageState extends State<AccountsPage> {
     );
   }
 
+  /// Check page can be pop
+  bool checkPageCanPop(BuildContext context) {
+    if (!ScreenPlanner(context).isSidePanelVisible) {
+      return selected == null;
+    }
+    return true;
+  }
+
   /// Triggers on back button pressed
   void onBackButtonPressed(BuildContext context) {
-    if (!ScreenPlanner(context).isSidePanelVisible) {
-      if (selected != null) {
-        selected = null;
-        setState(() {});
-        return;
-      }
+    if (checkPageCanPop(context)) {
+      Navigator.pop(context);
     }
-    Navigator.pop(context);
+    selected = null;
+    setState(() {});
+    return;
   }
 
   /// Triggers on [Account] selected
@@ -69,75 +75,85 @@ class _AccountsPageState extends State<AccountsPage> {
     final width = ScreenPlanner(context).panelWidth;
     final account = selected ?? Account.unknown;
     final sideVisible = ScreenPlanner(context).isSidePanelVisible;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(LocaleKeys.account.plural(2)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_outlined),
-          onPressed: () => onBackButtonPressed(context),
+    return WillPopScope(
+      onWillPop: () async {
+        final value = checkPageCanPop(context);
+        if (!value) {
+          selected = null;
+          setState(() {});
+        }
+        return value;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(LocaleKeys.account.plural(2)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_outlined),
+            onPressed: () => onBackButtonPressed(context),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Visibility(
-              visible: sideVisible || account == Account.unknown,
-              child: SizedBox(
-                width: width,
-                child: AccountsFragment(
-                  selected: selected,
-                  onItemTap: onAccountSelected,
-                  onEditFinish: onAccountSelected,
+        body: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Visibility(
+                visible: sideVisible || account == Account.unknown,
+                child: SizedBox(
+                  width: width,
+                  child: AccountsFragment(
+                    selected: selected,
+                    onItemTap: onAccountSelected,
+                    onEditFinish: onAccountSelected,
+                  ),
                 ),
               ),
-            ),
-            Visibility(
-              visible: sideVisible || account != Account.unknown,
-              child: SizedBox(
-                width: width,
-                child: IndexedStack(
-                  index: account == Account.unknown ? 0 : 1,
-                  children: [
-                    // 0: No account
-                    MessageBox(
-                      icon: Icons.question_mark_outlined,
-                      message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                        "object": LocaleKeys.account.plural(1),
-                      }),
-                    ),
-                    // 1: Account details and transactions
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AccountDetailsFragment(
-                            account: account,
-                          ),
-                          const SizedBox(height: 8,),
-                          Expanded(
-                            child: TransactionsFragment(
-                              conditions: [{
-                                Transaction.keyAccountID: account.pid,
-                                FinanceModel.keyDeleted: false,
-                              }],
-                            ),
-                          ),
-                        ],
+              Visibility(
+                visible: sideVisible || account != Account.unknown,
+                child: SizedBox(
+                  width: width,
+                  child: IndexedStack(
+                    index: account == Account.unknown ? 0 : 1,
+                    children: [
+                      // 0: No account
+                      MessageBox(
+                        icon: Icons.question_mark_outlined,
+                        message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                          "object": LocaleKeys.account.plural(1),
+                        }),
                       ),
-                    ),
-                  ],
+                      // 1: Account details and transactions
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AccountDetailsFragment(
+                              account: account,
+                            ),
+                            const SizedBox(height: 8,),
+                            Expanded(
+                              child: TransactionsFragment(
+                                conditions: [{
+                                  Transaction.keyAccountID: account.pid,
+                                  FinanceModel.keyDeleted: false,
+                                }],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: TransactionAddButton(
-        onFinish: onTransactionCreated,
+        floatingActionButton: TransactionAddButton(
+          onFinish: onTransactionCreated,
+        ),
       ),
     );
   }

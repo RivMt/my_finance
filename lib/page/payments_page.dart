@@ -42,16 +42,22 @@ class _PaymentsPageState extends State<PaymentsPage> {
     );
   }
 
+  /// Check page can be pop
+  bool checkPageCanPop(BuildContext context) {
+    if (!ScreenPlanner(context).isSidePanelVisible) {
+      return selected == null;
+    }
+    return true;
+  }
+
   /// Triggers on back button pressed
   void onBackButtonPressed(BuildContext context) {
-    if (!ScreenPlanner(context).isSidePanelVisible) {
-      if (selected != null) {
-        selected = null;
-        setState(() {});
-        return;
-      }
+    if (checkPageCanPop(context)) {
+      Navigator.pop(context);
     }
-    Navigator.pop(context);
+    selected = null;
+    setState(() {});
+    return;
   }
 
   /// Triggers on [Payment] selected
@@ -93,86 +99,96 @@ class _PaymentsPageState extends State<PaymentsPage> {
     final width = ScreenPlanner(context).panelWidth;
     final payment = selected ?? Payment.unknown;
     final sideVisible = ScreenPlanner(context).isSidePanelVisible;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(LocaleKeys.payment.plural(2)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_outlined),
-          onPressed: () => onBackButtonPressed(context),
+    return WillPopScope(
+      onWillPop: () async {
+        final value = checkPageCanPop(context);
+        if (!value) {
+          selected = null;
+          setState(() {});
+        }
+        return value;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(LocaleKeys.payment.plural(2)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_outlined),
+            onPressed: () => onBackButtonPressed(context),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Payments
-            Visibility(
-              visible: sideVisible || payment == Payment.unknown,
-              child: SizedBox(
-                width: width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    PaymentsFragment(
-                      subtitle: widget.subtitle,
-                      selected: selected,
-                      conditions: widget.condition,
-                      currency: widget.currency,
-                      onItemTap: onPaymentSelected,
-                      onEditFinish: (item) => setState(() {
-                        selected = item;
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Transactions
-            Visibility(
-              visible: sideVisible || payment != Payment.unknown,
-              child: SizedBox(
-                width: width,
-                child: IndexedStack(
-                  index: payment == Payment.unknown ? 0 : 1,
-                  children: [
-                    // 0: No payment
-                    MessageBox(
-                      icon: Icons.question_mark_outlined,
-                      message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                        "object": LocaleKeys.payment.plural(1),
-                      }),
-                    ),
-                    // 1: Payment details and transactions
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PaymentDetailsFragment(
-                            payment: payment,
-                            conditions: widget.condition,
-                          ),
-                          const SizedBox(height: 8,),
-                          Expanded(
-                            child: TransactionsFragment(
-                              conditions: transactionsCondition,
-                            ),
-                          ),
-                        ],
+        body: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Payments
+              Visibility(
+                visible: sideVisible || payment == Payment.unknown,
+                child: SizedBox(
+                  width: width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PaymentsFragment(
+                        subtitle: widget.subtitle,
+                        selected: selected,
+                        conditions: widget.condition,
+                        currency: widget.currency,
+                        onItemTap: onPaymentSelected,
+                        onEditFinish: (item) => setState(() {
+                          selected = item;
+                        }),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+              // Transactions
+              Visibility(
+                visible: sideVisible || payment != Payment.unknown,
+                child: SizedBox(
+                  width: width,
+                  child: IndexedStack(
+                    index: payment == Payment.unknown ? 0 : 1,
+                    children: [
+                      // 0: No payment
+                      MessageBox(
+                        icon: Icons.question_mark_outlined,
+                        message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                          "object": LocaleKeys.payment.plural(1),
+                        }),
+                      ),
+                      // 1: Payment details and transactions
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PaymentDetailsFragment(
+                              payment: payment,
+                              conditions: widget.condition,
+                            ),
+                            const SizedBox(height: 8,),
+                            Expanded(
+                              child: TransactionsFragment(
+                                conditions: transactionsCondition,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: TransactionAddButton(
-        onFinish: onTransactionCreated,
+        floatingActionButton: TransactionAddButton(
+          onFinish: onTransactionCreated,
+        ),
       ),
     );
   }
