@@ -171,11 +171,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
           ],
         ),
       ),
-      floatingActionButton: Visibility(
-        visible: ScreenPlanner(context).isSidePanelVisible,
-        child: TransactionAddButton(
-          onFinish: onTransactionCreated,
-        ),
+      floatingActionButton: TransactionAddButton(
+        onFinish: onTransactionCreated,
       ),
     );
   }
