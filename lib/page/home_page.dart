@@ -121,7 +121,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       ApiClient.buildOptions(
         limit: 3,
         sorts: [
-          const Sort(Account.keyPriority, SortType.asc),
+          const Sort(Account.keyPriority, SortType.desc),
+          const Sort(FinanceModel.keyLastUsed, SortType.desc),
         ],
       ),
     );
