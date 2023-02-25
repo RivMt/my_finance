@@ -200,6 +200,12 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// Triggers on paid date button pressed
   void onPaidDateButtonPressed(BuildContext context) async {
     editing.paidDate = await showDatePickDialog(context, editing.paidDate);
+    // Set calculated date by paid date
+    editing.calculatedDate = editing.paidDate;
+    final payment = ref.watch(_payments).firstWhere((element) => element.pid == editing.paymentId, orElse: () => Payment.none);
+    if (payment.isCredit) {
+      onPaymentChanged(payment);
+    }
     setState(() {});
   }
 
