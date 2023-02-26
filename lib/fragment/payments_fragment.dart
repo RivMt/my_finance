@@ -74,6 +74,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       ApiClient.buildOptions(
         sorts: [
           const Sort(Payment.keyIcon, SortType.asc),
+          const Sort(FinanceModel.keyLastUsed, SortType.desc),
         ],
       ),
     );
