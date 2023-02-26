@@ -192,6 +192,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
           ),
         ),
         floatingActionButton: TransactionAddButton(
+          payment: payment,
           onFinish: onTransactionCreated,
         ),
       ),

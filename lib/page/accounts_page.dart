@@ -157,6 +157,7 @@ class _AccountsPageState extends State<AccountsPage> {
           ),
         ),
         floatingActionButton: TransactionAddButton(
+          account: account,
           onFinish: onTransactionCreated,
         ),
       ),
