@@ -139,6 +139,11 @@ class _AccountsPageState extends State<AccountsPage> {
                                   Transaction.keyAccountID: account.pid,
                                   FinanceModel.keyDeleted: false,
                                 }],
+                                options: ApiClient.buildOptions(
+                                  sorts: [
+                                    const Sort(FinanceModel.keyLastUsed, SortType.desc),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

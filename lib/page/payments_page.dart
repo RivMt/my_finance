@@ -174,6 +174,11 @@ class _PaymentsPageState extends State<PaymentsPage> {
                             Expanded(
                               child: TransactionsFragment(
                                 conditions: transactionsCondition,
+                                options: ApiClient.buildOptions(
+                                  sorts: [
+                                    const Sort(FinanceModel.keyLastUsed, SortType.desc),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
