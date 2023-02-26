@@ -8,6 +8,8 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/dialog/category_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+const String _tag = "TransactionEditFragment";
+
 final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
   return ModelsState<Account>(ref);
 });
@@ -24,10 +26,14 @@ class TransactionEditFragment extends ConsumerStatefulWidget {
   const TransactionEditFragment({
     super.key,
     required this.onFinish,
+    this.isEdit = false,
     this.base,
   });
 
   final Transaction? base;
+
+  /// Value of this fragment is editing [Transaction]
+  final bool isEdit;
 
   final Function(Transaction?) onFinish;
 
@@ -48,7 +54,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// Is this fragment editing [Transaction]
   ///
   /// This returns `true` when [widget.base] is not `null`
-  bool get isEdit => widget.base != null;
+  bool get isEdit => widget.isEdit;
 
   /// [Transaction] which is now editing
   Transaction editing = Transaction({});
@@ -67,32 +73,58 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     setState(() {});
   }
 
+  /// Currently selected [Account]
+  Account get selectedAccount {
+    return ref.watch(_accounts).firstWhere((item) => item.pid == editing.accountId, orElse: () => Account.unknown);
+  }
+
+  /// Currently selected [Payment]
+  Payment get selectedPayment {
+    return ref.watch(_payments).firstWhere((item) => item.pid == editing.paymentId, orElse: () {
+      if (editing.paymentId == Payment.none.pid) {
+        return Payment.none;
+      }
+      return Payment.unknown;
+    });
+  }
+
+  /// Currently selected [Category]
+  Category get selectedCategory {
+    return ref.watch(_categories).firstWhere((item) => item.pid == editing.category, orElse: () => Category.unknown);
+  }
+
   /// Request
-  void request() {
+  void request() async {
     // Account
-    ref.read(_accounts.notifier).request([{
+    await ref.read(_accounts.notifier).request([{
       FinanceModel.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
         const Sort(Account.keyPriority, SortType.desc),
       ],
     ));
+    final account = selectedAccount;
+    setAccount(account);
     // Payment
-    ref.read(_payments.notifier).request([{
+    await ref.read(_payments.notifier).request([{
       FinanceModel.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
         const Sort(Payment.keyPriority, SortType.desc),
       ],
     ));
+    final payment = selectedPayment;
+    setPayment(payment);
     // Category
-    ref.read(_categories.notifier).request([{
+    await ref.read(_categories.notifier).request([{
       FinanceModel.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
         const Sort(FinanceModel.keyLastUsed, SortType.desc),
       ],
     ));
+    final category = selectedCategory;
+    setCategory(category);
   }
 
   /// Show [T] item selection dialog
@@ -184,8 +216,10 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     // Send
     if (isEdit) {
       result = await ApiClient().update([editing.map]);
+      Log.v(_tag, "Update: ${editing.map}");
     } else {
       result = await ApiClient().create([editing.map]);
+      Log.v(_tag, "Create: ${editing.map}");
     }
     // Check
     progressing = false;
@@ -197,21 +231,70 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     widget.onFinish(result.data[0]);
   }
 
+  /// Set [editing.paidDate]
+  void setPaidDate(DateTime date) {
+    editing.paidDate = date;
+    setCalculatedDate();
+  }
+
+  /// Set [editing.calculatedDate]
+  ///
+  /// If [date] is not `null`, set [editing.calculatedDate] to [date]. And
+  /// [date] is `null` and [editing.calculatedDate] is equal to
+  /// [Transaction.defaultCalculatedDate], set it from [editing.paidDate].
+  ///
+  /// Make [override] `true` to override [editing.calculatedDate] whether its value.
+  void setCalculatedDate([DateTime? date]) {
+    if (date != null) {
+      editing.calculatedDate = date;
+      return;
+    }
+    final payment = selectedPayment;
+    editing.calculatedDate = payment.getCalculatedDate(editing.paidDate);
+  }
+
+  /// Set [editing.accountId] and [editing.currency]
+  void setAccount(Account account) {
+    editing.accountId = account.pid;
+    editing.currency = account.currency;
+    setState(() {});
+  }
+
+  /// Set [editing.paymentId], [editing.altCurrency], [editing.altAmount] and
+  /// [editing.calculatedDate].
+  void setPayment(Payment payment) {
+    editing.paymentId = payment.pid;
+    if (payment.currency != Currency.unknown && payment.currency != editing.currency) {
+      editing.altCurrency = payment.currency;
+      editing.altAmount = Decimal.zero;
+    } else {
+      editing.altCurrency = null;
+      editing.altAmount = null;
+    }
+    setCalculatedDate();
+  }
+
+  /// Set [editing.category] and [editing.type]
+  void setCategory(Category category) {
+    editing.category = category.pid;
+    editing.type = category.type;
+    editing.isIncluded = category.isIncluded;
+    if (editing.type != TransactionType.expense) {
+      onNoPaymentCheckboxChanged(true);
+    }
+  }
+
   /// Triggers on paid date button pressed
   void onPaidDateButtonPressed(BuildContext context) async {
-    editing.paidDate = await showDatePickDialog(context, editing.paidDate);
-    // Set calculated date by paid date
-    editing.calculatedDate = editing.paidDate;
-    final payment = ref.watch(_payments).firstWhere((element) => element.pid == editing.paymentId, orElse: () => Payment.none);
-    if (payment.isCredit) {
-      onPaymentChanged(payment);
-    }
+    final date = await showDatePickDialog(context, editing.paidDate);
+    setPaidDate(date);
     setState(() {});
   }
 
   /// Triggers on calculated date button pressed
   void onCalculatedDateButtonPressed(BuildContext context) async {
-    editing.calculatedDate = await showDatePickDialog(context, editing.calculatedDate);
+    final date = await showDatePickDialog(context, editing.calculatedDate);
+    setCalculatedDate(date);
     setState(() {});
   }
 
@@ -219,8 +302,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   void onCategoryCardTapped(List<Category> categories) async {
     final category = await showCategorySelectDialog(context, categories);
     if (category != null) {
-      onCategoryChanged(category);
+      setCategory(category);
     }
+    setState(() {});
   }
   
   /// Triggers on account card tapped
@@ -230,8 +314,16 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       "action": LocaleKeys.select.tr(),
     }), accounts);
     if (account != null) {
-      onAccountChanged(account);
+      setAccount(account);
     }
+    setPayment(selectedPayment);
+    setState(() {});
+  }
+
+  /// Triggers on no payment checkbox changed
+  void onNoPaymentCheckboxChanged(bool value) {
+    setPayment(value ? Payment.none : Payment.unknown);
+    setState(() {});
   }
 
   /// Triggers on payment card tapped
@@ -241,47 +333,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       "action": LocaleKeys.select.tr(),
     }), payments);
     if (payment != null) {
-      onPaymentChanged(payment);
+      setPayment(payment);
     }
-  }
-
-  /// Triggers on category changed
-  void onCategoryChanged(Category category) {
-    editing.category = category.pid;
-    editing.type = category.type;
-    editing.isIncluded = category.isIncluded;
-    if (editing.type == TransactionType.income) {
-      onNoPaymentCheckboxChanged(true);
-    }
-    setState(() {});
-  }
-
-  /// Triggers on account changed
-  void onAccountChanged(Account account) {
-    editing.accountId = account.pid;
-    editing.currency = account.currency;
-    setState(() {});
-  }
-
-  /// Triggers on no payment checkbox changed
-  void onNoPaymentCheckboxChanged(bool value) {
-    editing.paymentId = value ? Payment.none.pid : Payment.unknown.pid;
-    editing.altCurrency = null;
-    editing.altAmount = null;
-    editing.calculatedDate = editing.paidDate;
-    setState(() {});
-  }
-
-  /// Triggers on payment changed
-  void onPaymentChanged(Payment payment) {
-    if (payment == Payment.none) {
-      onNoPaymentCheckboxChanged(true);
-      return;
-    }
-    editing.paymentId = payment.pid;
-    editing.altCurrency = (editing.currency == payment.currency) ? null : payment.currency;
-    editing.altAmount = (editing.currency == payment.currency) ? null : Decimal.zero;
-    editing.calculatedDate = payment.isCredit ? payment.getCalculatedDate(editing.paidDate) : editing.paidDate;
+    setAccount(selectedAccount);
     setState(() {});
   }
 
@@ -344,7 +398,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     editing.utilityDays = int.parse(value);
   }
 
-  /// Apply [editing] to UI
+  /// Apply [editing] data to UI
   void apply() {
     descriptionController.text = editing.descriptions;
     amountController.text = editing.amount.toString();
@@ -355,7 +409,8 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   @override
   void initState() {
     super.initState();
-    editing = widget.base ?? Transaction({});
+    assert((widget.isEdit && widget.base != null) || !widget.isEdit);
+    editing = widget.base ?? Transaction.init();
     request();
     apply();
   }
@@ -369,20 +424,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   @override
   Widget build(BuildContext context) {
-    final category = ref.watch(_categories).firstWhere((item) {
-      return item.pid == editing.category;
-    }, orElse: () => Category.unknown);
-    final account = ref.watch(_accounts).firstWhere((item) {
-      return item.pid == editing.accountId;
-    }, orElse: () => Account.unknown);
-    final payment = ref.watch(_payments).firstWhere((item) {
-      return item.pid == editing.paymentId;
-    }, orElse: () {
-      if (editing.paymentId == Payment.none.pid) {
-        return Payment.none;
-      }
-      return Payment.unknown;
-    });
+    final category = selectedCategory;
+    final account = selectedAccount;
+    final payment = selectedPayment;
     final bool useAlt = (payment != Payment.none) &&
         (account != Account.unknown) &&
         (editing.altCurrency != null) &&

@@ -84,6 +84,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
           children: [
             TransactionEditFragment(
               base: editing,
+              isEdit: true,
               onFinish: (account) {
                 Navigator.pop(context, account);
               },

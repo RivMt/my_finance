@@ -20,7 +20,7 @@ class TransactionAddButton extends StatelessWidget {
   final Function(Transaction?)? onFinish;
 
   void showTransactionCreateModal(BuildContext context) {
-    final Transaction data = Transaction({});
+    final Transaction data = Transaction.init();
     if (account != null && account != Account.unknown) {
       data.accountId = account!.pid;
     }
