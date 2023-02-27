@@ -25,9 +25,11 @@ class PaymentsFragment extends ConsumerStatefulWidget {
     this.subtitle = "",
     this.selected,
     this.currency = Currency.unknown,
+    this.hideCreateButton = false,
     this.onItemTap,
     this.onEditFinish,
-    this.conditions,
+    this.paymentsConditions,
+    this.amountConditions,
   });
 
   final Payment? selected;
@@ -36,11 +38,15 @@ class PaymentsFragment extends ConsumerStatefulWidget {
 
   final String subtitle;
 
+  final bool hideCreateButton;
+
   final Function(Payment)? onItemTap;
 
   final Function(Payment)? onEditFinish;
 
-  final List<Map<String, dynamic>>? conditions;
+  final List<Map<String, dynamic>>? paymentsConditions;
+
+  final List<Map<String, dynamic>>? amountConditions;
 
   @override
   _PaymentsFragmentState createState() => _PaymentsFragmentState();
@@ -67,7 +73,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   void request() {
     // Payments
     ref.read(_payments.notifier).request(
-      [{
+      widget.paymentsConditions ?? [{
         FinanceModel.keyDeleted: false,
         Payment.keyCurrency: currency.value,
       }],
@@ -79,8 +85,8 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       ),
     );
     // Amount
-    if (widget.conditions != null) {
-      final conditions = widget.conditions!;
+    if (widget.amountConditions != null) {
+      final conditions = widget.amountConditions!;
       for(Map map in conditions) {
         map[Payment.keyCurrency] = currency.value;
       }
@@ -152,7 +158,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Visibility(
-            visible: widget.conditions != null,
+            visible: widget.amountConditions != null,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
               child: Row(
@@ -232,10 +238,13 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
             },
           ),
           // Add
-          ListTailButton(
-            icon: Icons.add,
-            title: LocaleKeys.add.tr(),
-            onTap: () => onPaymentAddButtonPressed(context),
+          Visibility(
+            visible: !widget.hideCreateButton,
+            child: ListTailButton(
+              icon: Icons.add,
+              title: LocaleKeys.add.tr(),
+              onTap: () => onPaymentAddButtonPressed(context),
+            ),
           ),
         ],
       ),

@@ -36,6 +36,8 @@
   "delete": "Delete",
   "refresh": "Refresh",
   "select": "Select",
+  "filter": "Filter",
+  "undo": "Undo",
 
   "object_action": "{action} {object}",
   "full_name": "{first} {last}",
@@ -72,6 +74,9 @@
   "calculatedDate": "Withdraw date",
   "createdDate": "Created date",
   "editedDate": "Edited date",
+  "includeDeleted": "Include deleted",
+  "includeHidden": "Include hidden",
+  "trashCan": "Deleted items",
 
   "month": "Month",
   "nMonthBefore": {
@@ -96,6 +101,7 @@
 
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",
+  "msgItemRestored": "{} has been restored",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",

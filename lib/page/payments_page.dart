@@ -129,7 +129,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   child: PaymentsFragment(
                     subtitle: widget.subtitle,
                     selected: selected,
-                    conditions: widget.condition,
+                    amountConditions: widget.condition,
                     currency: widget.currency,
                     onItemTap: onPaymentSelected,
                     onEditFinish: (item) => setState(() {
