@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/fragment/priority_edit_fragment.dart';
 
 final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   return CalculateValueState<Transaction>(
@@ -66,6 +67,15 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
     ref.read(_total.notifier).request();
   }
 
+  /// Triggers on [PriorityEditFragment] pressed
+  void onPressed(Payment payment, int priority) async {
+    payment.priority = priority;
+    final result = await ApiClient().update<Payment>([payment.map]);
+    if (result.result == ApiResultCode.success) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,29 +97,42 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                payment.serialNumber,
-                style: Theme.of(context).textTheme.labelLarge,
+              WalletItemIcon(
+                icon: payment.icon.icon,
+                foreground: payment.foreground,
+                background: payment.background,
               ),
-              Text(
-                payment.currency.format(amount),
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-              Text(
-                payment.descriptions,
-                style: Theme.of(context).textTheme.bodyMedium,
+              const SizedBox(width: 8,),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      payment.serialNumber,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    Text(
+                      payment.currency.format(amount),
+                      style: Theme.of(context).textTheme.displayLarge,
+                    ),
+                    Text(
+                      payment.descriptions,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        WalletItemIcon(
-          icon: payment.icon.icon,
-          foreground: payment.foreground,
-          background: payment.background,
+        PriorityEditFragment<Payment>(
+          data: payment,
+          onPressed: (priority) => onPressed(payment, priority),
         ),
       ],
     );

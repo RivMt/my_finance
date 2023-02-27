@@ -6,19 +6,46 @@ import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class DeletedItemsPage extends StatefulWidget {
-  const DeletedItemsPage({super.key});
-
-  @override
-  _DeletedItemsPageState createState() => _DeletedItemsPageState();
+enum RestoreItemType {
+  visible,
+  deleted,
 }
 
-class _DeletedItemsPageState extends State<DeletedItemsPage> with TickerProviderStateMixin {
+class RestoreItemsPage extends StatefulWidget {
+  const RestoreItemsPage({
+    super.key,
+    required this.type,
+    required this.title,
+  });
+
+  final String title;
+
+  final RestoreItemType type;
+
+  @override
+  State createState() => _RestoreItemsPageState();
+}
+
+class _RestoreItemsPageState extends State<RestoreItemsPage> with TickerProviderStateMixin {
 
   late final TabController tabController;
 
+  List<Map<String, dynamic>> get conditions {
+    if (widget.type == RestoreItemType.deleted) {
+      return const [{
+        FinanceModel.keyDeleted: true,
+      }];
+    } else {
+      return const [{
+        WalletItem.keyPriority: {
+          "max": -1
+        },
+      }];
+    }
+  }
+
   /// Restore [item] when opened [SnackBar] closed successfully
-  void onItemTap<T extends FinanceModel>(BuildContext context, T item) {
+  void onItemTap<T extends WalletItem>(BuildContext context, T item) {
     final snackBar = SnackBar(
       content: Text(LocaleKeys.msgItemRestored.tr(args: [item.descriptions])),
       action: SnackBarAction(
@@ -28,7 +55,11 @@ class _DeletedItemsPageState extends State<DeletedItemsPage> with TickerProvider
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((value) async {
       if (value != SnackBarClosedReason.action) {
-        item.deleted = false;
+        if (widget.type == RestoreItemType.deleted) {
+          item.deleted = false;
+        } else {
+          item.priority = 0;
+        }
         await ApiClient().update<T>([item.map]);
         setState(() {});
       }
@@ -49,7 +80,7 @@ class _DeletedItemsPageState extends State<DeletedItemsPage> with TickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(LocaleKeys.trashCan.tr()),
+        title: Text(widget.title),
         bottom: TabBar(
           controller: tabController,
           tabs: [
@@ -71,17 +102,13 @@ class _DeletedItemsPageState extends State<DeletedItemsPage> with TickerProvider
                 AccountsFragment(
                   hideCreateButton: true,
                   hideHeader: true,
-                  conditions: const [{
-                    FinanceModel.keyDeleted: true,
-                  }],
+                  conditions: conditions,
                   onItemTap: (item) => onItemTap<Account>(context, item),
                 ),
                 // 1: Payments
                 PaymentsFragment(
                   hideCreateButton: true,
-                  paymentsConditions: const [{
-                    FinanceModel.keyDeleted: true,
-                  }],
+                  paymentsConditions: conditions,
                   onItemTap: (item) => onItemTap<Payment>(context, item),
                 ),
               ],

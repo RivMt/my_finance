@@ -100,7 +100,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       FinanceModel.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(Account.keyPriority, SortType.desc),
+        const Sort(WalletItem.keyPriority, SortType.desc),
       ],
     ));
     final account = selectedAccount;
@@ -110,7 +110,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       FinanceModel.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(Payment.keyPriority, SortType.desc),
+        const Sort(WalletItem.keyPriority, SortType.desc),
       ],
     ));
     final payment = selectedPayment;

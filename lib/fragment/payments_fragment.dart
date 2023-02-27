@@ -76,6 +76,9 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       widget.paymentsConditions ?? [{
         FinanceModel.keyDeleted: false,
         Payment.keyCurrency: currency.value,
+        WalletItem.keyPriority: {
+          "min": 0,
+        },
       }],
       ApiClient.buildOptions(
         sorts: [

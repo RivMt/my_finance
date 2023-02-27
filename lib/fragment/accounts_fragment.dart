@@ -45,6 +45,9 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
     ref.read(_accounts.notifier).request(
       widget.conditions ?? [{
         FinanceModel.keyDeleted: false,
+        WalletItem.keyPriority: {
+          "min": 0,
+        },
       }],
       ApiClient.buildOptions(
         sorts: [

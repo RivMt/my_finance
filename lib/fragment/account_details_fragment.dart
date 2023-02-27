@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/fragment/priority_edit_fragment.dart';
 
 final _account = StateNotifierProvider<ModelState<Account>, Account>((ref) {
   return ModelState<Account>(ref, Account.unknown);
@@ -27,6 +28,15 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
     });
   }
 
+  /// Triggers on [PriorityEditFragment] pressed
+  void onPressed(Account account, int priority) async {
+    account.priority = priority;
+    final result = await ApiClient().update<Account>([account.map]);
+    if (result.result == ApiResultCode.success) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -47,29 +57,42 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                account.serialNumber,
-                style: Theme.of(context).textTheme.labelLarge,
+              WalletItemIcon(
+                icon: account.icon.icon,
+                foreground: account.foreground,
+                background: account.background,
               ),
-              Text(
-                account.currency.format(account.balance),
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-              Text(
-                account.descriptions,
-                style: Theme.of(context).textTheme.bodyMedium,
+              const SizedBox(width: 8,),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      account.serialNumber,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    Text(
+                      account.currency.format(account.balance),
+                      style: Theme.of(context).textTheme.displayLarge,
+                    ),
+                    Text(
+                      account.descriptions,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        WalletItemIcon(
-          icon: account.icon.icon,
-          foreground: account.foreground,
-          background: account.background,
+        PriorityEditFragment<Account>(
+          data: account,
+          onPressed: (priority) => onPressed(account, priority),
         ),
       ],
     );
