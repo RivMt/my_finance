@@ -119,7 +119,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
         body: SafeArea(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Payments
               Visibility(
