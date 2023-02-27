@@ -186,10 +186,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
                       return PopupMenuItem(
                         value: currency,
                         child: ListTile(
-                          leading: Text(
-                            currency.symbol,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                          leading: Icon(currency.icon),
                           title: Text(currency.key.tr()),
                         ),
                       );
