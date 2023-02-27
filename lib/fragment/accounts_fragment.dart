@@ -15,6 +15,9 @@ class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
     super.key,
     this.selected,
+    this.conditions,
+    this.hideHeader = false,
+    this.hideCreateButton = false,
     this.onItemTap,
     this.onEditFinish,
   });
@@ -25,6 +28,12 @@ class AccountsFragment extends ConsumerStatefulWidget {
 
   final Account? selected;
 
+  final bool hideHeader;
+
+  final bool hideCreateButton;
+
+  final List<Map<String, dynamic>>? conditions;
+
   @override
   _AccountsFragmentState createState() => _AccountsFragmentState();
 }
@@ -34,7 +43,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   /// Request all accounts ordered by icon
   void request() {
     ref.read(_accounts.notifier).request(
-      [{
+      widget.conditions ?? [{
         FinanceModel.keyDeleted: false,
       }],
       ApiClient.buildOptions(
@@ -102,27 +111,30 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Head
-          GroupCard(
-            title: LocaleKeys.totalBalance.tr(),
-            count: Currency.values.length,
-            build: (context, index) {
-              final currency = Currency.values[index];
-              bool exist = false;
-              final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
-                if (account.currency == currency) {
-                  exist = true;
-                  return total + account.balance;
+          Visibility(
+            visible: !widget.hideHeader,
+            child: GroupCard(
+              title: LocaleKeys.totalBalance.tr(),
+              count: Currency.values.length,
+              build: (context, index) {
+                final currency = Currency.values[index];
+                bool exist = false;
+                final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
+                  if (account.currency == currency) {
+                    exist = true;
+                    return total + account.balance;
+                  }
+                  return total;
+                });
+                if (!exist) {
+                  return const SizedBox();
                 }
-                return total;
-              });
-              if (!exist) {
-                return const SizedBox();
-              }
-              return CurrencyCard(
-                data: currency,
-                amount: sum,
-              );
-            },
+                return CurrencyCard(
+                  data: currency,
+                  amount: sum,
+                );
+              },
+            ),
           ),
           // List
           ListView.builder(
@@ -160,10 +172,13 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
             },
           ),
           // Add
-          ListTailButton(
-            icon: Icons.add,
-            title: LocaleKeys.add.tr(),
-            onTap: () => onAccountAddButtonPressed(context),
+          Visibility(
+            visible: !widget.hideCreateButton,
+            child: ListTailButton(
+              icon: Icons.add,
+              title: LocaleKeys.add.tr(),
+              onTap: () => onAccountAddButtonPressed(context),
+            ),
           ),
         ],
       ),

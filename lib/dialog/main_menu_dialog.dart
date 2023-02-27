@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
+import 'package:my_finance/page/deleted_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 
 class MainMenuDialog extends StatefulWidget {
@@ -78,6 +79,12 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
                 "action": LocaleKeys.edit.tr(),
               })),
               onTap: () => openPage(const CategoriesPage()),
+            ),
+            // Trash can
+            ListTile(
+              leading: const Icon(Icons.delete_outline_outlined),
+              title: Text(LocaleKeys.trashCan.tr()),
+              onTap: () => openPage(const DeletedItemsPage()),
             ),
             const Divider(),
             Visibility(

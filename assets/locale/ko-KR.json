@@ -32,6 +32,8 @@
   "delete": "삭제",
   "refresh": "새로고침",
   "select": "선택",
+  "filter": "필터",
+  "undo": "실행 취소",
 
   "object_action": "{object} {action}",
   "full_name": "{last}{first}",
@@ -68,6 +70,9 @@
   "calculatedDate": "출금 날짜",
   "createdDate": "작성 날짜",
   "editedDate": "편집 날짜",
+  "includeDeleted": "삭제된 항목",
+  "includeHidden": "숨겨진 항목",
+  "trashCan": "휴지통",
 
   "month": "월",
   "nMonthBefore": {
@@ -92,6 +97,7 @@
 
   "msgPleaseSelect_object": "{object}를 선택해주세요",
   "msgError": "에러가 발생했습니다\n{}",
+  "msgItemRestored": "{}이(가) 복원되었습니다",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
