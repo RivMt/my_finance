@@ -126,21 +126,15 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 visible: sideVisible || payment == Payment.unknown,
                 child: SizedBox(
                   width: width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PaymentsFragment(
-                        subtitle: widget.subtitle,
-                        selected: selected,
-                        conditions: widget.condition,
-                        currency: widget.currency,
-                        onItemTap: onPaymentSelected,
-                        onEditFinish: (item) => setState(() {
-                          selected = item;
-                        }),
-                      ),
-                    ],
+                  child: PaymentsFragment(
+                    subtitle: widget.subtitle,
+                    selected: selected,
+                    conditions: widget.condition,
+                    currency: widget.currency,
+                    onItemTap: onPaymentSelected,
+                    onEditFinish: (item) => setState(() {
+                      selected = item;
+                    }),
                   ),
                 ),
               ),
