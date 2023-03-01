@@ -211,6 +211,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     ),
                   ),
                   ListView.builder(
+                    physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: budgets.keys.length,
                     itemBuilder: (context, index) {

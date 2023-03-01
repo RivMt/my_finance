@@ -138,6 +138,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
             width: ScreenPlanner(context).dialogWidth,
             height: MediaQuery.of(context).size.height * 0.7,
             child: ListView.builder(
+              physics: const BouncingScrollPhysics(),
               itemCount: list.length,
               itemBuilder: (context, index) {
                 final item = list[index];
@@ -432,6 +433,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
         (editing.altCurrency != null) &&
         (editing.altCurrency != editing.currency);
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,

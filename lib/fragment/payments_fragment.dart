@@ -155,6 +155,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     final payments = ref.watch(_payments);
     final amount = ref.watch(_amount);
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

@@ -59,6 +59,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
             width: ScreenPlanner(context).dialogWidth,
             height: MediaQuery.of(context).size.height * 0.7,
             child: GridView.builder(
+              physics: const BouncingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: size,
                 mainAxisSpacing: 8,
@@ -182,6 +183,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,

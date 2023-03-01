@@ -53,6 +53,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       content: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,

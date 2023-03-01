@@ -104,6 +104,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
         Color selected = color;
         return AlertDialog(
           content: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: ColorPicker(
               pickerColor: selected,
               onColorChanged: (value) => selected = value,
@@ -236,6 +237,7 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,

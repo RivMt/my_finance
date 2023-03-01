@@ -108,6 +108,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   Widget build(BuildContext context) {
     final accounts = ref.watch(_accounts);
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,

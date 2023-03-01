@@ -77,53 +77,59 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          ModalHeader(
-            disabled: progressing,
-            headerTitle: LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.budget.plural(1),
-              "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
-            }),
-            positiveButtonTitle: LocaleKeys.confirm.tr(),
-            negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-            onPositiveButtonPressed: progressing ? null : () => widget.onConfirmButtonPressed(editing),
-            onNegativeButtonPressed: progressing ? null : widget.onNegativeButtonPressed,
-          ),
-          // Body
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Basic information
-                Text(
-                  LocaleKeys.budget.plural(1),
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                const SizedBox(height: 8,),
-                // Limitation
-                TextField(
-                  controller: budgetController,
-                  decoration: InputDecoration(
-                    labelText: LocaleKeys.limitation.tr(),
-                    prefixIcon: Icon(widget.currency.icon),
-                  ),
-                  onChanged: onBudgetChanged,
-                ),
-              ],
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            ModalHeader(
+              disabled: progressing,
+              headerTitle: LocaleKeys.object_action.tr(namedArgs: {
+                "object": LocaleKeys.budget.plural(1),
+                "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
+              }),
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+              onPositiveButtonPressed: progressing ? null : () => widget.onConfirmButtonPressed(editing),
+              onNegativeButtonPressed: progressing ? null : widget.onNegativeButtonPressed,
             ),
-          ),
-          // Progress
-          Visibility(
-            visible: progressing,
-            child: const LinearProgressIndicator(value: null,),
-          ),
-        ],
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Basic information
+                  Text(
+                    LocaleKeys.budget.plural(1),
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                  const SizedBox(height: 8,),
+                  // Limitation
+                  TextField(
+                    controller: budgetController,
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.limitation.tr(),
+                      prefixIcon: Icon(widget.currency.icon),
+                    ),
+                    onChanged: onBudgetChanged,
+                  ),
+                ],
+              ),
+            ),
+            // Progress
+            Visibility(
+              visible: progressing,
+              child: const LinearProgressIndicator(value: null,),
+            ),
+          ],
+        ),
       ),
     );
   }

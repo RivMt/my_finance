@@ -113,6 +113,7 @@ class _CategorySelectDialogState extends State<CategorySelectDialog> {
             // List of categories
             Expanded(
               child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   final item = categories[index];

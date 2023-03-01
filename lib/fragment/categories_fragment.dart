@@ -56,6 +56,7 @@ class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
     final categories = ref.watch(_categories);
     final int panels = ScreenPlanner(context).panelNumber;
     return GridView.builder(
+      physics: const BouncingScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: panels,
         mainAxisSpacing: 8,

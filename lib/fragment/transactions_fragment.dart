@@ -151,6 +151,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       );
     }
     return GroupedListView<Transaction, DateTime>(
+      physics: const BouncingScrollPhysics(),
       shrinkWrap: widget.shrinkWrap,
       elements: transactions,
       groupBy: groupBy,

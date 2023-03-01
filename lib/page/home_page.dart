@@ -235,6 +235,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ),
       body: SafeArea(
         child: GridView(
+          physics: const BouncingScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: getCrossAxisCount(context),
             childAspectRatio: getChildAspectRatio(context),

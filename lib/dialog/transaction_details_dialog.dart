@@ -67,6 +67,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
               // Title
