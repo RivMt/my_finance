@@ -9,10 +9,10 @@ final _total = StateNotifierProvider<CalculateValueState, Decimal>((ref) {
   return CalculateValueState<Transaction>(
     ref,
     conditions: [{
-      FinanceModel.keyPid: -1,
+      ModelKeys.keyPid: -1,
     }],
     type: CalculationType.sum,
-    attribute: Transaction.keyAmount,
+    attribute: ModelKeys.keyAmount,
   );
 });
 
@@ -43,13 +43,13 @@ class _PaymentDetailsFragmentState extends ConsumerState<PaymentDetailsFragment>
   void request() {
     // Payment
     ref.read(_payment.notifier).request({
-      FinanceModel.keyPid: widget.payment.pid,
+      ModelKeys.keyPid: widget.payment.pid,
     });
     // Default condition
     List<Map<String, dynamic>> conditions = [{
-      Transaction.keyPaymentID: widget.payment.pid,
-      Transaction.keyType: TransactionType.expense.code,
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyPaymentID: widget.payment.pid,
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyDeleted: false,
     }];
     // Merge custom condition
     if (widget.conditions != null) {

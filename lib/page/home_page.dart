@@ -23,7 +23,7 @@ final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transact
   return CalculateValueState<Transaction>(ref,
     conditions: [],
     type: CalculationType.sum,
-    attribute: Transaction.keyAmount,
+    attribute: ModelKeys.keyAmount,
   );
 });
 
@@ -31,7 +31,7 @@ final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, De
   return CalculateValueState<Transaction>(ref,
     conditions: [],
     type: CalculationType.sum,
-    attribute: Transaction.keyAmount,
+    attribute: ModelKeys.keyAmount,
   );
 });
 
@@ -39,7 +39,7 @@ final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, 
   return CalculateValueState<Transaction>(ref,
     conditions: [],
     type: CalculationType.sum,
-    attribute: Transaction.keyAmount,
+    attribute: ModelKeys.keyAmount,
     queries: {
       "mode": "budget",
     }
@@ -116,13 +116,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Account
     ref.read(_accounts.notifier).request(
       [{
-        FinanceModel.keyDeleted: false,
+        ModelKeys.keyDeleted: false,
       }],
       ApiClient.buildOptions(
         limit: 3,
         sorts: [
-          const Sort(WalletItem.keyPriority, SortType.desc),
-          const Sort(FinanceModel.keyLastUsed, SortType.desc),
+          const Sort(ModelKeys.keyPriority, SortType.desc),
+          const Sort(ModelKeys.keyLastUsed, SortType.desc),
         ],
       ),
     );
@@ -130,37 +130,37 @@ class _HomePageState extends ConsumerState<HomePage> {
     await ref.read(preferenceProvider.notifier).request();
     // Current month expense
     ref.read(_currentMonthExpenses.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyPaidDate: [
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyPaidDate: [
         DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
         DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
       ],
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
     }];
     ref.read(_currentMonthExpenses.notifier).request();
     // Amount to be paid
     ref.read(_amountBePaid.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyCalculatedDate: [
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyCalculatedDate: [
         now.millisecondsSinceEpoch,
       ],
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
     }];
     ref.read(_amountBePaid.notifier).request();
     // Budget expense
     ref.read(_budgetExpensed.notifier).conditions = [{
-      Transaction.keyType: TransactionType.expense.code,
-      Transaction.keyCurrency: currency.value,
-      Transaction.keyIncluded: true,
-      FinanceModel.keyDeleted: false,
-      Transaction.keyPaidDate: {
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
+      ModelKeys.keyPaidDate: {
         "max": DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
       },
-      Transaction.keyUtilityEnd: {
+      ModelKeys.keyUtilityEnd: {
         "min": DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
       }
     }];

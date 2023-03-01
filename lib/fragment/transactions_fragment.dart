@@ -48,7 +48,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     final options = widget.options.isEmpty
         ? ApiClient.buildOptions(
       sorts: [
-        const Sort(Transaction.keyPaidDate, SortType.desc),
+        const Sort(ModelKeys.keyPaidDate, SortType.desc),
       ],
     ) : widget.options;
     // Get transactions

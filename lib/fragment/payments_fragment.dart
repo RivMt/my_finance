@@ -15,7 +15,7 @@ final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>
   return CalculateValueState<Transaction>(ref,
     conditions: [],
     type: CalculationType.sum,
-    attribute: Transaction.keyAmount,
+    attribute: ModelKeys.keyAmount,
   );
 });
 
@@ -74,16 +74,16 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     // Payments
     ref.read(_payments.notifier).request(
       widget.paymentsConditions ?? [{
-        FinanceModel.keyDeleted: false,
-        Payment.keyCurrency: currency.value,
-        WalletItem.keyPriority: {
+        ModelKeys.keyDeleted: false,
+        ModelKeys.keyCurrency: currency.value,
+        ModelKeys.keyPriority: {
           "min": 0,
         },
       }],
       ApiClient.buildOptions(
         sorts: [
-          const Sort(Payment.keyIcon, SortType.asc),
-          const Sort(FinanceModel.keyLastUsed, SortType.desc),
+          const Sort(ModelKeys.keyIcon, SortType.asc),
+          const Sort(ModelKeys.keyLastUsed, SortType.desc),
         ],
       ),
     );
@@ -91,7 +91,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     if (widget.amountConditions != null) {
       final conditions = widget.amountConditions!;
       for(Map map in conditions) {
-        map[Payment.keyCurrency] = currency.value;
+        map[ModelKeys.keyCurrency] = currency.value;
       }
       ref.read(_amount.notifier).conditions = conditions;
       ref.read(_amount.notifier).request();

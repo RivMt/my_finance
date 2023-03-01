@@ -42,13 +42,13 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
 
   void request() {
     ref.read(_category.notifier).request({
-      FinanceModel.keyPid: widget.data.category,
+      ModelKeys.keyPid: widget.data.category,
     });
     ref.read(_account.notifier).request({
-      FinanceModel.keyPid: widget.data.accountId,
+      ModelKeys.keyPid: widget.data.accountId,
     });
     ref.read(_payment.notifier).request({
-      FinanceModel.keyPid: widget.data.paymentId,
+      ModelKeys.keyPid: widget.data.paymentId,
     });
   }
 

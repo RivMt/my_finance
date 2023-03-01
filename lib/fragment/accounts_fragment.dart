@@ -44,15 +44,15 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   void request() {
     ref.read(_accounts.notifier).request(
       widget.conditions ?? [{
-        FinanceModel.keyDeleted: false,
-        WalletItem.keyPriority: {
+        ModelKeys.keyDeleted: false,
+        ModelKeys.keyPriority: {
           "min": 0,
         },
       }],
       ApiClient.buildOptions(
         sorts: [
-          const Sort(Account.keyIcon, SortType.asc),
-          const Sort(FinanceModel.keyLastUsed, SortType.desc),
+          const Sort(ModelKeys.keyIcon, SortType.asc),
+          const Sort(ModelKeys.keyLastUsed, SortType.desc),
         ],
       ),
     );

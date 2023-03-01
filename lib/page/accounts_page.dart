@@ -136,12 +136,12 @@ class _AccountsPageState extends State<AccountsPage> {
                             Expanded(
                               child: TransactionsFragment(
                                 conditions: [{
-                                  Transaction.keyAccountID: account.pid,
-                                  FinanceModel.keyDeleted: false,
+                                  ModelKeys.keyAccountID: account.pid,
+                                  ModelKeys.keyDeleted: false,
                                 }],
                                 options: ApiClient.buildOptions(
                                   sorts: [
-                                    const Sort(FinanceModel.keyLastUsed, SortType.desc),
+                                    const Sort(ModelKeys.keyLastUsed, SortType.desc),
                                   ],
                                 ),
                               ),

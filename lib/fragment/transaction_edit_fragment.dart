@@ -97,30 +97,30 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   void request() async {
     // Account
     await ref.read(_accounts.notifier).request([{
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(WalletItem.keyPriority, SortType.desc),
+        const Sort(ModelKeys.keyPriority, SortType.desc),
       ],
     ));
     final account = selectedAccount;
     setAccount(account);
     // Payment
     await ref.read(_payments.notifier).request([{
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(WalletItem.keyPriority, SortType.desc),
+        const Sort(ModelKeys.keyPriority, SortType.desc),
       ],
     ));
     final payment = selectedPayment;
     setPayment(payment);
     // Category
     await ref.read(_categories.notifier).request([{
-      FinanceModel.keyDeleted: false,
+      ModelKeys.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(FinanceModel.keyLastUsed, SortType.desc),
+        const Sort(ModelKeys.keyLastUsed, SortType.desc),
       ],
     ));
     final category = selectedCategory;

@@ -33,11 +33,11 @@ class _RestoreItemsPageState extends State<RestoreItemsPage> with TickerProvider
   List<Map<String, dynamic>> get conditions {
     if (widget.type == RestoreItemType.deleted) {
       return const [{
-        FinanceModel.keyDeleted: true,
+        ModelKeys.keyDeleted: true,
       }];
     } else {
       return const [{
-        WalletItem.keyPriority: {
+        ModelKeys.keyPriority: {
           "max": -1
         },
       }];

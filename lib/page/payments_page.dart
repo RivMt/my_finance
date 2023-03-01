@@ -79,7 +79,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
   /// Condition for [TransactionsFragment]
   List<Map<String, dynamic>> get transactionsCondition {
     final con = {
-      Transaction.keyPaymentID: (selected == null) ? -1 : selected!.pid,
+      ModelKeys.keyPaymentID: (selected == null) ? -1 : selected!.pid,
     };
     if (widget.condition == null) {
       return [con];
@@ -170,7 +170,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                                 conditions: transactionsCondition,
                                 options: ApiClient.buildOptions(
                                   sorts: [
-                                    const Sort(FinanceModel.keyLastUsed, SortType.desc),
+                                    const Sort(ModelKeys.keyLastUsed, SortType.desc),
                                   ],
                                 ),
                               ),

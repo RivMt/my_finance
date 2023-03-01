@@ -65,8 +65,8 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
       body: SafeArea(
         child: CategoriesFragment(
           conditions: [{
-            Category.keyType: tabController.index,
-            FinanceModel.keyDeleted: false,
+            ModelKeys.keyType: tabController.index,
+            ModelKeys.keyDeleted: false,
           }],
           onTap: showCategoryEditingModal,
         ),

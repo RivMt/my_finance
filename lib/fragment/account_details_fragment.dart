@@ -24,7 +24,7 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
 
   void request() async {
     ref.read(_account.notifier).request({
-      FinanceModel.keyPid: widget.account.pid,
+      ModelKeys.keyPid: widget.account.pid,
     });
   }
 
