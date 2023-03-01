@@ -35,7 +35,7 @@ class AccountsFragment extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>>? conditions;
 
   @override
-  _AccountsFragmentState createState() => _AccountsFragmentState();
+  ConsumerState createState() => _AccountsFragmentState();
 }
 
 class _AccountsFragmentState extends ConsumerState<AccountsFragment> {

@@ -49,7 +49,7 @@ class PaymentsFragment extends ConsumerStatefulWidget {
   final List<Map<String, dynamic>>? amountConditions;
 
   @override
-  _PaymentsFragmentState createState() => _PaymentsFragmentState();
+  ConsumerState createState() => _PaymentsFragmentState();
 }
 
 class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {

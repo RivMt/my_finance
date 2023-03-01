@@ -50,7 +50,7 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  ConsumerState createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomePage> {

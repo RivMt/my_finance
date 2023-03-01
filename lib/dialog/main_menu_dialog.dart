@@ -22,7 +22,7 @@ class MainMenuDialog extends StatefulWidget {
   final Function()? onRefreshPressed;
 
   @override
-  _MainMenuDialogState createState() => _MainMenuDialogState();
+  State createState() => _MainMenuDialogState();
 }
 
 class _MainMenuDialogState extends State<MainMenuDialog> {

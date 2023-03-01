@@ -19,7 +19,7 @@ class AccountEditFragment extends StatefulWidget {
   final Function(Account?) onFinish;
 
   @override
-  _AccountEditFragmentState createState() => _AccountEditFragmentState();
+  State createState() => _AccountEditFragmentState();
 }
 
 class _AccountEditFragmentState extends State<AccountEditFragment> {

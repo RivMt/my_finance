@@ -17,7 +17,7 @@ class AccountsPage extends StatefulWidget {
   final Account? init;
 
   @override
-  _AccountsPageState createState() => _AccountsPageState();
+  State createState() => _AccountsPageState();
 }
 
 class _AccountsPageState extends State<AccountsPage> {

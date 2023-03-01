@@ -26,7 +26,7 @@ class PaymentsPage extends StatefulWidget {
   final Payment? init;
 
   @override
-  _PaymentsPageState createState() => _PaymentsPageState();
+  State createState() => _PaymentsPageState();
 }
 
 class _PaymentsPageState extends State<PaymentsPage> {

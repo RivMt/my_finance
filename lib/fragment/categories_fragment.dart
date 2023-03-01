@@ -22,7 +22,7 @@ class CategoriesFragment extends ConsumerStatefulWidget {
   final Function(Category)? onLongPress;
 
   @override
-  _CategoriesFragmentState createState() => _CategoriesFragmentState();
+  ConsumerState createState() => _CategoriesFragmentState();
 }
 
 class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {

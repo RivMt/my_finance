@@ -18,7 +18,7 @@ class CategorySelectDialog extends StatefulWidget {
   final Function(Category)? onTap;
 
   @override
-  _CategorySelectDialogState createState() => _CategorySelectDialogState();
+  State createState() => _CategorySelectDialogState();
 }
 
 class _CategorySelectDialogState extends State<CategorySelectDialog> {

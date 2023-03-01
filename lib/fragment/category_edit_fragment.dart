@@ -16,7 +16,7 @@ class CategoryEditFragment extends StatefulWidget {
   final Function(Category?) onFinish;
 
   @override
-  _CategoryEditFragmentState createState() => _CategoryEditFragmentState();
+  State createState() => _CategoryEditFragmentState();
 }
 
 class _CategoryEditFragmentState extends State<CategoryEditFragment> {

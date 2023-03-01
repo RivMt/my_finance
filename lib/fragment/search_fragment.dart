@@ -18,7 +18,7 @@ class SearchFragment extends ConsumerStatefulWidget {
   final String query;
 
   @override
-  _SearchFragmentState createState() => _SearchFragmentState();
+  ConsumerState createState() => _SearchFragmentState();
 }
 
 class _SearchFragmentState extends ConsumerState<SearchFragment> {

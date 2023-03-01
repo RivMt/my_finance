@@ -38,7 +38,7 @@ class TransactionEditFragment extends ConsumerStatefulWidget {
   final Function(Transaction?) onFinish;
 
   @override
-  _TransactionEditFragmentState createState() => _TransactionEditFragmentState();
+  ConsumerState createState() => _TransactionEditFragmentState();
 }
 
 class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragment> {

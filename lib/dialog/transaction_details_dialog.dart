@@ -29,7 +29,7 @@ class TransactionDetailsDialog extends ConsumerStatefulWidget {
   final Transaction data;
 
   @override
-  _TransactionDetailsDialogState createState() => _TransactionDetailsDialogState();
+  ConsumerState createState() => _TransactionDetailsDialogState();
 }
 
 class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDialog> {

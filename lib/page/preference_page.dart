@@ -12,7 +12,7 @@ class PreferencePage extends ConsumerStatefulWidget {
   const PreferencePage({super.key});
 
   @override
-  _PreferencePageState createState() => _PreferencePageState();
+  ConsumerState createState() => _PreferencePageState();
 }
 
 class _PreferencePageState extends ConsumerState<PreferencePage> {

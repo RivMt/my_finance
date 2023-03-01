@@ -37,7 +37,7 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   final bool useSliver;
 
   @override
-  _TransactionsFragmentState createState() => _TransactionsFragmentState();
+  ConsumerState createState() => _TransactionsFragmentState();
 }
 
 class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {

@@ -19,7 +19,7 @@ class PaymentEditFragment extends StatefulWidget {
   final Function(Payment?) onFinish;
 
   @override
-  _PaymentEditFragmentState createState() => _PaymentEditFragmentState();
+  State createState() => _PaymentEditFragmentState();
 }
 
 class _PaymentEditFragmentState extends State<PaymentEditFragment> {

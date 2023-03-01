@@ -27,7 +27,7 @@ class BudgetEditFragment extends ConsumerStatefulWidget {
   final Function(Decimal) onConfirmButtonPressed;
 
   @override
-  _BudgetEditFragmentState createState() => _BudgetEditFragmentState();
+  ConsumerState createState() => _BudgetEditFragmentState();
 }
 
 class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
