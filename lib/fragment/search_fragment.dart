@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/payments_page.dart';
 
@@ -50,28 +51,45 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
       itemCount: results.length,
       itemBuilder: (context, index) {
         final item = results[index];
-        if (item.group == Account) {
-          final data = item.convert() as Account;
-          return AccountCard(
-            data: data,
-            onTap: () => openPage(AccountsPage(
-              init: data,
-            )),
-          );
-        } else if (item.group == Payment) {
-          final data = item.convert() as Payment;
-          return PaymentCard(
-            data: data,
-            onTap: () => openPage(PaymentsPage(
-              init: data,
-            )),
-          );
-        } else if (item.group == Transaction) {
-          final data = item.convert() as Transaction;
-          return TransactionCard(
-            data: data,
-            category: Category.unknown,
-          );
+        switch(item.table) {
+          case FinanceModelType.account:
+            final data = Account(item.map);
+            return AccountCard(
+              data: data,
+              onTap: () => openPage(AccountsPage(
+                init: data,
+              )),
+            );
+          case FinanceModelType.payment:
+            final data = Payment(item.map);
+            return PaymentCard(
+              data: data,
+              onTap: () => openPage(PaymentsPage(
+                init: data,
+                paymentCondition: const [{
+                  ModelKeys.keyPid: {
+                    "min": 0,
+                  }
+                }],
+              )),
+            );
+          case FinanceModelType.transaction:
+            final data = Transaction(item.map);
+            return TransactionCard(
+              data: data,
+              category: Category.unknown,
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => TransactionDetailsDialog(
+                  data: data,
+                ),
+              ),
+            );
+          case FinanceModelType.category:
+            final data = Category(item.map);
+            return CategoryCard(
+              category: data,
+            );
         }
         return const SizedBox();
       },
