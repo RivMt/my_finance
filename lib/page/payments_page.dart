@@ -12,14 +12,17 @@ class PaymentsPage extends StatefulWidget {
   const PaymentsPage({
     super.key,
     this.init,
-    this.condition,
+    this.paymentCondition,
+    this.amountCondition,
     this.subtitle = "",
     this.currency = Currency.unknown,
   });
 
   final String subtitle;
 
-  final List<Map<String, dynamic>>? condition;
+  final List<Map<String, dynamic>>? paymentCondition;
+
+  final List<Map<String, dynamic>>? amountCondition;
 
   final Currency currency;
 
@@ -81,10 +84,10 @@ class _PaymentsPageState extends State<PaymentsPage> {
     final con = {
       ModelKeys.keyPaymentID: (selected == null) ? -1 : selected!.pid,
     };
-    if (widget.condition == null) {
+    if (widget.amountCondition == null) {
       return [con];
     }
-    final List<Map<String, dynamic>> result = List.from(widget.condition!);
+    final List<Map<String, dynamic>> result = List.from(widget.amountCondition!);
     for(int i=0; i < result.length; i++) {
       result[i] = {
         ...result[i],
@@ -92,6 +95,12 @@ class _PaymentsPageState extends State<PaymentsPage> {
       };
     }
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selected = widget.init;
   }
 
   @override
@@ -129,7 +138,8 @@ class _PaymentsPageState extends State<PaymentsPage> {
                   child: PaymentsFragment(
                     subtitle: widget.subtitle,
                     selected: selected,
-                    amountConditions: widget.condition,
+                    paymentsConditions: widget.paymentCondition,
+                    amountConditions: widget.amountCondition,
                     currency: widget.currency,
                     onItemTap: onPaymentSelected,
                     onEditFinish: (item) => setState(() {
@@ -162,7 +172,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                           children: [
                             PaymentDetailsFragment(
                               payment: payment,
-                              conditions: widget.condition,
+                              conditions: widget.amountCondition,
                             ),
                             const SizedBox(height: 8,),
                             Expanded(

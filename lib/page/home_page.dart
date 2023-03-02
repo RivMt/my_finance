@@ -290,7 +290,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     onTap = () => openPage(PaymentsPage(
                       subtitle: name,
                       currency: currency,
-                      condition: ref.watch(_currentMonthExpenses.notifier).conditions,
+                      amountCondition: ref.watch(_currentMonthExpenses.notifier).conditions,
                     ));
                     break;
                   case 1:
@@ -300,7 +300,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     onTap = () => openPage(PaymentsPage(
                       subtitle: name,
                       currency: currency,
-                      condition: ref.watch(_amountBePaid.notifier).conditions,
+                      amountCondition: ref.watch(_amountBePaid.notifier).conditions,
                     ));
                     break;
                   case 2:
