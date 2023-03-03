@@ -10,6 +10,10 @@ final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<Fin
   return SearchState<FinanceSearchResult>(ref);
 });
 
+final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
+  return ModelsState<Category>(ref);
+});
+
 class SearchFragment extends ConsumerStatefulWidget {
   const SearchFragment({
     super.key,
@@ -28,13 +32,20 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => page));
   }
 
+  void getCategories() async {
+    // Get categories
+    await ref.read(_categories.notifier).request([{}]);
+  }
+
   void request() async {
+    // Search
     ref.read(_search.notifier).request(widget.query);
   }
 
   @override
   void initState() {
     super.initState();
+    getCategories();
     request();
   }
 
@@ -47,6 +58,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
   @override
   Widget build(BuildContext context) {
     final List<FinanceSearchResult> results = ref.watch(_search);
+    final List<Category> categories = ref.watch(_categories);
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) {
@@ -77,7 +89,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
             final data = Transaction(item.map);
             return TransactionCard(
               data: data,
-              category: Category.unknown,
+              category: categories.firstWhere((item) => item.pid == data.category, orElse: () => Category.unknown),
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => TransactionDetailsDialog(
