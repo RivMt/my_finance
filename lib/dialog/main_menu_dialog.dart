@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
+import 'package:my_finance/page/csv_page.dart';
 import 'package:my_finance/page/restore_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 
@@ -98,6 +99,12 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
                 title: LocaleKeys.trashCan.tr(),
                 type: RestoreItemType.deleted,
               )),
+            ),
+            // CSV
+            ListTile(
+              leading: const Icon(Icons.table_chart_outlined),
+              title: Text(LocaleKeys.trashCan.tr()),
+              onTap: () => openPage(const CsvPage()),
             ),
             const Divider(),
             Visibility(
