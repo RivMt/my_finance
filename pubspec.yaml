@@ -18,6 +18,8 @@ dependencies:
   decimal:
   grouped_list:
   flutter_colorpicker: ^1.0.3
+  file_picker: ^5.2.5
+  csv: ^5.0.1
 
 dev_dependencies:
   flutter_test:

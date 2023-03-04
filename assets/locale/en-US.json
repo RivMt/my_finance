@@ -78,6 +78,7 @@
   "includeHidden": "Include hidden",
   "trashCan": "Deleted items",
   "hiddenItems": "Hidden items",
+  "advancedQuery": "Advanced query",
 
   "month": "Month",
   "nMonthBefore": {
@@ -103,6 +104,7 @@
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",
   "msgItemRestored": "{} has been restored",
+  "msgExportCsv": "Export as CSV",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",

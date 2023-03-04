@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+
+const String _tag = "CsvPage";
 
 final _transactions = StateNotifierProvider<ModelsState<RawTransaction>, List<RawTransaction>>((ref) {
   return ModelsState<RawTransaction>(ref);
@@ -28,6 +32,10 @@ class _CsvPageState extends ConsumerState<CsvPage> {
   /// Value of request is progressing or not
   bool progressing = false;
 
+  /// Horizontal scroll controller
+  final ScrollController controller = ScrollController();
+
+  /// Request [RawTransaction]s
   void request() async {
     if (minDate.compareTo(maxDate) > 0) {
       return;
@@ -44,7 +52,65 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     });
   }
 
-  /// Triggers on [minDate] [DateButton] pressed
+  /// Triggers on download button pressed
+  void onDownloadButtonPressed() async {
+    String? path = await FilePicker.platform.saveFile(
+      dialogTitle: LocaleKeys.msgExportCsv.tr(),
+      fileName: 'data.csv',
+      allowedExtensions: ['csv'],
+    );
+    if (path == null) {
+      return;
+    }
+    // Create raw csv
+    final DataFrame<RawTransaction> df = DataFrame(
+      columns: RawTransaction.columns,
+      data: ref.watch(_transactions),
+      conversions: {
+        ModelKeys.keyType: (type) {
+          assert(type is int);
+          return TransactionType.fromCode(type).key.tr();
+        },
+        ModelKeys.keyCurrency: (value) {
+          assert(value is int);
+          return Currency.fromValue(value).key.tr();
+        },
+        ModelKeys.keyAltCurrency: (alt) {
+          assert(alt is int?);
+          if (alt == null) {
+            return "";
+          }
+          return Currency.fromValue(alt).key.tr();
+        },
+        ModelKeys.keyPaidDate: (date) {
+          assert(date is int);
+          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        },
+        ModelKeys.keyCalculatedDate: (date) {
+          assert(date is int);
+          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        },
+        ModelKeys.keyUtilityEnd: (date) {
+          assert(date is int);
+          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        },
+      }
+    );
+    String raw = df.toCsv(
+      separator: ",",
+      newLine: "\r\n",
+      escape: '"',
+    );
+    // Save
+    try {
+      final file = File(path);
+      file.writeAsString(raw);
+    } on Exception catch(e, s) {
+      Log.e(_tag, "Exception: $e on $s");
+    }
+  }
+
+  /// Triggers on [minDate] setting [DateButton] pressed
   void onMinDatePressed(BuildContext context) async {
     final result = await showDatePicker(
       context: context,
@@ -57,7 +123,7 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     });
   }
 
-  /// Triggers on [maxDate] [DateButton] pressed
+  /// Triggers on [maxDate] setting [DateButton] pressed
   void onMaxDatePressed(BuildContext context) async {
     final result = await showDatePicker(
       context: context,
@@ -81,7 +147,7 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     final transactions = ref.watch(_transactions);
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text(LocaleKeys.advancedQuery.tr()),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(6),
           child: Visibility(
@@ -91,6 +157,12 @@ class _CsvPageState extends ConsumerState<CsvPage> {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download_outlined),
+            onPressed: onDownloadButtonPressed,
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -115,43 +187,49 @@ class _CsvPageState extends ConsumerState<CsvPage> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                child: DataTable(
-                  columns: List.generate(RawTransaction.columns.length, (index) {
-                    final String name = RawTransaction.columns[index];
-                    return DataColumn(
-                      label: Text(name),
-                      tooltip: name,
-                    );
-                  }),
-                  rows: List.generate(transactions.length, (index) {
-                    final item = transactions[index];
-                    return DataRow(
-                      cells: [
-                        DataCell(Text(item.pid.toString())),
-                        DataCell(Text(item.type.key.tr())),
-                        DataCell(Text(item.categoryName)),
-                        DataCell(Text(item.accountName)),
-                        DataCell(Text(item.paymentName)),
-                        DataCell(Text(item.currency.key.tr())),
-                        DataCell(Text(item.amount.toString())),
-                        DataCell(Text(item.altCurrency == null
-                            ? ""
-                            : item.altCurrency!.key.tr())
-                        ),
-                        DataCell(Text(item.altAmount == null
-                            ? ""
-                            : item.altAmount.toString())
-                        ),
-                        DataCell(Text(DateFormat.yMd().format(item.paidDate))),
-                        DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),
-                        DataCell(Text(DateFormat.yMd().format(item.utilityEnd))),
-                        DataCell(Text(item.descriptions)),
-                        DataCell(Text(item.isIncluded.toString())),
-                      ],
-                    );
-                  }),
+              scrollDirection: Axis.vertical,
+              child: Scrollbar(
+                thumbVisibility: true,
+                controller: controller,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  controller: controller,
+                  child: DataTable(
+                    columns: List.generate(RawTransaction.columns.length, (index) {
+                      final String name = RawTransaction.columns[index];
+                      return DataColumn(
+                        label: Text(name),
+                        tooltip: name,
+                      );
+                    }),
+                    rows: List.generate(transactions.length, (index) {
+                      final item = transactions[index];
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(item.pid.toString())),
+                          DataCell(Text(item.type.key.tr())),
+                          DataCell(Text(item.categoryName)),
+                          DataCell(Text(item.accountName)),
+                          DataCell(Text(item.paymentName)),
+                          DataCell(Text(item.currency.code)),
+                          DataCell(Text(item.currency.format(item.amount))),
+                          DataCell(Text(item.altCurrency == null
+                              ? ""
+                              : item.altCurrency!.code)
+                          ),
+                          DataCell(Text(item.altAmount == null || item.altCurrency == null
+                              ? ""
+                              : item.altCurrency!.format(item.altAmount!))
+                          ),
+                          DataCell(Text(DateFormat.yMd().format(item.paidDate))),
+                          DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),
+                          DataCell(Text(DateFormat.yMd().format(item.utilityEnd))),
+                          DataCell(Text(item.descriptions)),
+                          DataCell(Text(item.isIncluded.toString())),
+                        ],
+                      );
+                    }),
+                  ),
                 ),
               ),
             ),

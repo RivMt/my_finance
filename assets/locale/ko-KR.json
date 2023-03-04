@@ -74,6 +74,7 @@
   "includeHidden": "숨겨진 항목",
   "trashCan": "휴지통",
   "hiddenItems": "숨겨진 항목",
+  "advancedQuery": "고급 쿼리",
 
   "month": "월",
   "nMonthBefore": {
@@ -99,6 +100,7 @@
   "msgPleaseSelect_object": "{object}를 선택해주세요",
   "msgError": "에러가 발생했습니다\n{}",
   "msgItemRestored": "{}이(가) 복원되었습니다",
+  "msgExportCsv": "CSV로 내보내기",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
