@@ -59,6 +59,15 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// [Transaction] which is now editing
   Transaction editing = Transaction({});
 
+  /// Value of [editing] is ready or not
+  bool get ready {
+    return editing.isValid
+        && (amountController.text == editing.amount.toString())
+        && (altAmountController.text == editing.altAmount.toString() || editing.altAmount == null)
+        && (descriptionController.text == editing.descriptions)
+        && (utilityDaysController.text == editing.utilityDays.toString());
+  }
+
   /// Value of sent [editing] and waiting for response
   bool _progressing = false;
 
@@ -343,9 +352,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// Triggers on alt amount changed
   void onAltAmountChanged(String value) {
     if (editing.regex.hasMatch(value)) {
-      editing.altAmount = value == "" ? Decimal.zero :Decimal.parse(value);
-    } else {
-      altAmountController.text = editing.altAmount.toString();
+      if (value != "") {
+        editing.altAmount = Decimal.parse(value);
+      }
     }
     setState(() {});
   }
@@ -353,9 +362,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   /// Triggers on amount changed
   void onAmountChanged(String value) {
     if (editing.regex.hasMatch(value)) {
-      editing.amount = value == "" ? Decimal.zero :Decimal.parse(value);
-    } else {
-      amountController.text = editing.amount.toString();
+      if (value != "") {
+        editing.amount = Decimal.parse(value);
+      }
     }
     setState(() {});
   }
@@ -393,10 +402,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Triggers on utility days value changed
   void onUtilityDaysValueChanged(String value) {
-    if (value.isEmpty) {
-      editing.utilityDays = 1;
+    if (value != "") {
+      editing.utilityDays = int.parse(value);
     }
-    editing.utilityDays = int.parse(value);
   }
 
   /// Apply [editing] data to UI
@@ -420,7 +428,6 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   void didUpdateWidget(TransactionEditFragment oldWidget) {
     super.didUpdateWidget(oldWidget);
     request();
-    apply();
   }
 
   @override
@@ -444,7 +451,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
           children: [
             // Header
             ModalHeader(
-              disabled: progressing || !editing.isValid,
+              disabled: progressing || !ready,
               headerTitle: LocaleKeys.object_action.tr(namedArgs: {
                 "object": LocaleKeys.transaction.plural(1),
                 "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
@@ -609,13 +616,22 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     visible: useAlt,
                     child: TextField(
                       controller: altAmountController,
+                      keyboardType: TextInputType.numberWithOptions(
+                        decimal: (editing.altCurrency == null) || (editing.altCurrency!.decimalDigits > 0),
+                      ),
                       decoration: InputDecoration(
                         labelText: LocaleKeys.paidAmount.tr(),
                         prefixIcon: IconButton(
                           icon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
                           onPressed: () {},
                         ),
+                        errorText: editing.regex.hasMatch(altAmountController.text)
+                            ? null
+                            : LocaleKeys.msgInvalidInput,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),
+                      ],
                       onChanged: onAltAmountChanged,
                     ),
                   ),
@@ -623,13 +639,22 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                   // Amount
                   TextField(
                     controller: amountController,
+                    keyboardType: TextInputType.numberWithOptions(
+                      decimal: editing.currency.decimalDigits > 0,
+                    ),
                     decoration: InputDecoration(
                       labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
                       prefixIcon: IconButton(
                         icon: Icon(editing.currency.icon),
                         onPressed: () {},
                       ),
+                      errorText: editing.regex.hasMatch(amountController.text)
+                          ? null
+                          : LocaleKeys.msgInvalidInput,
                     ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),
+                    ],
                     onChanged: onAmountChanged,
                   ),
                   const SizedBox(height: 8,),
@@ -659,6 +684,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                         flex: 1,
                         child: TextField(
                           controller: utilityDaysController,
+                          keyboardType: TextInputType.number,
                           textAlign: TextAlign.end,
                           decoration: InputDecoration(
                             labelText: LocaleKeys.utilityDays.tr(),

@@ -101,6 +101,7 @@
   "msgError": "에러가 발생했습니다\n{}",
   "msgItemRestored": "{}이(가) 복원되었습니다",
   "msgExportCsv": "CSV로 내보내기",
+  "msgInvalidInput": "올바르지 않은 입력입니다",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",

@@ -105,6 +105,7 @@
   "msgError": "Error occurred\n{}",
   "msgItemRestored": "{} has been restored",
   "msgExportCsv": "Export as CSV",
+  "msgInvalidInput": "Invalid input",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
