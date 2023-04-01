@@ -113,6 +113,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Request data
   void request() async {
     final now = DateTime.now();
+    final last = DateTime(now.year, now.month+1, 1, 0, 0, 0, 0);
+    assert(now.timeZoneOffset == last.timeZoneOffset);
+    final duration = now.timeZoneOffset;
     // Account
     ref.read(_accounts.notifier).request(
       [{
@@ -134,8 +137,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.read(_currentMonthExpenses.notifier).conditions = [{
       ModelKeys.keyType: TransactionType.expense.code,
       ModelKeys.keyPaidDate: [
-        DateTime(now.year, now.month, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
-        DateTime(now.year, now.month+1, 1, 0, 0, 0, 0).millisecondsSinceEpoch,
+        DateTime(now.year, now.month, 1, 0, 0, 0, 0).add(duration).millisecondsSinceEpoch,
+        last.add(duration).millisecondsSinceEpoch,
       ],
       ModelKeys.keyCurrency: currency.value,
       ModelKeys.keyIncluded: true,
@@ -145,9 +148,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     // Amount to be paid
     ref.read(_amountBePaid.notifier).conditions = [{
       ModelKeys.keyType: TransactionType.expense.code,
-      ModelKeys.keyCalculatedDate: [
-        now.millisecondsSinceEpoch,
-      ],
+      ModelKeys.keyCalculatedDate: {
+        "min": now.add(duration).add(const Duration(seconds: 1)).millisecondsSinceEpoch,
+        "max": last.add(duration).millisecondsSinceEpoch,
+      },
       ModelKeys.keyCurrency: currency.value,
       ModelKeys.keyIncluded: true,
       ModelKeys.keyDeleted: false,
@@ -160,11 +164,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       ModelKeys.keyIncluded: true,
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPaidDate: {
-        "max": DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
+        "max": DateTime(now.year, now.month+1, 1).add(duration).millisecondsSinceEpoch,
       },
       ModelKeys.keyUtilityEnd: {
-        "min": DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
-      }
+        "min": DateTime(now.year, now.month, 1).add(duration).millisecondsSinceEpoch,
+      },
     }];
     ref.read(_budgetExpensed.notifier).request();
     setState(() {});
