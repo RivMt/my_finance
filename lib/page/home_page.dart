@@ -117,11 +117,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.read(_accounts.notifier).request(
       [{
         ModelKeys.keyDeleted: false,
+        ModelKeys.keyPriority: {
+          "min": 0,
+        },
       }],
       ApiClient.buildOptions(
         limit: 3,
         sorts: [
-          const Sort(ModelKeys.keyPriority, SortType.desc),
           const Sort(ModelKeys.keyLastUsed, SortType.desc),
         ],
       ),

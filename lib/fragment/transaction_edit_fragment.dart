@@ -107,9 +107,12 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     // Account
     await ref.read(_accounts.notifier).request([{
       ModelKeys.keyDeleted: false,
+      ModelKeys.keyPriority: {
+        "min": 0,
+      },
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(ModelKeys.keyPriority, SortType.desc),
+        const Sort(ModelKeys.keyLastUsed, SortType.desc),
       ],
     ));
     final account = selectedAccount;
@@ -117,9 +120,12 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     // Payment
     await ref.read(_payments.notifier).request([{
       ModelKeys.keyDeleted: false,
+      ModelKeys.keyPriority: {
+        "min": 0,
+      },
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(ModelKeys.keyPriority, SortType.desc),
+        const Sort(ModelKeys.keyLastUsed, SortType.desc),
       ],
     ));
     final payment = selectedPayment;
@@ -129,7 +135,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
       ModelKeys.keyDeleted: false,
     }], ApiClient.buildOptions(
       sorts: [
-        const Sort(ModelKeys.keyLastUsed, SortType.desc),
+        const Sort(ModelKeys.keyPid, SortType.asc),
       ],
     ));
     final category = selectedCategory;
