@@ -38,6 +38,12 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   /// [Payment] which is now editing
   Payment editing = Payment({});
 
+  /// Value of [editing] is ready or not
+  bool get ready {
+    return editing.isValid
+        && (limitationController.text == editing.limitation.toString());
+  }
+
   /// Value of sent [editing] and waiting for response
   bool _progressing = false;
 
@@ -174,9 +180,9 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
   /// Triggers on limitation changed
   void onLimitationChanged(String value) {
     if (editing.regex.hasMatch(value)) {
-      editing.limitation = value == "" ? Decimal.zero :Decimal.parse(value);
-    } else {
-      limitationController.text = editing.limitation.toString();
+      if (value != "") {
+        editing.limitation = Decimal.parse(value);
+      }
     }
     setState(() {});
   }
@@ -275,7 +281,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
           children: [
             // Header
             ModalHeader(
-              disabled: progressing || !editing.isValid,
+              disabled: progressing || !ready,
               headerTitle: LocaleKeys.object_action.tr(namedArgs: {
                 "object": LocaleKeys.payment.plural(1),
                 "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
@@ -319,7 +325,7 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                         prefixIcon: const Icon(Icons.numbers_outlined)
                     ),
                     inputFormatters: [
-                      FilteringTextInputFormatter(RegExp(r'[\d\s.:;_,/*#()]'), allow: true),
+                      FilteringTextInputFormatter(RegExp(r'[\d\s.:;_\-@,/*#()]'), allow: true),
                     ],
                     onChanged: onSerialNumberChanged,
                   ),
@@ -327,13 +333,22 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                   // Limitation
                   TextField(
                     controller: limitationController,
-                    decoration: InputDecoration(
-                        labelText: LocaleKeys.limitation.tr(),
-                        prefixIcon: IconButton(
-                          icon: Icon(editing.currency.icon),
-                          onPressed: () => onCurrencyButtonPressed(),
-                        )
+                    keyboardType: TextInputType.numberWithOptions(
+                      decimal: editing.currency.decimalDigits > 0,
                     ),
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.limitation.tr(),
+                      prefixIcon: IconButton(
+                        icon: Icon(editing.currency.icon),
+                        onPressed: () => onCurrencyButtonPressed(),
+                      ),
+                      errorText: editing.regex.hasMatch(limitationController.text)
+                          ? null
+                          : LocaleKeys.msgInvalidInput,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),
+                    ],
                     onChanged: onLimitationChanged,
                   ),
                   // Is cash checkbox
