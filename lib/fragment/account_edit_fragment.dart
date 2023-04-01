@@ -327,18 +327,25 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                   // Is cash checkbox
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: editing.isCash,
-                          onChanged: (value) => onCashValueChanged(value ?? false),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => onCashValueChanged(!editing.isCash),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: editing.isCash,
+                              onChanged: null,
+                            ),
+                            Text(
+                              LocaleKeys.cash.tr(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          LocaleKeys.cash.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   // Color

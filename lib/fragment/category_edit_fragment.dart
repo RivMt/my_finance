@@ -234,7 +234,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
                               child: ChoiceChip(
-                                label: Text(type.name.tr()),
+                                label: Text(type.key.tr()),
                                 selected: type == editing.type,
                                 onSelected: (bool value) => onTypeChanged(type, value),
                               ),
@@ -271,18 +271,25 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
                   // Included checkbox
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: editing.isIncluded,
-                          onChanged: (value) => onIncludeValueChanged(value ?? false),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => onIncludeValueChanged(!editing.isIncluded),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: editing.isIncluded,
+                              onChanged: null,
+                            ),
+                            Text(
+                              LocaleKeys.included.tr(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          LocaleKeys.included.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],

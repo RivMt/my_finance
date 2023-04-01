@@ -354,18 +354,25 @@ class _PaymentEditFragmentState extends State<PaymentEditFragment> {
                   // Is cash checkbox
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: editing.isCredit,
-                          onChanged: (value) => onCreditValueChanged(value ?? false),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => onCreditValueChanged(!editing.isCredit),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: editing.isCredit,
+                              onChanged: null,
+                            ),
+                            Text(
+                              LocaleKeys.credit.tr(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          LocaleKeys.credit.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   // Payment

@@ -584,20 +584,27 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                         LocaleKeys.payment.plural(1),
                         style: Theme.of(context).textTheme.labelSmall,
                       ),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: payment == Payment.none,
-                            tristate: false,
-                            onChanged: (value) => onNoPaymentCheckboxChanged(value!),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => onNoPaymentCheckboxChanged(payment != Payment.none),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Checkbox(
+                                value: payment == Payment.none,
+                                tristate: false,
+                                onChanged: null,
+                              ),
+                              Text(
+                                LocaleKeys.noPayment.plural(1),
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
                           ),
-                          Text(
-                            LocaleKeys.noPayment.plural(1),
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                        ],
-                      )
+                        ),
+                      ),
                     ],
                   ),
                   Visibility(
@@ -627,10 +634,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       ),
                       decoration: InputDecoration(
                         labelText: LocaleKeys.paidAmount.tr(),
-                        prefixIcon: IconButton(
-                          icon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
-                          onPressed: () {},
-                        ),
+                        prefixIcon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
                         errorText: editing.regex.hasMatch(altAmountController.text)
                             ? null
                             : LocaleKeys.msgInvalidInput,
@@ -650,10 +654,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     ),
                     decoration: InputDecoration(
                       labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
-                      prefixIcon: IconButton(
-                        icon: Icon(editing.currency.icon),
-                        onPressed: () {},
-                      ),
+                      prefixIcon: Icon(editing.currency.icon),
                       errorText: editing.regex.hasMatch(amountController.text)
                           ? null
                           : LocaleKeys.msgInvalidInput,
@@ -716,18 +717,25 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                   // Included checkbox
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Checkbox(
-                          value: editing.isIncluded,
-                          onChanged: (value) => onIncludedValueChanged(value ?? false),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => onIncludedValueChanged(!editing.isIncluded),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: editing.isIncluded,
+                              onChanged: null,
+                            ),
+                            Text(
+                              LocaleKeys.included.tr(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
-                        Text(
-                          LocaleKeys.included.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
