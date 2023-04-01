@@ -121,6 +121,15 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   ),
                 ),
               ),
+              // Utility
+              Tooltip(
+                message: LocaleKeys.utilityDays.tr(),
+                child: ListTile(
+                  leading: const Icon(Icons.date_range_outlined),
+                  title: Text(LocaleKeys.nDay.plural(widget.data.utilityDays)),
+                  subtitle: Text(DateFormat.yMd().format(widget.data.utilityEnd)),
+                ),
+              ),
               const Divider(),
               // Relations
               CategoryCard(
