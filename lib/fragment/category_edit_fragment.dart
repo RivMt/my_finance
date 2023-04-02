@@ -33,6 +33,9 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   /// [Category] which is now editing
   Category editing = Category({});
 
+  /// Value is [editing] is ready or not
+  bool get ready => editing.isValid;
+
   /// Value of sent [editing] and waiting for response
   bool _progressing = false;
 
@@ -173,14 +176,6 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
   }
 
   @override
-  void didUpdateWidget(CategoryEditFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    editing = widget.base ?? Category({});
-    nameController.text = editing.name;
-    descriptionController.text = editing.descriptions;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -194,7 +189,7 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
           children: [
             // Header
             ModalHeader(
-              disabled: progressing,
+              disabled: progressing || !ready,
               headerTitle: LocaleKeys.object_action.tr(namedArgs: {
                 "object": LocaleKeys.category.plural(1),
                 "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
