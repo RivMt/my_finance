@@ -95,18 +95,28 @@ class _CategorySelectDialogState extends State<CategorySelectDialog> {
                   }).toList(growable: false),
                 ),
                 // Included
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Checkbox(
-                      value: include,
-                      onChanged: (value) => onIncludedPressed(value ?? false),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => onIncludedPressed(!include),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: include,
+                            onChanged: null,
+                          ),
+                          Text(
+                            LocaleKeys.included.tr(),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      LocaleKeys.included.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
