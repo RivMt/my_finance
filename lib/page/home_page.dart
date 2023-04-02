@@ -225,6 +225,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     final accounts = ref.watch(_accounts);
     return Scaffold(
       appBar: AppBar(
+        title: const Text("MyFinance"),
+        centerTitle: MediaQuery.of(context).orientation == Orientation.portrait,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: onMenuButtonPressed,
