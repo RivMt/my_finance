@@ -316,6 +316,10 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Triggers on category card tapped
   void onCategoryCardTapped(List<Category> categories) async {
+    // Check categories has been loaded
+    if (categories.isEmpty) {
+      return;
+    }
     final category = await showCategorySelectDialog(context, categories);
     if (category != null) {
       setCategory(category);
