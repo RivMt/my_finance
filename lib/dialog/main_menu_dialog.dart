@@ -115,7 +115,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             ),
             // CSV
             Visibility(
-              visible: isDesktop(),
+              visible: isDesktop() || kDebugMode,
               child: ListTile(
                 leading: const Icon(Icons.table_view_outlined),
                 title: Text(LocaleKeys.advancedQuery.tr()),
