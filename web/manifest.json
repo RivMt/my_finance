@@ -1,7 +1,7 @@
 {
     "name": "MyFinance",
     "short_name": "MyFinance",
-    "start_url": ".",
+    "start_url": "#",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#2196F3",
