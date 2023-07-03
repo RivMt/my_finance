@@ -8,17 +8,35 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 
 enum RestoreItemType {
   visible,
-  deleted,
+  deleted;
+
+  String get title {
+    if (this == RestoreItemType.deleted) {
+      return LocaleKeys.trashCan.tr();
+    }
+    return LocaleKeys.hiddenItems.tr();
+  }
+
+  static RestoreItemType getByName(String name) {
+    for(RestoreItemType type in RestoreItemType.values) {
+      if (type.name == name) {
+        return type;
+      }
+    }
+    return RestoreItemType.visible;
+  }
 }
 
 class RestoreItemsPage extends StatefulWidget {
+
+  static const String routeTrash = "/trash";
+
+  static const String routeInvisible = "/visible";
+
   const RestoreItemsPage({
     super.key,
     required this.type,
-    required this.title,
   });
-
-  final String title;
 
   final RestoreItemType type;
 
@@ -80,7 +98,7 @@ class _RestoreItemsPageState extends State<RestoreItemsPage> with TickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.type.title),
         bottom: TabBar(
           controller: tabController,
           tabs: [

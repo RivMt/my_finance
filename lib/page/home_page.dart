@@ -47,6 +47,9 @@ final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, 
 });
 
 class HomePage extends ConsumerStatefulWidget {
+
+  static const String route = "/";
+
   const HomePage({super.key});
 
   @override
@@ -99,7 +102,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     try {
       final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
       await client.init(
-        onLoginRequired: () => openPage(const LoginPage(), (value) => request()),
+        onLoginRequired: () => openPage(
+          const LoginPage(),
+          (value) => request(),
+        ),
         preferences: prefs,
       );
     } on Exception catch(e) {

@@ -31,5 +31,37 @@
             "type": "image/png",
             "purpose": "maskable"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "Accounts",
+            "short_name": "Accounts",
+            "description": "View account list",
+            "url": "/accounts",
+            "icons": [{
+                "src": "icons/shortcut-accounts.png",
+                "size": "192x192"
+            }]
+        },
+        {
+            "name": "Payments",
+            "short_name": "Payments",
+            "description": "View payments list",
+            "url": "/payments",
+            "icons": [{
+                "src": "icons/shortcut-payments.png",
+                "size": "192x192"
+            }]
+        },
+        {
+            "name": "Search",
+            "short_name": "Search",
+            "description": "Search history and items",
+            "url": "/payments",
+            "icons": [{
+                "src": "icons/shortcut-search.png",
+                "size": "192x192"
+            }]
+        }
     ]
 }

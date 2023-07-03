@@ -9,6 +9,9 @@ import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountsPage extends StatefulWidget {
+
+  static const String route = "/accounts";
+
   const AccountsPage({
     super.key,
     this.init,

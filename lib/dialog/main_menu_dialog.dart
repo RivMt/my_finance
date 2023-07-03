@@ -99,8 +99,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             ListTile(
               leading: const Icon(Icons.visibility_off_outlined),
               title: Text(LocaleKeys.hiddenItems.tr()),
-              onTap: () => openPage(RestoreItemsPage(
-                title: LocaleKeys.hiddenItems.tr(),
+              onTap: () => openPage(const RestoreItemsPage(
                 type: RestoreItemType.visible,
               )),
             ),
@@ -108,8 +107,7 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             ListTile(
               leading: const Icon(Icons.delete_outline_outlined),
               title: Text(LocaleKeys.trashCan.tr()),
-              onTap: () => openPage(RestoreItemsPage(
-                title: LocaleKeys.trashCan.tr(),
+              onTap: () => openPage(const RestoreItemsPage(
                 type: RestoreItemType.deleted,
               )),
             ),
