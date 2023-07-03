@@ -7,6 +7,9 @@ import 'package:my_finance/fragment/category_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class CategoriesPage extends StatefulWidget {
+
+  static const String route = "/categories";
+
   const CategoriesPage({super.key});
 
   @override

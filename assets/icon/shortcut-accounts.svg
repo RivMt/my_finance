@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46667"
+   version="1.1"
+   id="svg5"
+   xml:space="preserve"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="shortcut-accounts.svg"
+   inkscape:export-filename="shortcut-accounts.png"
+   inkscape:export-xdpi="36"
+   inkscape:export-ydpi="36"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="1"
+     inkscape:cx="262"
+     inkscape:cy="150"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g160" /><defs
+     id="defs2" /><g
+     inkscape:label="레이어 1"
+     inkscape:groupmode="layer"
+     id="layer1"><g
+       style="fill:#000000;stroke:none"
+       id="g160"
+       transform="matrix(4.2497528,0,0,4.2497528,16.7363,16.7363)"><path
+         d="M 0,0 H 24 V 24 H 0 Z"
+         fill="none"
+         id="path148"
+         style="stroke:none" /><path
+         d="m 9.17,6 2,2 H 20 V 18 H 4 V 6 H 9.17 M 10,4 H 4 C 2.9,4 2.01,4.9 2.01,6 L 2,18 c 0,1.1 0.9,2 2,2 h 16 c 1.1,0 2,-0.9 2,-2 V 8 C 22,6.9 21.1,6 20,6 h -8 z"
+         id="path150"
+         style="stroke:none;stroke-opacity:1;fill:#2196f3;fill-opacity:1" /></g></g></svg>

@@ -15,6 +15,9 @@ final _transactions = StateNotifierProvider<ModelsState<RawTransaction>, List<Ra
 });
 
 class CsvPage extends ConsumerStatefulWidget {
+
+  static const String route = "/csv";
+
   const CsvPage({super.key});
 
   @override

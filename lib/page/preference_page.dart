@@ -9,6 +9,9 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/preference_keys.dart';
 
 class PreferencePage extends ConsumerStatefulWidget {
+
+  static const String route = "/preferences";
+
   const PreferencePage({super.key});
 
   @override
