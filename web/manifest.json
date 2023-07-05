@@ -3,7 +3,7 @@
     "short_name": "MyFinance",
     "start_url": "/#",
     "display": "standalone",
-    "background_color": "#FFFFFF",
+    "background_color": "#2196F3",
     "theme_color": "#2196F3",
     "description": "Personal finance management application",
     "orientation": "portrait-primary",
@@ -37,7 +37,7 @@
             "name": "Accounts",
             "short_name": "Accounts",
             "description": "View account list",
-            "url": "/accounts",
+            "url": "/#/accounts",
             "icons": [{
                 "src": "icons/shortcut-accounts.png",
                 "size": "192x192"
@@ -47,19 +47,9 @@
             "name": "Payments",
             "short_name": "Payments",
             "description": "View payments list",
-            "url": "/payments",
+            "url": "/#/payments",
             "icons": [{
                 "src": "icons/shortcut-payments.png",
-                "size": "192x192"
-            }]
-        },
-        {
-            "name": "Search",
-            "short_name": "Search",
-            "description": "Search history and items",
-            "url": "/payments",
-            "icons": [{
-                "src": "icons/shortcut-search.png",
                 "size": "192x192"
             }]
         }
