@@ -57,6 +57,9 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
       appBar: AppBar(
         title: Text(LocaleKeys.category.plural(2)),
         bottom: TabBar(
+          indicatorColor: Theme.of(context).primaryColor,
+          labelColor: Theme.of(context).primaryColor,
+          unselectedLabelColor: AppTheme.subtext,
           controller: tabController,
           tabs: [
             Tab(text: LocaleKeys.transactionTypeExpense.tr(),),
