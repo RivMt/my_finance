@@ -3,11 +3,37 @@
     "short_name": "MyFinance",
     "start_url": "/#",
     "display": "standalone",
-    "background_color": "#2196F3",
+    "background_color": "#FFFFFF",
     "theme_color": "#2196F3",
     "description": "Personal finance management application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Accounts",
+            "short_name": "Accounts",
+            "description": "View account list",
+            "url": "/#/accounts",
+            "icons": [
+                {
+                    "src": "icons/shortcut-accounts.png",
+                    "size": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Payments",
+            "short_name": "Payments",
+            "description": "View payments list",
+            "url": "/#/payments",
+            "icons": [
+                {
+                    "src": "icons/shortcut-payments.png",
+                    "size": "192x192"
+                }
+            ]
+        }
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",
@@ -30,28 +56,6 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
-        }
-    ],
-    "shortcuts": [
-        {
-            "name": "Accounts",
-            "short_name": "Accounts",
-            "description": "View account list",
-            "url": "/#/accounts",
-            "icons": [{
-                "src": "icons/shortcut-accounts.png",
-                "size": "192x192"
-            }]
-        },
-        {
-            "name": "Payments",
-            "short_name": "Payments",
-            "description": "View payments list",
-            "url": "/#/payments",
-            "icons": [{
-                "src": "icons/shortcut-payments.png",
-                "size": "192x192"
-            }]
         }
     ]
 }
