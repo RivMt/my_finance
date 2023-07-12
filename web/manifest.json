@@ -3,55 +3,59 @@
     "short_name": "MyFinance",
     "start_url": "/#",
     "display": "standalone",
-    "background_color": "#2196F3",
+    "background_color": "#FFFFFF",
     "theme_color": "#2196F3",
     "description": "Personal finance management application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
-    "icons": [
-        {
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ],
     "shortcuts": [
         {
             "name": "Accounts",
             "short_name": "Accounts",
             "description": "View account list",
             "url": "/#/accounts",
-            "icons": [{
-                "src": "icons/shortcut-accounts.png",
-                "size": "192x192"
-            }]
+            "icons": [
+                {
+                    "src": "icons/shortcut-accounts.png",
+                    "size": "192x192"
+                }
+            ]
         },
         {
             "name": "Payments",
             "short_name": "Payments",
             "description": "View payments list",
             "url": "/#/payments",
-            "icons": [{
-                "src": "icons/shortcut-payments.png",
-                "size": "192x192"
-            }]
+            "icons": [
+                {
+                    "src": "icons/shortcut-payments.png",
+                    "size": "192x192"
+                }
+            ]
+        }
+    ],
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }
