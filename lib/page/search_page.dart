@@ -4,11 +4,8 @@ import 'package:my_finance/fragment/search_fragment.dart';
 
 class SearchPage extends SearchDelegate {
 
-  String text = "";
-
   @override
   void showResults(BuildContext context) {
-    text = query;
     super.showResults(context);
   }
 
@@ -32,9 +29,13 @@ class SearchPage extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return const Center(
-      child: Text("Message"),
-    );
+    if (query.length < 2) {
+      return const MessageBox(
+        icon: Icons.warning_amber_outlined,
+        message: "",
+      );
+    }
+    return buildResults(context);
   }
 
   @override
@@ -46,7 +47,7 @@ class SearchPage extends SearchDelegate {
       child: SizedBox(
         width: width,
         child: SearchFragment(
-          query: text,
+          query: query,
         ),
       ),
     );
