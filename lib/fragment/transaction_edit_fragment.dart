@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/dialog/category_select_dialog.dart';
+import 'package:my_finance/dialog/select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "TransactionEditFragment";
@@ -147,34 +148,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     return await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SizedBox(
-            width: ScreenPlanner(context).dialogWidth,
-            height: MediaQuery.of(context).size.height * 0.7,
-            child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                final item = list[index];
-                switch(T) {
-                  case Account:
-                    return AccountCard(
-                      data: item as Account,
-                      showBalance: false,
-                      onTap: () => Navigator.pop(context, item),
-                    );
-                  case Payment:
-                    return PaymentCard(
-                      data: item as Payment,
-                      onTap: () => Navigator.pop(context, item),
-                    );
-                  default:
-                    return const SizedBox();
-                }
-              },
-            ),
-          ),
+        return SelectDialog<T>(
+          title: title,
+          list: list,
         );
       },
     );
@@ -290,7 +266,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     setCalculatedDate();
   }
 
-  /// Set [editing.category] and [editing.type]
+  /// Set [editing.minusCategory] and [editing.type]
   void setCategory(Category category) {
     editing.category = category.pid;
     editing.type = category.type;

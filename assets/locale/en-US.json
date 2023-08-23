@@ -38,6 +38,7 @@
   "select": "Select",
   "filter": "Filter",
   "undo": "Undo",
+  "choose": "Choose",
 
   "object_action": "{action} {object}",
   "full_name": "{first} {last}",
@@ -79,6 +80,14 @@
   "trashCan": "Deleted items",
   "hiddenItems": "Hidden items",
   "advancedQuery": "Advanced query",
+  "file": "File",
+  "readCsv": "Load CSV file",
+  "target": "Target",
+  "loadOptions": "Load options",
+  "rawHandling": "Raw handling",
+  "range": "Range",
+  "dateFormat": "Date format",
+  "preview": "Preview",
 
   "month": "Month",
   "nMonthBefore": {
@@ -106,6 +115,9 @@
   "msgItemRestored": "{} has been restored",
   "msgExportCsv": "Export as CSV",
   "msgInvalidInput": "Invalid input",
+  "msgMinusAsExpense": "Negative number as expense",
+  "msgMinusAsIncome": "Negative number as income",
+  "msgTaskComplete": "Task has been successfully completed",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
@@ -144,5 +156,8 @@
   "currentMonthExpense": "Expenses of current month",
   "amountBePaid": "Amount to be paid",
 
-  "totalBalance": "Total balance"
+  "totalBalance": "Total balance",
+
+  "columnDate": "Date column",
+  "columnAmount": "Amount column"
 }
