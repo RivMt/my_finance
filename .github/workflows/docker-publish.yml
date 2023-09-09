@@ -38,6 +38,12 @@ jobs:
         with:
           cosign-release: 'v2.1.1'
 
+      # Clone my_api
+      - name: Clone my_api
+        run: |
+          mkdir ../my_api
+          git clone https://${{ secrets.MYAPI_GIT }} ../my_api
+
       # Install flutter
       - name: Install Flutter
         uses: subosito/flutter-action@v1.5.1
@@ -46,6 +52,11 @@ jobs:
       - name: Install dependencies
         run: |
           flutter pub get
+
+      # Generate locales
+      - name: Generate locales
+        run: |
+          dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
       
       # Build web
       - name: Build web
@@ -58,7 +69,7 @@ jobs:
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: Log into registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
