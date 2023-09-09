@@ -34,6 +34,7 @@
   "select": "선택",
   "filter": "필터",
   "undo": "실행 취소",
+  "choose": "선택",
 
   "object_action": "{object} {action}",
   "full_name": "{last}{first}",
@@ -75,6 +76,14 @@
   "trashCan": "휴지통",
   "hiddenItems": "숨겨진 항목",
   "advancedQuery": "고급 쿼리",
+  "file": "파일",
+  "readCsv": "CSV 파일 불러오기",
+  "target": "대상",
+  "loadOptions": "불러오기 설정",
+  "rawHandling": "행 처리",
+  "range": "범위",
+  "dateFormat": "날짜 형식",
+  "preview": "미리보기",
 
   "month": "월",
   "nMonthBefore": {
@@ -102,6 +111,9 @@
   "msgItemRestored": "{}이(가) 복원되었습니다",
   "msgExportCsv": "CSV로 내보내기",
   "msgInvalidInput": "올바르지 않은 입력입니다",
+  "msgMinusAsExpense": "음수를 지출로 설정",
+  "msgMinusAsIncome": "음수를 수입으로 설정",
+  "msgTaskComplete": "작업이 성공적으로 완료되었습니다",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
@@ -140,5 +152,8 @@
   "currentMonthExpense": "이번 달 지출",
   "amountBePaid": "지불할 대금",
 
-  "totalBalance": "총 자산"
+  "totalBalance": "총 자산",
+
+  "columnDate": "날짜 열",
+  "columnAmount": "금액 열"
 }

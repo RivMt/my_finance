@@ -9,6 +9,7 @@ import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/csv_page.dart';
+import 'package:my_finance/page/read_csv_page.dart';
 import 'package:my_finance/page/restore_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 
@@ -119,6 +120,12 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
                 title: Text(LocaleKeys.advancedQuery.tr()),
                 onTap: () => openPage(const CsvPage()),
               ),
+            ),
+            // Load CSV
+            ListTile(
+              leading: const Icon(Icons.file_open_outlined),
+              title: Text(LocaleKeys.readCsv.tr()),
+              onTap: () => openPage(const ReadCsvPage()),
             ),
             const Divider(),
             Visibility(

@@ -20,11 +20,14 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
     super.key,
     this.conditions,
+    this.list,
     this.options = const {},
     this.shrinkWrap = false,
     this.useSliver = false,
     this.onEditFinish,
   });
+
+  final List<Transaction>? list;
 
   final List<Map<String, dynamic>>? conditions;
 
@@ -44,11 +47,18 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   /// Request transactions
   void request() {
+    // Get categories
+    ref.read(_categories.notifier).request([{}]);
+    // Exit if widget.list is not null
+    if (widget.list != null) {
+      return;
+    }
     // Build options if it is empty
     final options = widget.options.isEmpty
         ? ApiClient.buildOptions(
       sorts: [
         const Sort(ModelKeys.keyPaidDate, SortType.desc),
+        const Sort(ModelKeys.keyPid, SortType.desc),
       ],
     ) : widget.options;
     // Get transactions
@@ -56,8 +66,6 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       widget.conditions ?? [],
       options,
     );
-    // Get categories
-    ref.read(_categories.notifier).request([{}]);
   }
 
   /// Show transaction details dialog
@@ -137,7 +145,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = ref.watch(_transactions);
+    final transactions = (widget.list ?? ref.watch(_transactions))!;
     final categories = ref.watch(_categories);
     // Return sliver grouped list view
     if (widget.useSliver) {
