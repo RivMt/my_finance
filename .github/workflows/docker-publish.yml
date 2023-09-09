@@ -38,6 +38,12 @@ jobs:
         with:
           cosign-release: 'v2.1.1'
 
+      # Clone my_api
+      - name: Clone my_api
+        run: |
+          mkdir ../my_api
+          git clone https://${{ secrets.MYAPI_GIT }} ../my_api
+
       # Install flutter
       - name: Install Flutter
         uses: subosito/flutter-action@v1.5.1
