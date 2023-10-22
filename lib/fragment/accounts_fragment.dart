@@ -4,12 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/account_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-
-final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
-  return ModelsState<Account>(ref);
-});
 
 class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
@@ -40,24 +37,6 @@ class AccountsFragment extends ConsumerStatefulWidget {
 
 class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
-  /// Request all accounts ordered by icon
-  void request() {
-    ref.read(_accounts.notifier).request(
-      widget.conditions ?? [{
-        ModelKeys.keyDeleted: false,
-        ModelKeys.keyPriority: {
-          "min": 0,
-        },
-      }],
-      ApiClient.buildOptions(
-        sorts: [
-          const Sort(ModelKeys.keyIcon, SortType.asc),
-          const Sort(ModelKeys.keyLastUsed, SortType.desc),
-        ],
-      ),
-    );
-  }
-
   /// Show account editing modal
   void showAccountEditingModal(BuildContext context, [Account? account]) async {
     Account? editing = account;
@@ -80,7 +59,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
         );
       },
     ).then((account) {
-      request();
+      provider.refreshAccounts(ref);
       if (widget.onEditFinish != null && account != null) {
         widget.onEditFinish!(account);
       }
@@ -95,18 +74,11 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   @override
   void initState() {
     super.initState();
-    request();
-  }
-
-  @override
-  void didUpdateWidget(AccountsFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
   }
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(_accounts);
+    final accounts = ref.watch(provider.filteredAccounts).reversed;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8),

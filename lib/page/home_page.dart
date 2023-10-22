@@ -1,50 +1,20 @@
 import 'dart:convert';
 
-import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/main_menu_dialog.dart';
+import 'package:my_finance/fragment/accounts_fragment.dart';
+import 'package:my_finance/fragment/home_fragment.dart';
+import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/accounts_page.dart';
-import 'package:my_finance/page/payments_page.dart';
 import 'package:my_finance/preference_keys.dart';
-
-final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
-  return ModelsState<Account>(ref);
-});
-
-final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  return CalculateValueState<Transaction>(ref,
-    conditions: [],
-    type: CalculationType.sum,
-    attribute: ModelKeys.keyAmount,
-  );
-});
-
-final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  return CalculateValueState<Transaction>(ref,
-    conditions: [],
-    type: CalculationType.sum,
-    attribute: ModelKeys.keyAmount,
-  );
-});
-
-final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  return CalculateValueState<Transaction>(ref,
-    conditions: [],
-    type: CalculationType.sum,
-    attribute: ModelKeys.keyAmount,
-    queries: {
-      "mode": "budget",
-    }
-  );
-});
 
 class HomePage extends ConsumerStatefulWidget {
 
@@ -62,6 +32,31 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   final client = ApiClient();
 
+  final List<_NavigationDestinations> destinations = [
+    _NavigationDestinations(
+      icon: const Icon(Icons.home_filled),
+      selectedIcon: const Icon(Icons.home_filled),
+      label: LocaleKeys.home,
+    ),
+    _NavigationDestinations(
+      icon: const Icon(Icons.folder_outlined),
+      selectedIcon: const Icon(Icons.folder),
+      label: LocaleKeys.account.plural(1),
+    ),
+    _NavigationDestinations(
+      icon: const Icon(Icons.payment_outlined),
+      selectedIcon: const Icon(Icons.payment),
+      label: LocaleKeys.payment.plural(1),
+    ),
+  ];
+
+  int navigationIndex = 0;
+
+  void onNavigationIndexChanged(int index) {
+    navigationIndex = index;
+    setState(() {});
+  }
+
   /// Currently selected [Currency]
   ///
   /// **DO NOT** access directly in [build]. Use [currency] alternatively.
@@ -78,19 +73,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   set currency(Currency c) => _currency = c;
 
-  /// Open [page]
-  ///
-  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
-  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
-      if (onPageFinished != null) {
-        onPageFinished(value);
-      }
-    }).then((value) {
-      request();
-    });
-  }
-
   /// Init API
   void init() async {
     // Init preference
@@ -104,80 +86,41 @@ class _HomePageState extends ConsumerState<HomePage> {
       await client.init(
         onLoginRequired: () => openPage(
           const LoginPage(),
-          (value) => request(),
+              (value) => refresh(),
         ),
         preferences: prefs,
       );
+      // Refresh providers
+      provider.refreshAccounts(ref);
+      provider.refreshPayments(ref);
+      provider.refreshCategories(ref);
     } on Exception catch(e) {
       Log.e(_tag, "Error: $e");
       return;
     }
     // Request
-    request();
+    refresh();
   }
 
-  /// Request data
-  void request() async {
-    final now = DateTime.now();
-    final last = DateTime(now.year, now.month+1, 1, 0, 0, 0, 0);
-    assert(now.timeZoneOffset == last.timeZoneOffset);
-    final duration = now.timeZoneOffset;
-    // Account
-    ref.read(_accounts.notifier).request(
-      [{
-        ModelKeys.keyDeleted: false,
-        ModelKeys.keyPriority: {
-          "min": 0,
-        },
-      }],
-      ApiClient.buildOptions(
-        limit: 3,
-        sorts: [
-          const Sort(ModelKeys.keyLastUsed, SortType.desc),
-        ],
-      ),
-    );
-    // Preference
-    await ref.read(preferenceProvider.notifier).request();
-    // Current month expense
-    ref.read(_currentMonthExpenses.notifier).conditions = [{
-      ModelKeys.keyType: TransactionType.expense.code,
-      ModelKeys.keyPaidDate: [
-        DateTime(now.year, now.month, 1, 0, 0, 0, 0).add(duration).millisecondsSinceEpoch,
-        last.add(duration).millisecondsSinceEpoch,
-      ],
-      ModelKeys.keyCurrency: currency.value,
-      ModelKeys.keyIncluded: true,
-      ModelKeys.keyDeleted: false,
-    }];
-    ref.read(_currentMonthExpenses.notifier).request();
-    // Amount to be paid
-    ref.read(_amountBePaid.notifier).conditions = [{
-      ModelKeys.keyType: TransactionType.expense.code,
-      ModelKeys.keyCalculatedDate: {
-        "min": now.add(duration).add(const Duration(seconds: 1)).millisecondsSinceEpoch,
-        "max": last.add(duration).millisecondsSinceEpoch,
-      },
-      ModelKeys.keyCurrency: currency.value,
-      ModelKeys.keyIncluded: true,
-      ModelKeys.keyDeleted: false,
-    }];
-    ref.read(_amountBePaid.notifier).request();
-    // Budget expense
-    ref.read(_budgetExpensed.notifier).conditions = [{
-      ModelKeys.keyType: TransactionType.expense.code,
-      ModelKeys.keyCurrency: currency.value,
-      ModelKeys.keyIncluded: true,
-      ModelKeys.keyDeleted: false,
-      ModelKeys.keyPaidDate: {
-        "max": DateTime(now.year, now.month+1, 1).add(duration).millisecondsSinceEpoch,
-      },
-      ModelKeys.keyUtilityEnd: {
-        "min": DateTime(now.year, now.month, 1).add(duration).millisecondsSinceEpoch,
-      },
-    }];
-    ref.read(_budgetExpensed.notifier).request();
-    setState(() {});
+  /// Refresh page
+  void refresh() {
+    provider.refreshAccounts(ref);
+    provider.refreshPayments(ref);
+    provider.refreshCategories(ref);
+    onNavigationIndexChanged(navigationIndex);
+  }
+
+  /// Open [page]
+  ///
+  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
+      if (onPageFinished != null) {
+        onPageFinished(value);
+      }
+    }).then((value) {
+      refresh();
+    });
   }
 
   /// Triggers on menu button pressed
@@ -185,22 +128,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     showDialog(
       context: context,
       builder: (context) => MainMenuDialog(
-        onAccountButtonPressed: init,
-        onRefreshPressed: request,
+        onAccountButtonPressed: refresh,
+        onRefreshPressed: refresh,
       ),
     );
-  }
-
-  /// Triggers on payment group card button pressed
-  void onPaymentGroupButtonPressed(Currency currency) {
-    this.currency = currency;
-    request();
   }
 
   /// Triggers on transaction created
   void onTransactionCreated(Transaction? transaction) {
     if (transaction != null) {
-      request();
+      refresh();
     }
   }
 
@@ -223,12 +160,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void didUpdateWidget(HomePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    request();
   }
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(_accounts);
+    final bool isWide = ScreenPlanner(context).isSidePanelVisible;
     return Scaffold(
       appBar: AppBar(
         title: const Text("MyFinance"),
@@ -248,111 +184,62 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: GridView(
-          physics: const BouncingScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: getCrossAxisCount(context),
-            childAspectRatio: getChildAspectRatio(context),
-            mainAxisSpacing: 8,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GroupCard(
-              title: LocaleKeys.account.plural(1),
-              count: accounts.length,
-              button: IconButton(
-                icon: const Icon(Icons.keyboard_arrow_right_outlined),
-                color: Theme.of(context).textTheme.titleMedium?.color,
-                onPressed: () => openPage(const AccountsPage()),
+            if (isWide)
+              NavigationRail(
+                destinations: List.generate(destinations.length, (index) => NavigationRailDestination(
+                  icon: destinations[index].icon,
+                  selectedIcon: destinations[index].selectedIcon,
+                  label: Text(destinations[index].label),
+                )),
+                selectedIndex: navigationIndex,
+                onDestinationSelected: onNavigationIndexChanged,
+                labelType: NavigationRailLabelType.all,
+              )
+            ,
+            Expanded(
+              child: IndexedStack(
+                index: navigationIndex,
+                children: const [
+                  HomeFragment(),
+                  AccountsFragment(),
+                  PaymentsFragment()
+                ],
               ),
-              build: (BuildContext context, int index) {
-                final account = accounts[index];
-                return AccountCard(
-                  data: account,
-                  onTap: () => openPage(AccountsPage(init: account)),
-                );
-              },
-            ),
-            GroupCard(
-              title: LocaleKeys.payment.plural(1),
-              count: 3,
-              button: PopupMenuButton(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Theme.of(context).textTheme.titleMedium?.color,
-                ),
-                onSelected: onPaymentGroupButtonPressed,
-                itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
-                  return PopupMenuItem(
-                    value: currency,
-                    child: CurrencyCard(
-                      data: currency,
-                      useIconBackground: false,
-                    ),
-                  );
-                }).toList(growable: false),
-              ),
-              build: (BuildContext context, int index) {
-                late String name;
-                late IconData icon;
-                late Decimal amount;
-                late Function() onTap;
-                switch(index) {
-                  case 0:
-                    name = LocaleKeys.currentMonthExpense.tr();
-                    icon = Icons.payments_outlined;
-                    amount = ref.watch(_currentMonthExpenses);
-                    onTap = () => openPage(PaymentsPage(
-                      subtitle: name,
-                      currency: currency,
-                      amountCondition: ref.watch(_currentMonthExpenses.notifier).conditions,
-                    ));
-                    break;
-                  case 1:
-                    name = LocaleKeys.amountBePaid.tr();
-                    icon = Icons.calendar_today_outlined;
-                    amount = ref.watch(_amountBePaid);
-                    onTap = () => openPage(PaymentsPage(
-                      subtitle: name,
-                      currency: currency,
-                      amountCondition: ref.watch(_amountBePaid.notifier).conditions,
-                    ));
-                    break;
-                  case 2:
-                    name = LocaleKeys.budgetLeft.tr();
-                    icon = Icons.bar_chart_outlined;
-                    onTap = () => openPage(PaymentsPage(
-                      currency: currency,
-                    ));
-                    final budgetExpensed = ref.watch(_budgetExpensed);
-                    final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
-                    if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
-                      amount = pref.value[currency.value] - budgetExpensed;
-                    } else {
-                      amount = Decimal.zero;
-                    }
-                    break;
-                  default:
-                    name = "???";
-                    icon = Icons.question_mark_outlined;
-                    onTap = () {};
-                    amount = Decimal.zero;
-                }
-                return WalletItemCard(
-                  title: currency.format(amount),
-                  subtitle: name,
-                  foreground: Colors.white,
-                  background: Theme.of(context).primaryColor,
-                  icon: icon,
-                  onTap: onTap,
-                );
-              },
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: isWide ? null : BottomNavigationBar(
+        currentIndex: navigationIndex,
+        onTap: onNavigationIndexChanged,
+        items: List.generate(destinations.length, (index) => BottomNavigationBarItem(
+          icon: destinations[index].icon,
+          activeIcon: destinations[index].selectedIcon,
+          label: destinations[index].label,
+        )),
       ),
       floatingActionButton: TransactionAddButton(
         onFinish: onTransactionCreated,
       ),
     );
   }
+}
+
+class _NavigationDestinations {
+
+  final Icon icon;
+
+  final Icon selectedIcon;
+
+  final String label;
+
+  _NavigationDestinations({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+  });
 }

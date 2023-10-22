@@ -4,12 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-
-final _payments = StateNotifierProvider<ModelsState<Payment>, List<Payment>>((ref) {
-  return ModelsState<Payment>(ref);
-});
 
 final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   return CalculateValueState<Transaction>(ref,
@@ -72,21 +69,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   /// Request all payments ordered by icon
   void request() {
     // Payments
-    ref.read(_payments.notifier).request(
-      widget.paymentsConditions ?? [{
-        ModelKeys.keyDeleted: false,
-        ModelKeys.keyCurrency: currency.value,
-        ModelKeys.keyPriority: {
-          "min": 0,
-        },
-      }],
-      ApiClient.buildOptions(
-        sorts: [
-          const Sort(ModelKeys.keyIcon, SortType.asc),
-          const Sort(ModelKeys.keyLastUsed, SortType.desc),
-        ],
-      ),
-    );
+    provider.refreshPayments(ref);
     // Amount
     if (widget.amountConditions != null) {
       final conditions = widget.amountConditions!;
@@ -120,7 +103,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
         );
       },
     ).then((payment) {
-      request();
+      provider.refreshPayments(ref);
       if (widget.onEditFinish != null && payment != null) {
         widget.onEditFinish!(payment);
       }
@@ -128,10 +111,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   }
 
   /// Triggers on currency menu button pressed
-  void onCurrencyButtonPressed(Currency currency) {
-    this.currency = currency;
-    request();
-  }
+  void onCurrencyButtonPressed(Currency currency) => ref.read(provider.currencyFilter.notifier).set(currency);
 
   /// Triggers on payment add button pressed
   void onPaymentAddButtonPressed(BuildContext context) {
@@ -152,7 +132,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final payments = ref.watch(_payments);
+    final payments = ref.watch(provider.filteredPayments);
     final amount = ref.watch(_amount);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

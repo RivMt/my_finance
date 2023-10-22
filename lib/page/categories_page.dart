@@ -1,22 +1,24 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/categories_fragment.dart';
 import 'package:my_finance/fragment/category_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class CategoriesPage extends StatefulWidget {
+class CategoriesPage extends ConsumerStatefulWidget {
 
   static const String route = "/categories";
 
   const CategoriesPage({super.key});
 
   @override
-  State createState() => _CategoriesPageState();
+  ConsumerState createState() => _CategoriesPageState();
 }
 
-class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStateMixin {
+class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProviderStateMixin {
 
   late final TabController tabController;
 
@@ -37,7 +39,7 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
         ],
       ),
     ).then((value) {
-      setState(() {});
+      provider.refreshCategories(ref);
     });
   }
 
@@ -65,15 +67,13 @@ class _CategoriesPageState extends State<CategoriesPage> with TickerProviderStat
             Tab(text: LocaleKeys.transactionTypeExpense.tr(),),
             Tab(text: LocaleKeys.transactionTypeIncome.tr(),),
           ],
-          onTap: (index) => setState(() {}),
+          onTap: (index) => setState(() {
+            ref.read(provider.transactionTypeFilter.notifier).set(TransactionType.fromCode(index));
+          }),
         ),
       ),
       body: SafeArea(
         child: CategoriesFragment(
-          conditions: [{
-            ModelKeys.keyType: tabController.index,
-            ModelKeys.keyDeleted: false,
-          }],
           onTap: showCategoryEditingModal,
         ),
       ),

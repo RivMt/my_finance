@@ -1,0 +1,274 @@
+import 'package:decimal/decimal.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:my_api/core.dart';
+import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
+import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/page/payments_page.dart';
+import 'package:my_finance/preference_keys.dart';
+
+
+final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  return CalculateValueState<Transaction>(ref,
+    conditions: [],
+    type: CalculationType.sum,
+    attribute: ModelKeys.keyAmount,
+  );
+});
+
+final _amountBePaid = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  return CalculateValueState<Transaction>(ref,
+    conditions: [],
+    type: CalculationType.sum,
+    attribute: ModelKeys.keyAmount,
+  );
+});
+
+final _budgetExpensed = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
+  return CalculateValueState<Transaction>(ref,
+    conditions: [],
+    type: CalculationType.sum,
+    attribute: ModelKeys.keyAmount,
+    queries: {
+      "mode": "budget",
+    }
+  );
+});
+
+class HomeFragment extends ConsumerStatefulWidget {
+
+  static const String route = "/";
+
+  const HomeFragment({super.key});
+
+  @override
+  ConsumerState createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomeFragment> {
+
+  static const String _tag = "HomePage";
+
+  final client = ApiClient();
+
+  /// Currently selected [Currency]
+  ///
+  /// **DO NOT** access directly in [build]. Use [currency] alternatively.
+  Currency? _currency;
+
+  /// Currently selected [Currency]
+  Currency get currency {
+    if (_currency != null) {
+      return _currency!;
+    }
+    final prefs = ref.watch(preferenceProvider);
+    return Currency.fromValue(prefs[PreferenceKeys.defaultCurrency]?.value);
+  }
+
+  set currency(Currency c) => _currency = c;
+
+  /// Open [page]
+  ///
+  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
+      if (onPageFinished != null) {
+        onPageFinished(value);
+      }
+    }).then((value) {
+      request();
+    });
+  }
+
+  /// Request data
+  void request() async {
+    final now = DateTime.now();
+    final last = DateTime(now.year, now.month+1, 1, 0, 0, 0, 0);
+    assert(now.timeZoneOffset == last.timeZoneOffset);
+    final duration = now.timeZoneOffset;
+    // Preference
+    await ref.read(preferenceProvider.notifier).request();
+    // Current month expense
+    ref.read(_currentMonthExpenses.notifier).conditions = [{
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyPaidDate: [
+        DateTime(now.year, now.month, 1, 0, 0, 0, 0).add(duration).millisecondsSinceEpoch,
+        last.add(duration).millisecondsSinceEpoch,
+      ],
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
+    }];
+    ref.read(_currentMonthExpenses.notifier).request();
+    // Amount to be paid
+    ref.read(_amountBePaid.notifier).conditions = [{
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyCalculatedDate: {
+        "min": now.add(duration).add(const Duration(seconds: 1)).millisecondsSinceEpoch,
+        "max": last.add(duration).millisecondsSinceEpoch,
+      },
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
+    }];
+    ref.read(_amountBePaid.notifier).request();
+    // Budget expense
+    ref.read(_budgetExpensed.notifier).conditions = [{
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyCurrency: currency.value,
+      ModelKeys.keyIncluded: true,
+      ModelKeys.keyDeleted: false,
+      ModelKeys.keyPaidDate: {
+        "max": DateTime(now.year, now.month+1, 1).add(duration).millisecondsSinceEpoch,
+      },
+      ModelKeys.keyUtilityEnd: {
+        "min": DateTime(now.year, now.month, 1).add(duration).millisecondsSinceEpoch,
+      },
+    }];
+    ref.read(_budgetExpensed.notifier).request();
+    setState(() {});
+  }
+
+  /// Triggers on payment group card button pressed
+  void onPaymentGroupButtonPressed(Currency currency) {
+    this.currency = currency;
+    request();
+  }
+
+  /// Triggers on transaction created
+  void onTransactionCreated(Transaction? transaction) {
+    if (transaction != null) {
+      request();
+    }
+  }
+
+  /// Get [GridView] cross axis count
+  ///
+  /// Value is always bigger than `0`
+  int getCrossAxisCount(BuildContext context) => ScreenPlanner(context).panelNumber;
+
+  /// Get [GridView] child aspect ratio
+  double getChildAspectRatio(BuildContext context) {
+    return (MediaQuery.of(context).size.width / getCrossAxisCount(context)) / GroupCard.height;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(HomeFragment oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    request();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accounts = ref.watch(provider.filteredAccounts);
+    return GridView(
+      physics: const BouncingScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: getCrossAxisCount(context),
+        childAspectRatio: getChildAspectRatio(context),
+        mainAxisSpacing: 8,
+      ),
+      children: [
+        GroupCard(
+          title: LocaleKeys.account.plural(1),
+          count: accounts.length,
+          button: IconButton(
+            icon: const Icon(Icons.keyboard_arrow_right_outlined),
+            color: Theme.of(context).textTheme.titleMedium?.color,
+            onPressed: () => openPage(const AccountsPage()),
+          ),
+          build: (BuildContext context, int index) {
+            final account = accounts[index];
+            return AccountCard(
+              data: account,
+              onTap: () => openPage(AccountsPage(init: account)),
+            );
+          },
+        ),
+        GroupCard(
+          title: LocaleKeys.payment.plural(1),
+          count: 3,
+          button: PopupMenuButton(
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).textTheme.titleMedium?.color,
+            ),
+            onSelected: onPaymentGroupButtonPressed,
+            itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
+              return PopupMenuItem(
+                value: currency,
+                child: CurrencyCard(
+                  data: currency,
+                  useIconBackground: false,
+                ),
+              );
+            }).toList(growable: false),
+          ),
+          build: (BuildContext context, int index) {
+            late String name;
+            late IconData icon;
+            late Decimal amount;
+            late Function() onTap;
+            switch(index) {
+              case 0:
+                name = LocaleKeys.currentMonthExpense.tr();
+                icon = Icons.payments_outlined;
+                amount = ref.watch(_currentMonthExpenses);
+                onTap = () => openPage(PaymentsPage(
+                  subtitle: name,
+                  currency: currency,
+                  amountCondition: ref.watch(_currentMonthExpenses.notifier).conditions,
+                ));
+                break;
+              case 1:
+                name = LocaleKeys.amountBePaid.tr();
+                icon = Icons.calendar_today_outlined;
+                amount = ref.watch(_amountBePaid);
+                onTap = () => openPage(PaymentsPage(
+                  subtitle: name,
+                  currency: currency,
+                  amountCondition: ref.watch(_amountBePaid.notifier).conditions,
+                ));
+                break;
+              case 2:
+                name = LocaleKeys.budgetLeft.tr();
+                icon = Icons.bar_chart_outlined;
+                onTap = () => openPage(PaymentsPage(
+                  currency: currency,
+                ));
+                final budgetExpensed = ref.watch(_budgetExpensed);
+                final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
+                if (pref != null && pref.value is Map && pref.value.containsKey(currency.value)) {
+                  amount = pref.value[currency.value] - budgetExpensed;
+                } else {
+                  amount = Decimal.zero;
+                }
+                break;
+              default:
+                name = "???";
+                icon = Icons.question_mark_outlined;
+                onTap = () {};
+                amount = Decimal.zero;
+            }
+            return WalletItemCard(
+              title: currency.format(amount),
+              subtitle: name,
+              foreground: Colors.white,
+              background: Theme.of(context).primaryColor,
+              icon: icon,
+              onTap: onTap,
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
