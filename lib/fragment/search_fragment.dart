@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
-import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/payments_page.dart';
 
 final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
@@ -68,9 +67,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
             final data = Account(item.map);
             return AccountCard(
               data: data,
-              onTap: () => openPage(AccountsPage(
-                init: data,
-              )),
+              onTap: () => {},
             );
           case FinanceModelType.payment:
             final data = Payment(item.map);

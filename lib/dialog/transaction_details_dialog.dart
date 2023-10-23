@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/payments_page.dart';
 
@@ -138,9 +137,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
               ),
               AccountCard(
                 data: account,
-                onTap: () => openPage(AccountsPage(
-                  init: account,
-                )),
+                onTap: () => {},
               ),
               Visibility(
                 visible: widget.data.paymentId != Payment.unknown.pid

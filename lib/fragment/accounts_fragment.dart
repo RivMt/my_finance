@@ -11,13 +11,15 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 class AccountsFragment extends ConsumerStatefulWidget {
   const AccountsFragment({
     super.key,
+    required this.accounts,
     this.selected,
-    this.conditions,
     this.hideHeader = false,
     this.hideCreateButton = false,
     this.onItemTap,
     this.onEditFinish,
   });
+
+  final List<Account> accounts;
 
   final Function(Account)? onItemTap;
 
@@ -28,8 +30,6 @@ class AccountsFragment extends ConsumerStatefulWidget {
   final bool hideHeader;
 
   final bool hideCreateButton;
-
-  final List<Map<String, dynamic>>? conditions;
 
   @override
   ConsumerState createState() => _AccountsFragmentState();
@@ -78,7 +78,6 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(provider.filteredAccounts).reversed;
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8),
@@ -95,7 +94,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
               build: (context, index) {
                 final currency = Currency.values[index];
                 bool exist = false;
-                final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
+                final sum = widget.accounts.fold<Decimal>(Decimal.zero, (total, account) {
                   if (account.currency == currency) {
                     exist = true;
                     return total + account.balance;
@@ -119,7 +118,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
             itemCount: AccountSymbol.values.length,
             itemBuilder: (context, index) {
               final icon = AccountSymbol.values[index];
-              final sublist = accounts.where((element) => (element.icon == icon)).toList(growable: false);
+              final sublist = widget.accounts.where((element) => (element.icon == icon)).toList(growable: false);
               // Hide when sublist is empty
               if (sublist.isEmpty) {
                 return const SizedBox();

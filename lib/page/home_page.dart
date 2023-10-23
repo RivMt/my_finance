@@ -16,6 +16,32 @@ import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/preference_keys.dart';
 
+final _filteredAccounts = Provider<List<Account>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.accounts);
+  List<Account> result = list
+      .where((account) => (account.priority >= min && account.priority <= max)).toList();
+  if (Account.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 0);
+});
+
+final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 1000);
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyPid);
+});
+
 class HomePage extends ConsumerStatefulWidget {
 
   static const String route = "/";
@@ -203,9 +229,9 @@ class _HomePageState extends ConsumerState<HomePage> {
             Expanded(
               child: IndexedStack(
                 index: navigationIndex,
-                children: const [
+                children: [
                   HomeFragment(),
-                  AccountsFragment(),
+                  AccountsFragment(accounts: ref.watch(_filteredAccounts),),
                   PaymentsFragment()
                 ],
               ),

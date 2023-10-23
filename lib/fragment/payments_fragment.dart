@@ -8,6 +8,32 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+final _filteredPayments = Provider<List<Payment>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.payments);
+  List<Payment> result = list
+      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  if ( Payment.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 0);
+});
+
+final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 1000);
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyPid);
+});
+
 final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   return CalculateValueState<Transaction>(ref,
     conditions: [],
@@ -132,7 +158,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final payments = ref.watch(provider.filteredPayments);
+    final payments = ref.watch(_filteredPayments);
     final amount = ref.watch(_amount);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

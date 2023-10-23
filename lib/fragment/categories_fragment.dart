@@ -4,6 +4,15 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 
+final _filteredCategories = Provider<List<Category>>((ref) {
+  final type = ref.watch(provider.transactionTypeFilter);
+  List<Category> list = ref.watch(provider.categories);
+  if (type != TransactionType.unknown) {
+    list = list.where((category) => category.type == type).toList();
+  }
+  return list;
+});
+
 class CategoriesFragment extends ConsumerStatefulWidget {
   const CategoriesFragment({
     super.key,
@@ -26,7 +35,7 @@ class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ref.watch(provider.filteredCategories);
+    final categories = ref.watch(_filteredCategories);
     final int panels = ScreenPlanner(context).panelNumber;
     return GridView.builder(
       physics: const BouncingScrollPhysics(),

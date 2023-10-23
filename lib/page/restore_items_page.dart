@@ -1,10 +1,38 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+
+final _filteredAccounts = Provider<List<Account>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.accounts);
+  List<Account> result = list
+      .where((account) => (account.priority >= min && account.priority <= max)).toList();
+  if (Account.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, -1000);
+});
+
+final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, -1);
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+});
 
 enum RestoreItemType {
   visible,
@@ -27,7 +55,7 @@ enum RestoreItemType {
   }
 }
 
-class RestoreItemsPage extends StatefulWidget {
+class RestoreItemsPage extends ConsumerStatefulWidget {
 
   static const String routeTrash = "/trash";
 
@@ -41,10 +69,10 @@ class RestoreItemsPage extends StatefulWidget {
   final RestoreItemType type;
 
   @override
-  State createState() => _RestoreItemsPageState();
+  ConsumerState createState() => _RestoreItemsPageState();
 }
 
-class _RestoreItemsPageState extends State<RestoreItemsPage> with TickerProviderStateMixin {
+class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with TickerProviderStateMixin {
 
   late final TabController tabController;
 
@@ -118,9 +146,9 @@ class _RestoreItemsPageState extends State<RestoreItemsPage> with TickerProvider
               children: [
                 // 0: Accounts
                 AccountsFragment(
+                  accounts: ref.watch(_filteredAccounts).reversed.toList(),
                   hideCreateButton: true,
                   hideHeader: true,
-                  conditions: conditions,
                   onItemTap: (item) => onItemTap<Account>(context, item),
                 ),
                 // 1: Payments

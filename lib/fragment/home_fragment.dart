@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +8,22 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/accounts_page.dart';
 import 'package:my_finance/page/payments_page.dart';
 import 'package:my_finance/preference_keys.dart';
 
+final _filteredAccounts = Provider<List<Account>>((ref) {
+  final sort = ref.watch(_sortFilter);
+  List<Account> list = ref.watch(provider.accounts);
+  if (Account.unknown.map.containsKey(sort)) {
+    list.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return list.sublist(0, math.min(2, list.length));
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+});
 
 final _currentMonthExpenses = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
   return CalculateValueState<Transaction>(ref,
@@ -168,7 +182,7 @@ class _HomePageState extends ConsumerState<HomeFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final accounts = ref.watch(provider.filteredAccounts);
+    final accounts = ref.watch(_filteredAccounts);
     return GridView(
       physics: const BouncingScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -183,13 +197,13 @@ class _HomePageState extends ConsumerState<HomeFragment> {
           button: IconButton(
             icon: const Icon(Icons.keyboard_arrow_right_outlined),
             color: Theme.of(context).textTheme.titleMedium?.color,
-            onPressed: () => openPage(const AccountsPage()),
+            onPressed: () => {},
           ),
           build: (BuildContext context, int index) {
             final account = accounts[index];
             return AccountCard(
               data: account,
-              onTap: () => openPage(AccountsPage(init: account)),
+              onTap: () => {},
             );
           },
         ),
