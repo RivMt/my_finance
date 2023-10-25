@@ -5,23 +5,52 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/category_select_dialog.dart';
 import 'package:my_finance/dialog/select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+final _filteredAccounts = Provider<List<Account>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.accounts);
+  List<Account> result = list
+      .where((account) => (account.priority >= min && account.priority <= max)).toList();
+  if (Account.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _filteredPayments = Provider<List<Payment>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.payments);
+  List<Payment> result = list
+      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  if ( Payment.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 0);
+});
+
+final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 1000);
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+});
+
 const String _tag = "TransactionEditFragment";
-
-final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
-  return ModelsState<Account>(ref);
-});
-
-final _payments = StateNotifierProvider<ModelsState<Payment>, List<Payment>>((ref) {
-  return ModelsState<Payment>(ref);
-});
-
-final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref);
-});
 
 class TransactionEditFragment extends ConsumerStatefulWidget {
   const TransactionEditFragment({
@@ -85,12 +114,12 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Currently selected [Account]
   Account get selectedAccount {
-    return ref.watch(_accounts).firstWhere((item) => item.pid == editing.accountId, orElse: () => Account.unknown);
+    return ref.watch(_filteredAccounts).firstWhere((item) => item.pid == editing.accountId, orElse: () => Account.unknown);
   }
 
   /// Currently selected [Payment]
   Payment get selectedPayment {
-    return ref.watch(_payments).firstWhere((item) => item.pid == editing.paymentId, orElse: () {
+    return ref.watch(_filteredPayments).firstWhere((item) => item.pid == editing.paymentId, orElse: () {
       if (editing.paymentId == Payment.none.pid) {
         return Payment.none;
       }
@@ -100,47 +129,14 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Currently selected [Category]
   Category get selectedCategory {
-    return ref.watch(_categories).firstWhere((item) => item.pid == editing.category, orElse: () => Category.unknown);
+    return ref.watch(provider.categories).firstWhere((item) => item.pid == editing.category, orElse: () => Category.unknown);
   }
 
   /// Request
   void request() async {
-    // Account
-    await ref.read(_accounts.notifier).request([{
-      ModelKeys.keyDeleted: false,
-      ModelKeys.keyPriority: {
-        "min": 0,
-      },
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyLastUsed, SortType.desc),
-      ],
-    ));
-    final account = selectedAccount;
-    setAccount(account);
-    // Payment
-    await ref.read(_payments.notifier).request([{
-      ModelKeys.keyDeleted: false,
-      ModelKeys.keyPriority: {
-        "min": 0,
-      },
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyLastUsed, SortType.desc),
-      ],
-    ));
-    final payment = selectedPayment;
-    setPayment(payment);
-    // Category
-    await ref.read(_categories.notifier).request([{
-      ModelKeys.keyDeleted: false,
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyPid, SortType.asc),
-      ],
-    ));
-    final category = selectedCategory;
-    setCategory(category);
+    provider.refreshAccounts(ref);
+    provider.refreshPayments(ref);
+    provider.refreshCategories(ref);
   }
 
   /// Show [T] item selection dialog
@@ -538,7 +534,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                       "object": LocaleKeys.category.plural(1),
                     }),
-                    onTap: () => onCategoryCardTapped(ref.watch(_categories)),
+                    onTap: () => onCategoryCardTapped(ref.watch(provider.categories)),
                   ),
                   const SizedBox(height: 8,),
                   // Account
@@ -552,7 +548,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                     unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                       "object": LocaleKeys.account.plural(1),
                     }),
-                    onTap: () => onAccountCardTapped(ref.watch(_accounts)),
+                    onTap: () => onAccountCardTapped(ref.watch(_filteredAccounts)),
                   ),
                   const SizedBox(height: 8,),
                   // Payment
@@ -594,7 +590,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                       unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                         "object": LocaleKeys.payment.plural(1),
                       }),
-                      onTap: () => onPaymentCardTapped(ref.watch(_payments)),
+                      onTap: () => onPaymentCardTapped(ref.watch(_filteredPayments)),
                     ),
                   ),
                   const SizedBox(height: 8,),

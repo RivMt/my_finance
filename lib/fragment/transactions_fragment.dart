@@ -5,15 +5,12 @@ import 'package:grouped_list/sliver_grouped_list.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/fragment/transaction_edit_fragment.dart';
 
 final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
   return ModelsState<Transaction>(ref);
-});
-
-final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref);
 });
 
 class TransactionsFragment extends ConsumerStatefulWidget {
@@ -48,11 +45,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   /// Request transactions
   void request() {
     // Get categories
-    ref.read(_categories.notifier).request([{}]);
-    // Exit if widget.list is not null
-    if (widget.list != null) {
-      return;
-    }
+    provider.refreshCategories(ref);
     // Build options if it is empty
     final options = widget.options.isEmpty
         ? ApiClient.buildOptions(
@@ -146,7 +139,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   @override
   Widget build(BuildContext context) {
     final transactions = (widget.list ?? ref.watch(_transactions))!;
-    final categories = ref.watch(_categories);
+    final categories = ref.watch(provider.categories);
     // Return sliver grouped list view
     if (widget.useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(
