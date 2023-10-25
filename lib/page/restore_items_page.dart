@@ -22,6 +22,20 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
   return result;
 });
 
+final _filteredPayments = Provider<List<Payment>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.payments);
+  List<Payment> result = list
+      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  if ( Payment.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
 final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
   return ModelState<int>(ref, -1000);
 });
@@ -153,6 +167,7 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
                 ),
                 // 1: Payments
                 PaymentsFragment(
+                  payments: ref.watch(_filteredPayments).reversed.toList(),
                   hideCreateButton: true,
                   paymentsConditions: conditions,
                   onItemTap: (item) => onItemTap<Payment>(context, item),

@@ -30,6 +30,20 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
   return result;
 });
 
+final _filteredPayments = Provider<List<Payment>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.payments);
+  List<Payment> result = list
+      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  if ( Payment.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
 final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
   return ModelState<int>(ref, 0);
 });
@@ -232,7 +246,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 children: [
                   HomeFragment(),
                   AccountsFragment(accounts: ref.watch(_filteredAccounts),),
-                  PaymentsFragment()
+                  PaymentsFragment(payments: ref.watch(_filteredPayments),)
                 ],
               ),
             ),

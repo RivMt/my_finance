@@ -1,14 +1,43 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_details_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class PaymentsPage extends StatefulWidget {
+final _filteredPayments = Provider<List<Payment>>((ref) {
+  final min = ref.watch(_minPriorityFilter);
+  final max = ref.watch(_maxPriorityFilter);
+  final sort = ref.watch(_sortFilter);
+  final list = ref.watch(provider.payments);
+  List<Payment> result = list
+      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  if ( Payment.unknown.map.containsKey(sort)) {
+    result.sort((a1, a2) =>
+        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  }
+  return result;
+});
+
+final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 0);
+});
+
+final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
+  return ModelState<int>(ref, 1000);
+});
+
+final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
+  return ModelState<String>(ref, ModelKeys.keyPid);
+});
+
+
+class PaymentsPage extends ConsumerStatefulWidget {
 
   static const String route = "/payments";
 
@@ -32,10 +61,11 @@ class PaymentsPage extends StatefulWidget {
   final Payment? init;
 
   @override
-  State createState() => _PaymentsPageState();
+
+  ConsumerState createState() => _PaymentsPageState();
 }
 
-class _PaymentsPageState extends State<PaymentsPage> {
+class _PaymentsPageState extends ConsumerState<PaymentsPage> {
 
   /// Selected [Payment]
   Payment? selected;
@@ -139,6 +169,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
                 child: SizedBox(
                   width: width,
                   child: PaymentsFragment(
+                    payments: ref.watch(_filteredPayments),
                     subtitle: widget.subtitle,
                     selected: selected,
                     paymentsConditions: widget.paymentCondition,
