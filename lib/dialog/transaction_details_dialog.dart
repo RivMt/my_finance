@@ -3,21 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/payments_page.dart';
-
-final _category = StateNotifierProvider<ModelState<Category>, Category>((ref) {
-  return ModelState(ref, Category.unknown);
-});
-
-final _account = StateNotifierProvider<ModelState<Account>, Account>((ref) {
-  return ModelState(ref, Account.unknown);
-});
-
-final _payment = StateNotifierProvider<ModelState<Payment>, Payment>((ref) {
-  return ModelState(ref, Payment.unknown);
-});
 
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({
@@ -39,29 +28,11 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
     ));
   }
 
-  void request() {
-    ref.read(_category.notifier).request({
-      ModelKeys.keyPid: widget.data.category,
-    });
-    ref.read(_account.notifier).request({
-      ModelKeys.keyPid: widget.data.accountId,
-    });
-    ref.read(_payment.notifier).request({
-      ModelKeys.keyPid: widget.data.paymentId,
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    request();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final category = ref.watch(_category);
-    final account = ref.watch(_account);
-    final payment = ref.watch(_payment);
+    final category = ref.watch(provider.categories).where((item) => item.pid == widget.data.category).first;
+    final account = ref.watch(provider.accounts).where((item) => item.pid == widget.data.accountId).first;
+    final payment = ref.watch(provider.payments).where((item) => item.pid == widget.data.paymentId).first;
     return AlertDialog(
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
@@ -77,6 +48,15 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
+              // Category
+              Tooltip(
+                message: category.descriptions,
+                child: ListTile(
+                  leading: Icon(category.icon.icon),
+                  title: Text(category.name),
+                  onTap: () => openPage(const CategoriesPage()),
+                ),
+              ),
               // Descriptions
               Visibility(
                 visible: widget.data.descriptions.isNotEmpty,
@@ -84,6 +64,30 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   leading: const Icon(Icons.notes_outlined),
                   title: Text(widget.data.descriptions),
                 ),
+              ),
+              // Details
+              const Divider(),
+              Tooltip(
+                message: account.serialNumber,
+                child: ListTile(
+                  leading: Icon(account.icon.icon),
+                  title: Text(account.descriptions),
+                  onTap: () => {},
+                ),
+              ),
+              Visibility(
+                visible: widget.data.paymentId != Payment.unknown.pid
+                    && widget.data.paymentId != Payment.none.pid,
+                child: Tooltip(
+                  message: payment.serialNumber,
+                  child: ListTile(
+                    leading: Icon(payment.icon.icon),
+                    title: Text(payment.descriptions),
+                    onTap: () => openPage(PaymentsPage(
+                      init: payment,
+                    )),
+                  ),
+                )
               ),
               const Divider(),
               // Date
@@ -127,26 +131,6 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   leading: const Icon(Icons.date_range_outlined),
                   title: Text(LocaleKeys.nDay.plural(widget.data.utilityDays)),
                   subtitle: Text(DateFormat.yMd().format(widget.data.utilityEnd)),
-                ),
-              ),
-              const Divider(),
-              // Relations
-              CategoryCard(
-                category: category,
-                onTap: () => openPage(const CategoriesPage()),
-              ),
-              AccountCard(
-                data: account,
-                onTap: () => {},
-              ),
-              Visibility(
-                visible: widget.data.paymentId != Payment.unknown.pid
-                    && widget.data.paymentId != Payment.none.pid,
-                child: PaymentCard(
-                  data: payment,
-                  onTap: () => openPage(PaymentsPage(
-                    init: payment,
-                  )),
                 ),
               ),
             ],
