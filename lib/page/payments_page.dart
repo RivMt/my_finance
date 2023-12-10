@@ -182,50 +182,6 @@ class _PaymentsPageState extends ConsumerState<PaymentsPage> {
                   ),
                 ),
               ),
-              // Transactions
-              Visibility(
-                visible: sideVisible || payment != Payment.unknown,
-                child: SizedBox(
-                  width: width,
-                  child: IndexedStack(
-                    index: payment == Payment.unknown ? 0 : 1,
-                    children: [
-                      // 0: No payment
-                      MessageBox(
-                        icon: Icons.question_mark_outlined,
-                        message: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                          "object": LocaleKeys.payment.plural(1),
-                        }),
-                      ),
-                      // 1: Payment details and transactions
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            PaymentDetailsFragment(
-                              payment: payment,
-                              conditions: widget.amountCondition,
-                            ),
-                            const SizedBox(height: 8,),
-                            Expanded(
-                              child: TransactionsFragment(
-                                conditions: transactionsCondition,
-                                options: ApiClient.buildOptions(
-                                  sorts: [
-                                    const Sort(ModelKeys.keyLastUsed, SortType.desc),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),

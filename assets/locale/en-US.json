@@ -39,6 +39,7 @@
   "filter": "Filter",
   "undo": "Undo",
   "choose": "Choose",
+  "sort": "Sort",
 
   "object_action": "{action} {object}",
   "full_name": "{first} {last}",

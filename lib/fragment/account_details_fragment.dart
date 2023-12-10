@@ -4,10 +4,6 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/priority_edit_fragment.dart';
 
-final _account = StateNotifierProvider<ModelState<Account>, Account>((ref) {
-  return ModelState<Account>(ref, Account.unknown);
-});
-
 class AccountDetailsFragment extends ConsumerStatefulWidget {
   const AccountDetailsFragment({
     super.key,
@@ -22,12 +18,6 @@ class AccountDetailsFragment extends ConsumerStatefulWidget {
 
 class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
 
-  void request() async {
-    ref.read(_account.notifier).request({
-      ModelKeys.keyPid: widget.account.pid,
-    });
-  }
-
   /// Triggers on [PriorityEditFragment] pressed
   void onPressed(Account account, int priority) async {
     account.priority = priority;
@@ -38,20 +28,7 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    request();
-  }
-
-  @override
-  void didUpdateWidget(AccountDetailsFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final account = ref.watch(_account);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,9 +39,9 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               WalletItemIcon(
-                icon: account.icon.icon,
-                foreground: account.foreground,
-                background: account.background,
+                icon: widget.account.icon.icon,
+                foreground: widget.account.foreground,
+                background: widget.account.background,
               ),
               const SizedBox(width: 8,),
               Expanded(
@@ -73,15 +50,15 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      account.serialNumber,
+                      widget.account.serialNumber,
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     Text(
-                      account.currency.format(account.balance),
+                      widget.account.currency.format(widget.account.balance),
                       style: Theme.of(context).textTheme.displayLarge,
                     ),
                     Text(
-                      account.descriptions,
+                      widget.account.descriptions,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -91,8 +68,8 @@ class _AccountDetailsFragment extends ConsumerState<AccountDetailsFragment> {
           ),
         ),
         PriorityEditFragment<Account>(
-          data: account,
-          onPressed: (priority) => onPressed(account, priority),
+          data: widget.account,
+          onPressed: (priority) => onPressed(widget.account, priority),
         ),
       ],
     );

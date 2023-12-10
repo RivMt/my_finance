@@ -9,26 +9,17 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/fragment/transaction_edit_fragment.dart';
 
-final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
-  return ModelsState<Transaction>(ref);
-});
-
 class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
     super.key,
-    this.conditions,
-    this.list,
-    this.options = const {},
+    required this.items,
     this.shrinkWrap = false,
     this.useSliver = false,
     this.onEditFinish,
+    this.isReverse = false,
   });
 
-  final List<Transaction>? list;
-
-  final List<Map<String, dynamic>>? conditions;
-
-  final Map<String, dynamic> options;
+  final List<Transaction> items;
 
   final Function(Transaction)? onEditFinish;
 
@@ -36,30 +27,13 @@ class TransactionsFragment extends ConsumerStatefulWidget {
 
   final bool useSliver;
 
+  final bool isReverse;
+
   @override
   ConsumerState createState() => _TransactionsFragmentState();
 }
 
 class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
-
-  /// Request transactions
-  void request() {
-    // Get categories
-    provider.refreshCategories(ref);
-    // Build options if it is empty
-    final options = widget.options.isEmpty
-        ? ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyPaidDate, SortType.desc),
-        const Sort(ModelKeys.keyPid, SortType.desc),
-      ],
-    ) : widget.options;
-    // Get transactions
-    ref.read(_transactions.notifier).request(
-      widget.conditions ?? [],
-      options,
-    );
-  }
 
   /// Show transaction details dialog
   void showTransactionDetailsDialog(BuildContext context, Transaction data) {
@@ -94,23 +68,10 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
         );
       },
     ).then((transaction) {
-      request();
       if (widget.onEditFinish != null && transaction != null) {
         widget.onEditFinish!(transaction);
       }
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    request();
-  }
-
-  @override
-  void didUpdateWidget(TransactionsFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
   }
 
   DateTime groupBy(Transaction data) {
@@ -123,7 +84,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     style: Theme.of(context).textTheme.titleSmall,
   );
 
-  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate);
+  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate) * (widget.isReverse ? -1 : 1);
 
   Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) {
     return TransactionCard(
@@ -138,14 +99,13 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = (widget.list ?? ref.watch(_transactions))!;
     final categories = ref.watch(provider.categories);
     // Return sliver grouped list view
     if (widget.useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(
-        elements: transactions,
+        elements: widget.items,
         groupBy: groupBy,
-        order: GroupedListOrder.DESC,
+        order: widget.isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
         groupSeparatorBuilder: groupSeparatorBuilder,
         itemComparator: itemComparator,
         itemBuilder: (context, data) => itemBuilder(context, data, categories),
@@ -154,9 +114,9 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     return GroupedListView<Transaction, DateTime>(
       physics: const BouncingScrollPhysics(),
       shrinkWrap: widget.shrinkWrap,
-      elements: transactions,
+      elements: widget.items,
       groupBy: groupBy,
-      order: GroupedListOrder.DESC,
+      order: widget.isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
       groupSeparatorBuilder: groupSeparatorBuilder,
       itemComparator: itemComparator,
       itemBuilder: (context, data) => itemBuilder(context, data, categories),

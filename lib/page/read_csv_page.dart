@@ -35,7 +35,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
         return Padding(
           padding: const EdgeInsets.all(16),
           child: TransactionsFragment(
-            list: transactions,
+            items: transactions,
           ),
         );
       },
@@ -127,7 +127,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
                 padding: const EdgeInsets.all(16),
                 width: width,
                 child: TransactionsFragment(
-                  list: transactions,
+                  items: transactions,
                 ),
               ),
             ),

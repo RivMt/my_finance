@@ -11,6 +11,7 @@ import 'package:my_finance/dialog/main_menu_dialog.dart';
 import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/home_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
+import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
@@ -245,7 +246,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                 index: navigationIndex,
                 children: [
                   HomeFragment(),
-                  AccountsFragment(accounts: ref.watch(_filteredAccounts),),
+                  AccountsFragment(
+                    accounts: ref.watch(_filteredAccounts),
+                    onItemTap: (account) => openPage(AccountDetailsPage(pid: account.pid)),
+                  ),
                   PaymentsFragment(payments: ref.watch(_filteredPayments),)
                 ],
               ),
