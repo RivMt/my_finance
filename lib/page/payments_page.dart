@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/payment_details_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';

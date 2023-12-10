@@ -1,9 +1,10 @@
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/account_edit_fragment.dart';
+import 'package:my_finance/fragment/payment_edit_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 
@@ -21,6 +22,16 @@ final _filteredTransactions = Provider<List<Transaction>>((ref) {
   return list;
 });
 
+final _totalExpense = Provider<Decimal>((ref) {
+  final date = ref.watch(_dateFilter);
+  final begin = DateTime(date.year, date.month, 1);
+  final end = DateTime(date.year, date.month + 1, 0);
+  List<Transaction> list = ref.watch(provider.transactions);
+  list = list
+      .where((item) => (!item.deleted && item.paidDate.compareTo(begin) == 1 && item.paidDate.compareTo(end) == -1)).toList();
+  return list.fold<Decimal>(Decimal.zero, (Decimal value, item) => value + item.amount * (item.type == TransactionType.expense ? Decimal.one : Decimal.fromInt(-1)));
+});
+
 final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
   return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
@@ -29,9 +40,9 @@ final _sortFilter = StateNotifierProvider<ModelState<bool>, bool>((ref) {
   return ModelState<bool>(ref, false);
 });
 
-class AccountDetailsPage extends ConsumerStatefulWidget {
+class PaymentDetailsPage extends ConsumerStatefulWidget {
 
-  const AccountDetailsPage({
+  const PaymentDetailsPage({
     super.key,
     required this.pid,
   });
@@ -39,13 +50,13 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
   final int pid;
 
   @override
-  ConsumerState createState() => _AccountDetailsPageState();
+  ConsumerState createState() => _PaymentDetailsPageState();
 
 }
 
-class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
+class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
-  Account get account => ref.watch(provider.accounts).firstWhere((account) => account.pid == widget.pid, orElse: () => Account.unknown);
+  Payment get payment => ref.watch(provider.payments).firstWhere((payment) => payment.pid == widget.pid, orElse: () => Payment.unknown);
 
   List<Transaction> get transactions => ref.watch(_filteredTransactions);
 
@@ -58,7 +69,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   }
 
   void refresh() {
-    provider.refreshTransactions(ref, accountId: account.pid);
+    provider.refreshTransactions(ref, paymentId: payment.pid);
   }
 
   void onMonthChanged(DateTime value) {
@@ -66,10 +77,10 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     refresh();
   }
 
-  /// Show account editing modal
-  void showAccountEditingModal(BuildContext context, [Account? account]) async {
-    Account? editing = account;
-    showModalBottomSheet<Account>(
+  /// Show payment editing modal
+  void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
+    Payment? editing = payment;
+    showModalBottomSheet<Payment>(
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
@@ -78,10 +89,10 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
       builder: (context) {
         return Wrap(
           children: [
-            AccountEditFragment(
+            PaymentEditFragment(
               base: editing,
-              onFinish: (account) {
-                Navigator.pop(context, account);
+              onFinish: (payment) {
+                Navigator.pop(context, payment);
               },
             ),
           ],
@@ -101,19 +112,19 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: WalletItemDetailsFragment<Account>(
-        item: account,
-        content: account.balance,
+      body: WalletItemDetailsFragment<Payment>(
+        item: payment,
+        content: ref.watch(_totalExpense),
         transactions: transactions,
         month: month,
-        onEditButtonPressed: () => showAccountEditingModal(context, account),
+        onEditButtonPressed: () => showPaymentEditingModal(context, payment),
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,
         isReverse: isReverse,
       ),
       floatingActionButton: TransactionAddButton(
-        account: account,
+        payment: payment,
       ),
     );
   }
