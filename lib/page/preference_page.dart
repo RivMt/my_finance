@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/budget_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/preference_keys.dart';
@@ -36,13 +37,13 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
 
   /// Request preferences from server
   void request() {
-    ref.read(preferenceProvider.notifier).request();
+    ref.read(provider.preferences.notifier).request();
   }
 
-  /// Set [value] as [key] to [preferenceProvider]
+  /// Set [value] as [key] to [provider.preferences]
   Future set(String key, dynamic value) async {
     progressing = true;
-    await ref.read(preferenceProvider.notifier).set(Preference.fromKV(
+    await ref.read(provider.preferences.notifier).set(Preference.fromKV(
       {},
       key: key,
       value: value,
@@ -54,7 +55,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   /// Delete [key] from server
   Future delete(String key) async {
     progressing = true;
-    await ref.read(preferenceProvider.notifier).delete(key);
+    await ref.read(provider.preferences.notifier).delete(key);
     progressing = false;
     return;
   }
@@ -103,7 +104,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
               base: value,
               currency: currency,
               onConfirmButtonPressed: (value) {
-                final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
+                final pref = ref.watch(provider.preferences)[PreferenceKeys.budgets];
                 if (pref != null) {
                   final map = pref.value;
                   map[currency.value] = value;
@@ -112,7 +113,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                 Navigator.pop(context);
               },
               onNegativeButtonPressed: () {
-                final pref = ref.watch(preferenceProvider)[PreferenceKeys.budgets];
+                final pref = ref.watch(provider.preferences)[PreferenceKeys.budgets];
                 // Check edit mode
                 if (pref != null && value != null) {
                   final map = pref.value as Map;
@@ -156,7 +157,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   @override
   void initState() {
     super.initState();
-    ref.read(preferenceProvider.notifier).setDefaults({
+    ref.read(provider.preferences.notifier).setDefaults({
       PreferenceKeys.defaultCurrency: Currency.unknown,
       PreferenceKeys.budgets: {},
     });
@@ -172,7 +173,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   @override
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
-    final Map<String, Preference> preferences = ref.watch(preferenceProvider);
+    final Map<String, Preference> preferences = ref.watch(provider.preferences);
     final budgets = preferences[PreferenceKeys.budgets]?.value ?? {};
     return Scaffold(
       appBar: AppBar(

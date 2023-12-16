@@ -17,6 +17,7 @@ import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/preference_keys.dart';
+import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _filteredAccounts = Provider<List<Account>>((ref) {
   final min = ref.watch(_minPriorityFilter);
@@ -76,18 +77,18 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   final List<_NavigationDestinations> destinations = [
     _NavigationDestinations(
-      icon: const Icon(Icons.home_filled),
-      selectedIcon: const Icon(Icons.home_filled),
-      label: LocaleKeys.home,
+      icon: const Icon(Icons.explore_outlined),
+      selectedIcon: const Icon(Icons.explore),
+      label: LocaleKeys.home.tr(),
     ),
     _NavigationDestinations(
-      icon: const Icon(Icons.folder_outlined),
-      selectedIcon: const Icon(Icons.folder),
+      icon: const Icon(Icons.folder_copy_outlined),
+      selectedIcon: const Icon(Icons.folder_copy),
       label: LocaleKeys.account.plural(1),
     ),
     _NavigationDestinations(
-      icon: const Icon(Icons.payment_outlined),
-      selectedIcon: const Icon(Icons.payment),
+      icon: const Icon(Icons.payments_outlined),
+      selectedIcon: const Icon(Icons.payments),
       label: LocaleKeys.payment.plural(1),
     ),
   ];
@@ -109,7 +110,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (_currency != null) {
       return _currency!;
     }
-    final prefs = ref.watch(preferenceProvider);
+    final prefs = ref.watch(provider.preferences);
     return Currency.fromValue(prefs[PreferenceKeys.defaultCurrency]?.value);
   }
 
@@ -118,7 +119,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Init API
   void init() async {
     // Init preference
-    ref.read(preferenceProvider.notifier).setDefaults({
+    ref.read(provider.preferences.notifier).setDefaults({
       PreferenceKeys.defaultCurrency: Currency.unknown.value,
       PreferenceKeys.budgets: {},
     });
@@ -149,6 +150,13 @@ class _HomePageState extends ConsumerState<HomePage> {
     provider.refreshAccounts(ref);
     provider.refreshPayments(ref);
     provider.refreshCategories(ref);
+    final now = DateTime.now();
+    local_provider.refreshTransactions(ref, [{
+      ModelKeys.keyPaidDate: [
+        DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
+        DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
+      ]
+    }]);
     onNavigationIndexChanged(navigationIndex);
   }
 
