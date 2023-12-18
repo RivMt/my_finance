@@ -156,7 +156,11 @@ class _HomePageState extends ConsumerState<HomeFragment> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Card(
-            child: ExpenseChartFragment(),
+            elevation: 4,
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: ExpenseChartFragment(),
+            ),
           ),
         ],
       ),

@@ -29,7 +29,7 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
             ),
             color: data.priority > 0
                 ? AppTheme.primary
-                : AppTheme.subtext,
+                : AppTheme.contentSecondary,
             onPressed: () => onPressed(data.priority > 0 ? 0 : 1),
           ),
         ),
@@ -42,7 +42,7 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
                 : Icons.visibility
             ),
             color: data.priority < 0
-                ? AppTheme.subtext
+                ? AppTheme.contentSecondary
                 : AppTheme.primary,
             onPressed: () => onPressed(data.priority < 0 ? 0 : -1),
           ),
