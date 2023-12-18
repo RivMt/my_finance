@@ -93,34 +93,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     ),
   ];
 
-  List<_NavigationDestinations> get barDestinations => [
-    railDestinations[1],
-    railDestinations[0],
-    railDestinations[2],
-  ];
-
-  int navigationIndex = 0;
-
-  void onNavigationIndexChanged(int index) {
-    navigationIndex = index;
-    setState(() {});
-  }
-
-  /// Currently selected [Currency]
-  ///
-  /// **DO NOT** access directly in [build]. Use [currency] alternatively.
-  Currency? _currency;
-
-  /// Currently selected [Currency]
-  Currency get currency {
-    if (_currency != null) {
-      return _currency!;
+  List<_NavigationDestinations> get barDestinations {
+    final List<_NavigationDestinations> list = [];
+    for(int i=0; i < railDestinations.length; i++) {
+      list.add(railDestinations[convertNavigationIndex(i)]);
     }
-    final prefs = ref.watch(provider.preferences);
-    return Currency.fromValue(prefs[PreferenceKeys.defaultCurrency]?.value);
+    return list;
   }
 
-  set currency(Currency c) => _currency = c;
+  /// Index of [NavigationRail]
+  int navigationRailIndex = 0;
+
+  /// Index of [BottomNavigationBar]
+  int get navigationBarIndex => convertNavigationIndex(navigationRailIndex);
 
   /// Init API
   void init() async {
@@ -163,7 +148,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
       ]
     }]);
-    onNavigationIndexChanged(navigationIndex);
+    onNavigationIndexChanged(navigationRailIndex);
   }
 
   /// Open [page]
@@ -176,6 +161,23 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
     }).then((value) {
       refresh();
+    });
+  }
+
+  /// Convert [NavigationRail] index to [BottomNavigationBar] index
+  int convertNavigationIndex(int index) {
+    if (index == 0) {
+      return 1;
+    } else if (index == 1) {
+      return 0;
+    }
+    return index;
+  }
+
+  /// Triggers on [navigationRailIndex] changed
+  void onNavigationIndexChanged(int index) {
+    setState(() {
+      navigationRailIndex = index;
     });
   }
 
@@ -257,14 +259,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                   selectedIcon: railDestinations[index].selectedIcon,
                   label: Text(railDestinations[index].label),
                 )),
-                selectedIndex: navigationIndex,
+                selectedIndex: navigationRailIndex,
                 onDestinationSelected: onNavigationIndexChanged,
                 labelType: NavigationRailLabelType.all,
               )
             ,
             Expanded(
               child: IndexedStack(
-                index: navigationIndex,
+                index: navigationRailIndex,
                 children: [
                   HomeFragment(),
                   AccountsFragment(
@@ -282,7 +284,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
       bottomNavigationBar: isWide ? null : BottomNavigationBar(
-        currentIndex: navigationIndex,
+        currentIndex: navigationBarIndex,
         onTap: onNavigationIndexChanged,
         items: List.generate(barDestinations.length, (index) => BottomNavigationBarItem(
           icon: barDestinations[index].icon,
