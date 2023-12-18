@@ -150,6 +150,7 @@ class _HomePageState extends ConsumerState<HomeFragment> {
   @override
   Widget build(BuildContext context) {
     return const SingleChildScrollView(
+      padding: EdgeInsets.all(8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.stretch,

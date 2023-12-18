@@ -75,7 +75,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   final client = ApiClient();
 
-  final List<_NavigationDestinations> destinations = [
+  final List<_NavigationDestinations> railDestinations = [
     _NavigationDestinations(
       icon: const Icon(Icons.explore_outlined),
       selectedIcon: const Icon(Icons.explore),
@@ -91,6 +91,12 @@ class _HomePageState extends ConsumerState<HomePage> {
       selectedIcon: const Icon(Icons.payments),
       label: LocaleKeys.payment.plural(1),
     ),
+  ];
+
+  List<_NavigationDestinations> get barDestinations => [
+    railDestinations[1],
+    railDestinations[0],
+    railDestinations[2],
   ];
 
   int navigationIndex = 0;
@@ -218,7 +224,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("MyFinance"),
-        centerTitle: MediaQuery.of(context).orientation == Orientation.portrait,
+        centerTitle: !isWide,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: onMenuButtonPressed,
@@ -240,10 +246,16 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: [
             if (isWide)
               NavigationRail(
-                destinations: List.generate(destinations.length, (index) => NavigationRailDestination(
-                  icon: destinations[index].icon,
-                  selectedIcon: destinations[index].selectedIcon,
-                  label: Text(destinations[index].label),
+                leading: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                  child: TransactionAddButton(
+                    onFinish: onTransactionCreated,
+                  ),
+                ),
+                destinations: List.generate(railDestinations.length, (index) => NavigationRailDestination(
+                  icon: railDestinations[index].icon,
+                  selectedIcon: railDestinations[index].selectedIcon,
+                  label: Text(railDestinations[index].label),
                 )),
                 selectedIndex: navigationIndex,
                 onDestinationSelected: onNavigationIndexChanged,
@@ -272,13 +284,13 @@ class _HomePageState extends ConsumerState<HomePage> {
       bottomNavigationBar: isWide ? null : BottomNavigationBar(
         currentIndex: navigationIndex,
         onTap: onNavigationIndexChanged,
-        items: List.generate(destinations.length, (index) => BottomNavigationBarItem(
-          icon: destinations[index].icon,
-          activeIcon: destinations[index].selectedIcon,
-          label: destinations[index].label,
+        items: List.generate(barDestinations.length, (index) => BottomNavigationBarItem(
+          icon: barDestinations[index].icon,
+          activeIcon: barDestinations[index].selectedIcon,
+          label: barDestinations[index].label,
         )),
       ),
-      floatingActionButton: TransactionAddButton(
+      floatingActionButton: isWide ? null : TransactionAddButton(
         onFinish: onTransactionCreated,
       ),
     );
