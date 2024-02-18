@@ -132,13 +132,6 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     return ref.watch(provider.categories).firstWhere((item) => item.pid == editing.category, orElse: () => Category.unknown);
   }
 
-  /// Request
-  void request() async {
-    provider.refreshAccounts(ref);
-    provider.refreshPayments(ref);
-    provider.refreshCategories(ref);
-  }
-
   /// Show [T] item selection dialog
   Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
@@ -402,14 +395,7 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
     super.initState();
     assert((widget.isEdit && widget.base != null) || !widget.isEdit);
     editing = widget.base ?? Transaction.init();
-    request();
     apply();
-  }
-
-  @override
-  void didUpdateWidget(TransactionEditFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
   }
 
   @override

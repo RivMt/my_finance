@@ -1,4 +1,3 @@
-import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,14 +6,6 @@ import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-
-final _amount = StateNotifierProvider<CalculateValueState<Transaction>, Decimal>((ref) {
-  return CalculateValueState<Transaction>(ref,
-    conditions: [],
-    type: CalculationType.sum,
-    attribute: ModelKeys.keyAmount,
-  );
-});
 
 class PaymentsFragment extends ConsumerStatefulWidget {
   const PaymentsFragment({
@@ -69,21 +60,6 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
 
   set currency(Currency value) => _currency = value;
 
-  /// Request all payments ordered by icon
-  void request() {
-    // Payments
-    provider.refreshPayments(ref);
-    // Amount
-    if (widget.amountConditions != null) {
-      final conditions = widget.amountConditions!;
-      for(Map map in conditions) {
-        map[ModelKeys.keyCurrency] = currency.value;
-      }
-      ref.read(_amount.notifier).conditions = conditions;
-      ref.read(_amount.notifier).request();
-    }
-  }
-
   /// Show payment editing modal
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
     Payment? editing = payment;
@@ -122,20 +98,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    request();
-  }
-
-  @override
-  void didUpdateWidget(PaymentsFragment oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final amount = ref.watch(_amount);
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.all(8),
@@ -143,51 +106,6 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Visibility(
-            visible: widget.amountConditions != null,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Visibility(
-                        visible: widget.subtitle.isNotEmpty,
-                        child: Text(
-                          widget.subtitle,
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ),
-                      Text(
-                        currency.format(amount),
-                        style: Theme.of(context).textTheme.displayLarge,
-                      ),
-                    ],
-                  ),
-                  PopupMenuButton(
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: Theme.of(context).textTheme.titleMedium?.color,
-                    ),
-                    onSelected: onCurrencyButtonPressed,
-                    itemBuilder: (BuildContext context) => Currency.validValues.map((currency) {
-                      return PopupMenuItem(
-                        value: currency,
-                        child: ListTile(
-                          leading: Icon(currency.icon),
-                          title: Text(currency.key.tr()),
-                        ),
-                      );
-                    }).toList(growable: false),
-                  ),
-                ],
-              ),
-            ),
-          ),
           // List
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),

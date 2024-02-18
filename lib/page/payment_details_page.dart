@@ -99,7 +99,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
         );
       },
     ).then((account) {
-      provider.refreshAccounts(ref);
+      provider.refreshPayments(ref);
     });
   }
 

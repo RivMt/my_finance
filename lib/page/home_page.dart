@@ -144,9 +144,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Refresh page
   void refresh() {
-    provider.refreshAccounts(ref);
-    provider.refreshPayments(ref);
-    provider.refreshCategories(ref);
     final now = DateTime.now();
     local_provider.refreshTransactions(ref, [{
       ModelKeys.keyPaidDate: [

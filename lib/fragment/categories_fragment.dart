@@ -30,9 +30,6 @@ class CategoriesFragment extends ConsumerStatefulWidget {
 
 class _CategoriesFragmentState extends ConsumerState<CategoriesFragment> {
 
-  /// Request categories
-  void request() => provider.refreshCategories(ref);
-
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(_filteredCategories);
