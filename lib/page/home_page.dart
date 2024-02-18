@@ -7,13 +7,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/condition_builder.dart';
 import 'package:my_finance/dialog/main_menu_dialog.dart';
 import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/home_fragment.dart';
 import 'package:my_finance/fragment/payments_fragment.dart';
-import 'package:my_finance/page/account_details_page.dart';
-import 'package:my_finance/page/payment_details_page.dart';
+import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
@@ -62,14 +60,12 @@ final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
 
 class HomePage extends ConsumerStatefulWidget {
 
-  static const String route = "/";
-
   const HomePage({
     super.key,
     required this.router,
   });
 
-  final RouterDelegate router;
+  final FinanceRouterDelegate router;
 
   @override
   ConsumerState createState() => _HomePageState();
@@ -117,7 +113,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   ///
   /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
   void openPage(RoutePath path, [Function(dynamic)? onPageFinished]) {
-    widget.router.setNewRoutePath(path).then((value) => request());
+    widget.router.setNewRoutePath(path).then(onPageFinished!);
   }
 
   /// Init API
@@ -131,10 +127,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     try {
       final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
       await client.init(
-        onLoginRequired: () => openPage(
-          const LoginPage(),
-              (value) => refresh(),
-        ),
+        onLoginRequired: () => openPage(RoutePath.login, (value) => refresh()),
         preferences: prefs,
       );
       // Refresh providers
@@ -161,20 +154,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
       ]
     }]);
-    onNavigationIndexChanged(navigationRailIndex);
-  }
-
-  /// Open [page]
-  ///
-  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
-  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
-      if (onPageFinished != null) {
-        onPageFinished(value);
-      }
-    }).then((value) {
-      refresh();
-    });
   }
 
   /// Convert [NavigationRail] index to [BottomNavigationBar] index
@@ -226,7 +205,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     init();
-    widget.router.addListener(() => request());
+    widget.router.addListener(() => refresh());
   }
 
   @override
@@ -282,14 +261,14 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: IndexedStack(
                 index: navigationRailIndex,
                 children: [
-                  HomeFragment(),
+                  const HomeFragment(),
                   AccountsFragment(
                     accounts: ref.watch(_filteredAccounts),
-                    onItemTap: (account) => openPage(AccountDetailsPage(pid: account.pid)),
+                    onItemTap: (account) => openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.pid)),
                   ),
                   PaymentsFragment(
                     payments: ref.watch(_filteredPayments),
-                    onItemTap: (payment) => openPage(PaymentDetailsPage(pid: payment.pid,)),
+                    onItemTap: (payment) => openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.pid)),
                   ),
                 ],
               ),

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
-import 'package:my_api/finance.dart';
-import 'package:my_finance/condition_builder.dart';
-import 'package:my_finance/page/accounts_page.dart';
+import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/home_page.dart';
-import 'package:my_finance/page/payments_page.dart';
+import 'package:my_finance/page/payment_details_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 
 List<RoutePath> _d1 = [
@@ -51,10 +49,34 @@ class FinanceRoutePath extends RoutePath {
 
   static const String keyMode = "mode";
 
-  FinanceRoutePath(super.path);
+  FinanceRoutePath(super.path, [super.pid, super.queries, super.anchor]);
 }
 
 class FinanceRouterDelegate extends CoreRouterDelegate {
+
+  /// Find page by [currentConfiguration] value
+  Widget? getPage() {
+    if (currentConfiguration.path == FinanceRoutePath.accounts.path) {
+      // Accounts
+      final pid = currentConfiguration.pid;
+      if (pid != null) {
+        return AccountDetailsPage(pid: pid);
+      }
+    } else if (currentConfiguration.path == FinanceRoutePath.payments.path) {
+      // Payments
+      final pid = currentConfiguration.pid;
+      if (pid != null) {
+        return PaymentDetailsPage(pid: pid);
+      }
+    } else if (currentConfiguration.path == FinanceRoutePath.categories.path) {
+      // Category
+      return const CategoriesPage();
+    } else if (currentConfiguration.path == FinanceRoutePath.preferences.path) {
+      // Preference
+      return const PreferencePage();
+    }
+    return null;
+  }
 
   @override
   List<Page> findPage() {
@@ -63,40 +85,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
     if (pages.isNotEmpty) {
       return pages;
     }
-    late Widget? page;
-    if (currentConfiguration.path == FinanceRoutePath.accounts.path) {
-      // Accounts
-      page = AccountsPage(
-        router: this,
-      );
-    } else if (currentConfiguration.path == FinanceRoutePath.payments.path) {
-      // Payments
-      final currency = Currency.fromValue(currentConfiguration.queries![Payment.keyCurrency]);
-      final mode = currentConfiguration.queries![FinanceRoutePath.keyMode] ?? "";
-      late List<Map<String, dynamic>>? condition;
-      if (mode == PaymentsPage.keyAmountToBePaid) {
-        condition = ConditionBuilder.amountToBePaid(currency);
-      } else if (mode == PaymentsPage.keyCurrentMonthExpense) {
-        condition = ConditionBuilder.currentMonthExpense(currency);
-      } else if (mode == PaymentsPage.keyBudgets) {
-        condition = ConditionBuilder.budgets(currency);
-      } else {
-        condition = null;
-      }
-      page = PaymentsPage(
-        subtitle: currentConfiguration.queries![FinanceModel.keyDescriptions] ?? "",
-        currency: currency,
-        condition: condition,
-      );
-    } else if (currentConfiguration.path == FinanceRoutePath.categories.path) {
-      // Category
-      page = const CategoriesPage();
-    } else if (currentConfiguration.path == FinanceRoutePath.preferences.path) {
-      // Preference
-      page = const PreferencePage();
-    } else {
-      page = null;
-    }
+    final page = getPage();
     if (page != null) {
       pages.add(MaterialPage(
         key: ValueKey(currentConfiguration.location),
