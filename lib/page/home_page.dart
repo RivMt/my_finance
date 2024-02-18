@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
+import 'package:my_finance/condition_builder.dart';
 import 'package:my_finance/dialog/main_menu_dialog.dart';
 import 'package:my_finance/fragment/accounts_fragment.dart';
 import 'package:my_finance/fragment/home_fragment.dart';
@@ -63,7 +64,12 @@ class HomePage extends ConsumerStatefulWidget {
 
   static const String route = "/";
 
-  const HomePage({super.key});
+  const HomePage({
+    super.key,
+    required this.router,
+  });
+
+  final RouterDelegate router;
 
   @override
   ConsumerState createState() => _HomePageState();
@@ -106,6 +112,13 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Index of [BottomNavigationBar]
   int get navigationBarIndex => convertNavigationIndex(navigationRailIndex);
+
+  /// Open [page]
+  ///
+  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  void openPage(RoutePath path, [Function(dynamic)? onPageFinished]) {
+    widget.router.setNewRoutePath(path).then((value) => request());
+  }
 
   /// Init API
   void init() async {
@@ -213,6 +226,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
     init();
+    widget.router.addListener(() => request());
   }
 
   @override
