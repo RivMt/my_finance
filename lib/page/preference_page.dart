@@ -35,15 +35,10 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setState(() {});
   }
 
-  /// Request preferences from server
-  void request() {
-    ref.read(provider.preferences.notifier).request();
-  }
-
   /// Set [value] as [key] to [provider.preferences]
   Future set(String key, dynamic value) async {
     progressing = true;
-    await ref.read(provider.preferences.notifier).set(Preference.fromKV(
+    await provider.setPreference(ref, Preference.fromKV(
       {},
       key: key,
       value: value,
@@ -130,7 +125,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
         );
       },
     ).then((value) {
-      request();
+      provider.syncPreferences(ref);
     });
   }
 
@@ -152,22 +147,6 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     }
     // Show modal
     showBudgetEditingModal(currency);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    ref.read(provider.preferences.notifier).setDefaults({
-      PreferenceKeys.defaultCurrency: Currency.unknown,
-      PreferenceKeys.budgets: {},
-    });
-    request();
-  }
-
-  @override
-  void didUpdateWidget(PreferencePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    request();
   }
 
   @override

@@ -113,16 +113,11 @@ class _HomePageState extends ConsumerState<HomePage> {
   ///
   /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
   void openPage(RoutePath path, [Function(dynamic)? onPageFinished]) {
-    widget.router.setNewRoutePath(path).then(onPageFinished!);
+    widget.router.setNewRoutePath(path).then(onPageFinished ?? (value) {});
   }
 
-  /// Init API
-  void init() async {
-    // Init preference
-    ref.read(provider.preferences.notifier).setDefaults({
-      PreferenceKeys.defaultCurrency: Currency.unknown.value,
-      PreferenceKeys.budgets: {},
-    });
+  /// Refresh all data
+  void refreshAll() async {
     // Login or authenticate
     try {
       final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
@@ -134,16 +129,21 @@ class _HomePageState extends ConsumerState<HomePage> {
       provider.refreshAccounts(ref);
       provider.refreshPayments(ref);
       provider.refreshCategories(ref);
+      provider.syncPreferences(ref, {
+        PreferenceKeys.defaultCurrency: Currency.unknown.value,
+        PreferenceKeys.budgets: {},
+      });
     } on Exception catch(e) {
       Log.e(_tag, "Error: $e");
       return;
     }
-    // Request
+    // Refresh widgets
     refresh();
   }
 
-  /// Refresh page
-  void refresh() {
+  /// Refresh transaction data
+  void refresh() async {
+    // Request
     final now = DateTime.now();
     local_provider.refreshTransactions(ref, [{
       ModelKeys.keyPaidDate: [
@@ -175,8 +175,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     showDialog(
       context: context,
       builder: (context) => MainMenuDialog(
-        onAccountButtonPressed: refresh,
-        onRefreshPressed: refresh,
+        onRefreshPressed: refreshAll,
       ),
     );
   }
@@ -201,13 +200,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    init();
-    widget.router.addListener(() => refresh());
-  }
-
-  @override
-  void didUpdateWidget(HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    refreshAll();
   }
 
   @override
