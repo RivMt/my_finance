@@ -31,7 +31,12 @@ final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
 
 final _totalExpense = Provider<Decimal>((ref) {
   final currency = _currentCurrency(ref);
-  final List<Transaction> list = ref.watch(local_provider.transactions).where((item) => item.currency == currency).toList();
+  final List<Transaction> list = ref.watch(local_provider.transactions).where((item) {
+    return item.currency == currency
+        && item.type == TransactionType.expense
+        && item.isIncluded
+        && !item.deleted;
+  }).toList();
   Decimal total = Decimal.zero;
   for(Transaction item in list) {
     total += item.amount;
