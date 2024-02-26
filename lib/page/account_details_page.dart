@@ -59,6 +59,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   void refresh() {
     provider.refreshTransactions(ref, accountId: account.pid);
+    provider.refreshAccounts(ref);
   }
 
   void onMonthChanged(DateTime value) {
@@ -87,8 +88,8 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
           ],
         );
       },
-    ).then((account) {
-      provider.refreshAccounts(ref);
+    ).then((item) {
+      refresh();
     });
   }
 
@@ -114,6 +115,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
       ),
       floatingActionButton: TransactionAddButton(
         account: account,
+        onFinish: (item) => refresh(),
       ),
     );
   }

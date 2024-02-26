@@ -151,6 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
       ]
     }]);
+    provider.refreshAccounts(ref);
   }
 
   /// Convert [NavigationRail] index to [BottomNavigationBar] index

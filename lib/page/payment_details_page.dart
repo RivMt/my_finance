@@ -70,6 +70,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
   void refresh() {
     provider.refreshTransactions(ref, paymentId: payment.pid);
+    provider.refreshPayments(ref);
   }
 
   void onMonthChanged(DateTime value) {
@@ -98,8 +99,8 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
           ],
         );
       },
-    ).then((account) {
-      provider.refreshPayments(ref);
+    ).then((item) {
+      refresh();
     });
   }
 
@@ -125,6 +126,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
       ),
       floatingActionButton: TransactionAddButton(
         payment: payment,
+        onFinish: (item) => refresh(),
       ),
     );
   }
