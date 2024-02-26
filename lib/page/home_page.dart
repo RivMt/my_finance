@@ -268,9 +268,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
       bottomNavigationBar: isWide ? null : BottomNavigationBar(
-        currentIndex: navigationBarIndex,
-        onTap: onNavigationIndexChanged,
-        items: List.generate(barDestinations.length, (index) => BottomNavigationBarItem(
+        currentIndex: convertNavigationIndex(navigationRailIndex),
+        onTap: (index) {
+          return onNavigationIndexChanged(convertNavigationIndex(index));
+        },
+        items: List.generate(barDestinations.
+          length, (index) => BottomNavigationBarItem(
           icon: barDestinations[index].icon,
           activeIcon: barDestinations[index].selectedIcon,
           label: barDestinations[index].label,
