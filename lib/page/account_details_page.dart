@@ -10,11 +10,11 @@ import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final date = ref.watch(_dateFilter);
   final begin = DateTime(date.year, date.month, 1);
-  final end = DateTime(date.year, date.month + 1, 0);
+  final end = DateTime(date.year, date.month + 1, 1);
   final sort = ref.watch(_sortFilter);
   List<Transaction> list = ref.watch(provider.transactions);
   list = list
-      .where((item) => (!item.deleted && item.paidDate.compareTo(begin) == 1 && item.paidDate.compareTo(end) == -1)).toList();
+      .where((item) => (!item.deleted && item.paidDate.compareTo(begin) >= 0 && item.paidDate.compareTo(end) == -1)).toList();
   if (sort) {
     list = list.reversed.toList();
   }
