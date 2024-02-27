@@ -297,9 +297,6 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                         labelText: LocaleKeys.serialNumber.tr(),
                         prefixIcon: const Icon(Icons.numbers_outlined)
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter(RegExp(r'[\d\s.:;_\-@,/*#()]'), allow: true),
-                    ],
                     onChanged: onSerialNumberChanged,
                   ),
                   const SizedBox(height: 8,),
