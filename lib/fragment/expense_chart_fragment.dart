@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/local_provider.dart'as local_provider;
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/preference_keys.dart';
 
@@ -13,7 +12,7 @@ Currency _currentCurrency(ref) => Currency.fromValue(ref.watch(provider.preferen
 
 final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
   final currency = _currentCurrency(ref);
-  final List<Transaction> list = ref.watch(local_provider.transactions)
+  final List<Transaction> list = ref.watch(provider.transactions)
       .where((item) => (!item.deleted && item.type == TransactionType.expense && item.isIncluded && item.currency == currency)).toList();
   final List<Category> categories = ref.watch(provider.categories);
   Map<Category, Decimal> map = {};
@@ -31,7 +30,7 @@ final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
 
 final _totalExpense = Provider<Decimal>((ref) {
   final currency = _currentCurrency(ref);
-  final List<Transaction> list = ref.watch(local_provider.transactions).where((item) {
+  final List<Transaction> list = ref.watch(provider.transactions).where((item) {
     return item.currency == currency
         && item.type == TransactionType.expense
         && item.isIncluded

@@ -58,7 +58,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   }
 
   void refresh() {
-    provider.refreshTransactions(ref, accountId: account.pid);
+    provider.fetchTransactions(ref, [{
+      ModelKeys.keyAccountID: account.pid,
+    }]);
     provider.refreshAccounts(ref);
   }
 

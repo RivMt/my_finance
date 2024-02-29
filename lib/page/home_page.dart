@@ -16,7 +16,6 @@ import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/preference_keys.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _filteredAccounts = Provider<List<Account>>((ref) {
   final min = ref.watch(_minPriorityFilter);
@@ -145,7 +144,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void refresh() async {
     // Request
     final now = DateTime.now();
-    local_provider.refreshTransactions(ref, [{
+    provider.fetchTransactions(ref, [{
       ModelKeys.keyPaidDate: [
         DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
         DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,

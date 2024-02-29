@@ -69,7 +69,9 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
   }
 
   void refresh() {
-    provider.refreshTransactions(ref, paymentId: payment.pid);
+    provider.fetchTransactions(ref, [{
+      ModelKeys.keyPaymentID: payment.pid,
+    }]);
     provider.refreshPayments(ref);
   }
 
