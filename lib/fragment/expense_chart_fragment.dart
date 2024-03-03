@@ -35,26 +35,6 @@ final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
   return Map.fromEntries(entries);
 });
 
-final _totalExpense = Provider<Decimal>((ref) {
-  final currency = provider.getDefaultCurrency(ref);
-  final date = ref.watch(_dateFilter);
-  final begin = DateTime(date.year, date.month, 1);
-  final end = DateTime(date.year, date.month + 1, 1);
-  final List<Transaction> list = ref.watch(provider.transactions).where((item) {
-    return !item.deleted
-        && item.type == TransactionType.expense
-        && item.isIncluded
-        && item.currency == currency
-        && item.paidDate.compareTo(begin) >= 0
-        && item.paidDate.compareTo(end) == -1;
-  }).toList();
-  Decimal total = Decimal.zero;
-  for(Transaction item in list) {
-    total += item.amount;
-  }
-  return total;
-});
-
 final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
   return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
@@ -76,9 +56,10 @@ class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
   Widget build(BuildContext context) {
     final currency = provider.getDefaultCurrency(ref);
     final map = ref.watch(_expenseTransactions);
+    final total = map.values.toList(growable: false).fold(Decimal.zero, (prev, element) => prev + element);
     return PieChartFragment<Category, Decimal>(
       title: LocaleKeys.currentMonthExpense.tr(),
-      subtitle: currency.format(ref.watch(_totalExpense)),
+      subtitle: currency.format(total),
       keys: map.keys.toList(),
       values: map.values.toList(),
       entries: maxEntries,
