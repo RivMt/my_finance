@@ -89,9 +89,6 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     });
   }
 
-  /// Triggers on currency menu button pressed
-  void onCurrencyButtonPressed(Currency currency) => ref.read(provider.currencyFilter.notifier).set(currency);
-
   /// Triggers on payment add button pressed
   void onPaymentAddButtonPressed(BuildContext context) {
     showPaymentEditingModal(context);

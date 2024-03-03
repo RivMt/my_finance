@@ -6,14 +6,21 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/preference_keys.dart';
-
-Currency _currentCurrency(ref) => Currency.fromValue(ref.watch(provider.preferences)[PreferenceKeys.defaultCurrency]?.value);
 
 final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
-  final currency = _currentCurrency(ref);
+  final currency = provider.getDefaultCurrency(ref);
+  final date = ref.watch(_dateFilter);
+  final begin = DateTime(date.year, date.month, 1);
+  final end = DateTime(date.year, date.month + 1, 1);
   final List<Transaction> list = ref.watch(provider.transactions)
-      .where((item) => (!item.deleted && item.type == TransactionType.expense && item.isIncluded && item.currency == currency)).toList();
+      .where((item) {
+    return !item.deleted
+        && item.type == TransactionType.expense
+        && item.isIncluded
+        && item.currency == currency
+        && item.paidDate.compareTo(begin) >= 0
+        && item.paidDate.compareTo(end) == -1;
+  }).toList();
   final List<Category> categories = ref.watch(provider.categories);
   Map<Category, Decimal> map = {};
   for(Transaction item in list) {
@@ -29,18 +36,27 @@ final _expenseTransactions = Provider<Map<Category, Decimal>>((ref) {
 });
 
 final _totalExpense = Provider<Decimal>((ref) {
-  final currency = _currentCurrency(ref);
+  final currency = provider.getDefaultCurrency(ref);
+  final date = ref.watch(_dateFilter);
+  final begin = DateTime(date.year, date.month, 1);
+  final end = DateTime(date.year, date.month + 1, 1);
   final List<Transaction> list = ref.watch(provider.transactions).where((item) {
-    return item.currency == currency
+    return !item.deleted
         && item.type == TransactionType.expense
         && item.isIncluded
-        && !item.deleted;
+        && item.currency == currency
+        && item.paidDate.compareTo(begin) >= 0
+        && item.paidDate.compareTo(end) == -1;
   }).toList();
   Decimal total = Decimal.zero;
   for(Transaction item in list) {
     total += item.amount;
   }
   return total;
+});
+
+final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
+  return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
 class ExpenseChartFragment extends ConsumerStatefulWidget {
@@ -58,7 +74,7 @@ class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = _currentCurrency(ref);
+    final currency = provider.getDefaultCurrency(ref);
     final map = ref.watch(_expenseTransactions);
     return PieChartFragment<Category, Decimal>(
       title: LocaleKeys.currentMonthExpense.tr(),

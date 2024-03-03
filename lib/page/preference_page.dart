@@ -7,7 +7,6 @@ import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/budget_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/preference_keys.dart';
 
 class PreferencePage extends ConsumerStatefulWidget {
 
@@ -38,11 +37,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   /// Set [value] as [key] to [provider.preferences]
   Future set(String key, dynamic value) async {
     progressing = true;
-    await provider.setPreference(ref, Preference.fromKV(
-      {},
-      key: key,
-      value: value,
-    ));
+    await provider.setPreference(ref, key, value);
     progressing = false;
     return;
   }
@@ -152,8 +147,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   @override
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
-    final Map<String, Preference> preferences = ref.watch(provider.preferences);
-    final budgets = preferences[PreferenceKeys.budgets]?.value ?? {};
+    final budgets = provider.getPreference(ref, PreferenceKeys.budgets);
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.settings.tr()),
@@ -181,7 +175,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                   ),
                   PreferenceTile(
                     title: LocaleKeys.preferenceDefaultCurrency.tr(),
-                    subtitle: Currency.fromValue(preferences[PreferenceKeys.defaultCurrency]?.value).key.tr(),
+                    subtitle: Currency.fromValue(provider.getDefaultCurrency(ref).value).key.tr(),
                     onTap: () => onDefaultCurrencyPressed(context),
                   ),
                   // Budgets
