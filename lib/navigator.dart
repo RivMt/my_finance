@@ -60,13 +60,13 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       // Accounts
       final pid = currentConfiguration.pid;
       if (pid != null) {
-        return AccountDetailsPage(pid: pid);
+        return const AccountDetailsPage();
       }
     } else if (currentConfiguration.path == FinanceRoutePath.payments.path) {
       // Payments
       final pid = currentConfiguration.pid;
       if (pid != null) {
-        return PaymentDetailsPage(pid: pid);
+        return const PaymentDetailsPage();
       }
     } else if (currentConfiguration.path == FinanceRoutePath.categories.path) {
       // Category

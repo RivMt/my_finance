@@ -6,15 +6,21 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/account_edit_fragment.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
+import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final date = ref.watch(_dateFilter);
   final begin = DateTime(date.year, date.month, 1);
   final end = DateTime(date.year, date.month + 1, 1);
   final sort = ref.watch(_sortFilter);
+  final account = ref.watch(local_provider.selectedAccount);
   List<Transaction> list = ref.watch(provider.transactions);
-  list = list
-      .where((item) => (!item.deleted && item.paidDate.compareTo(begin) >= 0 && item.paidDate.compareTo(end) == -1)).toList();
+  list = list.where((item) {
+    return !item.deleted
+        && item.paidDate.compareTo(begin) >= 0
+        && item.paidDate.compareTo(end) == -1
+        && item.accountId == account;
+  }).toList();
   if (sort) {
     list = list.reversed.toList();
   }
@@ -33,10 +39,7 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
 
   const AccountDetailsPage({
     super.key,
-    required this.pid,
   });
-
-  final int pid;
 
   @override
   ConsumerState createState() => _AccountDetailsPageState();
@@ -44,8 +47,6 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
-
-  Account get account => ref.watch(provider.accounts).firstWhere((account) => account.pid == widget.pid, orElse: () => Account.unknown);
 
   List<Transaction> get transactions => ref.watch(_filteredTransactions);
 
@@ -58,10 +59,11 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   }
 
   void refresh() {
-    provider.fetchTransactions(ref, [{
-      ModelKeys.keyAccountID: account.pid,
-    }]);
+    final account = ref.watch(local_provider.selectedAccount);
     provider.refreshAccounts(ref);
+    provider.fetchTransactions(ref, [{
+      ModelKeys.keyAccountID: account,
+    }]);
   }
 
   void onMonthChanged(DateTime value) {
@@ -103,17 +105,19 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final account = ref.watch(provider.accounts).firstWhere((element) => element.pid == ref.watch(local_provider.selectedAccount));
     return Scaffold(
       body: WalletItemDetailsFragment<Account>(
         item: account,
         content: account.balance,
         transactions: transactions,
         month: month,
+        isReverse: isReverse,
         onEditButtonPressed: () => showAccountEditingModal(context, account),
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,
-        isReverse: isReverse,
+        onTransactionEdit: (item) => refresh(),
       ),
       floatingActionButton: TransactionAddButton(
         account: account,
@@ -122,4 +126,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     );
   }
 
+  @override
+  void dispose() {
+    month = DateTime.now();
+    super.dispose();
+  }
 }

@@ -15,7 +15,7 @@ import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/preference_keys.dart';
+import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _filteredAccounts = Provider<List<Account>>((ref) {
   final min = ref.watch(_minPriorityFilter);
@@ -187,6 +187,18 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  /// Triggers on account item selected
+  void onAccountPressed(Account account) {
+    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
+    openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.pid));
+  }
+
+  /// Triggers on payment item selected
+  void onPaymentPressed(Payment payment) {
+    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
+    openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.pid));
+  }
+
   /// Get [GridView] cross axis count
   ///
   /// Value is always bigger than `0`
@@ -254,11 +266,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                   const HomeFragment(),
                   AccountsFragment(
                     accounts: ref.watch(_filteredAccounts),
-                    onItemTap: (account) => openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.pid)),
+                    onItemTap: onAccountPressed,
                   ),
                   PaymentsFragment(
                     payments: ref.watch(_filteredPayments),
-                    onItemTap: (payment) => openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.pid)),
+                    onItemTap: onPaymentPressed,
                   ),
                 ],
               ),

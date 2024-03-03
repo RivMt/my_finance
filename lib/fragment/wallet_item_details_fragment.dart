@@ -17,6 +17,7 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
     required this.onMonthChanged,
     required this.onSortButtonPressed,
     required this.onRefreshButtonPressed,
+    required this.onTransactionEdit,
     this.isReverse = false,
   });
 
@@ -31,6 +32,8 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
   final void Function() onSortButtonPressed;
 
   final void Function() onRefreshButtonPressed;
+
+  final void Function(Transaction) onTransactionEdit;
 
   final List<Transaction> transactions;
 
@@ -112,6 +115,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
             useSliver: true,
             items: widget.transactions,
             isReverse: widget.isReverse,
+            onEditFinish: widget.onTransactionEdit,
           ),
         ),
       ],
