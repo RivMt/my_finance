@@ -67,7 +67,15 @@ class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
       height: 400,
       getName: (category) => category.name,
       getDescription: (category, decimal) => currency.format(decimal),
-      getIcon: (category) => CategoryIcon.fromCategory(category),
+      getIcon: (category, color) {
+        final hsv = HSVColor.fromColor(color);
+        return CategoryIcon(
+          type: category.type,
+          icon: category.icon.icon,
+          foreground: color,
+          background: HSVColor.fromAHSV(1, hsv.hue, hsv.saturation * 0.2, hsv.value).toColor(),
+        );
+      },
       toDouble: (category, decimal) => decimal.toDouble(),
     );
   }
