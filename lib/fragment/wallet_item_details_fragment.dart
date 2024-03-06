@@ -94,7 +94,13 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
                       ),
                       MonthPicker(
                         date: widget.month,
-                        displayText: (date) => DateFormat.yM().format(date),
+                        displayText: (date) {
+                          final now = DateTime.now();
+                          if (date.year == now.year) {
+                            return DateFormat.MMM().format(date);
+                          }
+                          return DateFormat.yMMM().format(date);
+                        },
                         onDateChanged: widget.onMonthChanged,
                       ),
                       TextButton.icon(
@@ -115,6 +121,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
             useSliver: true,
             items: widget.transactions,
             isReverse: widget.isReverse,
+            groupSeparator: (date) => DateFormat.d().format(date),
             onEditFinish: widget.onTransactionEdit,
           ),
         ),

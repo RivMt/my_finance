@@ -17,6 +17,7 @@ class TransactionsFragment extends ConsumerStatefulWidget {
     this.useSliver = false,
     this.onEditFinish,
     this.isReverse = false,
+    this.groupSeparator,
   });
 
   final List<Transaction> items;
@@ -28,6 +29,8 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   final bool useSliver;
 
   final bool isReverse;
+
+  final String Function(DateTime)? groupSeparator;
 
   @override
   ConsumerState createState() => _TransactionsFragmentState();
@@ -80,7 +83,9 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   }
 
   Widget groupSeparatorBuilder(DateTime date) => Text(
-    DateFormat.yMd().format(date.toLocal()),
+    widget.groupSeparator == null
+        ? DateFormat.yMd().format(date.toLocal())
+        : widget.groupSeparator!(date),
     style: Theme.of(context).textTheme.titleSmall,
   );
 
