@@ -63,19 +63,16 @@ class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
       keys: map.keys.toList(),
       values: map.values.toList(),
       entries: maxEntries,
-      width: 400,
-      height: 400,
+      width: 200,
+      height: 200,
       getName: (category) => category.name,
       getDescription: (category, decimal) => currency.format(decimal),
-      getIcon: (category, color) {
-        final hsv = HSVColor.fromColor(color);
-        return CategoryIcon(
-          type: category.type,
-          icon: category.icon.icon,
-          foreground: color,
-          background: HSVColor.fromAHSV(1, hsv.hue, hsv.saturation * 0.2, hsv.value).toColor(),
-        );
-      },
+      getIcon: (category, color) => CategoryIcon(
+        type: category.type,
+        icon: category.icon.icon,
+        foreground: color,
+        background: Color.lerp(Color.fromARGB(20, color.red, color.green, color.blue), Colors.white, 0.8),
+      ),
       toDouble: (category, decimal) => decimal.toDouble(),
     );
   }
