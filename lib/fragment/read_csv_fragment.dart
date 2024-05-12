@@ -129,9 +129,9 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
         if (begin.compareTo(item.paidDate) > 0 || end.compareTo(item.paidDate) < 0) {
           continue;
         }
-        item.accountId = account.pid;
+        item.setAccount(account);
         item.currency = account.currency;
-        item.paymentId = payment.pid;
+        item.setPayment(payment);
         item.calculatedDate = payment.getCalculatedDate(item.paidDate);
         item.amount = parseAmount(row[columnAmount]);
         if (item.amount < Decimal.zero) {

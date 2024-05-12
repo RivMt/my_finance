@@ -22,10 +22,10 @@ class TransactionAddButton extends StatelessWidget {
   void showTransactionCreateModal(BuildContext context) {
     final Transaction data = Transaction.init();
     if (account != null && account != Account.unknown) {
-      data.accountId = account!.pid;
+      data.setAccount(account!);
     }
     if (payment != null && payment != Payment.unknown) {
-      data.paymentId = payment!.pid;
+      data.setPayment(payment!);
     }
     showModalBottomSheet(
       context: context,

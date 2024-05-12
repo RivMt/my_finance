@@ -236,23 +236,18 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Set [editing.accountId] and [editing.currency]
   void setAccount(Account account) {
-    editing.accountId = account.pid;
-    editing.currency = account.currency;
-    setState(() {});
+    setState(() {
+      editing.setAccount(account);
+    });
   }
 
   /// Set [editing.paymentId], [editing.altCurrency], [editing.altAmount] and
   /// [editing.calculatedDate].
   void setPayment(Payment payment) {
-    editing.paymentId = payment.pid;
-    if (payment.currency != Currency.unknown && payment.currency != editing.currency) {
-      editing.altCurrency = payment.currency;
-      editing.altAmount = Decimal.zero;
-    } else {
-      editing.altCurrency = null;
-      editing.altAmount = null;
-    }
-    setCalculatedDate();
+    setState(() {
+      editing.setPayment(payment);
+      setCalculatedDate();
+    });
   }
 
   /// Set [editing.minusCategory] and [editing.type]
