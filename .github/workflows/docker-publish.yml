@@ -131,7 +131,4 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Pull and Up docker container in GCP
-        run: gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} \
-          --zone us-west1-a \
-          --quiet \
-          --command '${{ env.GCP_SSH_COMMAND }}'
+        run: gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} --zone=us-west1-a --command="${{ env.GCP_SSH_COMMAND }}"
