@@ -56,7 +56,7 @@ jobs:
 
       # Install flutter
       - name: Install Flutter
-        uses: subosito/flutter-action@v1.5.1
+        uses: subosito/flutter-action@v2.16.0
 
       # Install project's dependencies
       - name: Install dependencies
