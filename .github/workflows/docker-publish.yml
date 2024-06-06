@@ -131,7 +131,7 @@ jobs:
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ env.GCP_PROJECT_ID }}
+          project_id: '${{ env.GCP_PROJECT_ID }}'
       - name: SSH and Pull Repository in GCP VM
         id: git_pull
         run: echo "::set-output name=git_pull_output::$(
