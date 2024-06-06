@@ -23,7 +23,7 @@ env:
   GCP_INSTANCE: ${{ secrets.GCP_INSTANCE }}
   GCP_SSH_USERNAME: ${{ secrets.GCP_SSH_USERNAME }}
   GCP_SSH_PASSWORD: ${{ secrets.GCP_SSH_PASSWORD }}
-  GCP_SSH_COMMAND: ${{ secrets.GCP_SSH_COMMAND }}
+  GCP_SSH_COMMAND: ${{ vars.GCP_SSH_COMMAND }}
 
 
 jobs:
