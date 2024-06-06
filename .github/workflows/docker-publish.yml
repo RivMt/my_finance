@@ -10,12 +10,20 @@ on:
     tags: [ 'v*.*.*' ]
     branches:
       - "dev"
+      - "docker"
+      - "master"
 
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: "docker.io"
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  GCP_INSTANCE: ${{ secrets.GCP_INSTANCE }}
+  GCP_SSH_USERNAME: ${{ secrets.GCP_SSH_USERNAME }}
+  GCP_SSH_PASSWORD: ${{ secrets.GCP_SSH_PASSWORD }}
+  GCP_SSH_COMMAND: ${{ secrets.GCP_SSH_COMMAND }}
 
 
 jobs:
@@ -115,3 +123,22 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          service_account_key: ${{ env.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: SSH and Pull Repository in GCP VM
+        id: git_pull
+        run: echo "::set-output name=git_pull_output::$(
+          gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} \
+            -p ${{ env.GCP_SSH_PASSWORD }}
+            --zone us-west1-a \
+            --quiet \
+            --command='
+            ${{ env.GCP_SSH_COMMAND }}
+            '
+          )"
