@@ -136,7 +136,5 @@ jobs:
           gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} \
             --zone us-west1-a \
             --quiet \
-            --command='
-            ${{ env.GCP_SSH_COMMAND }}
-            '
+            --command '${{ env.GCP_SSH_COMMAND }}'
           )"
