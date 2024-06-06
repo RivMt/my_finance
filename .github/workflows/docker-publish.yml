@@ -130,11 +130,8 @@ jobs:
           credentials_json: '${{ env.GCP_SA_KEY }}'
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-      - name: SSH and Pull Repository in GCP VM
-        id: git_pull
-        run: echo "::set-output name=git_pull_output::$(
-          gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} \
-            --zone us-west1-a \
-            --quiet \
-            --command '${{ env.GCP_SSH_COMMAND }}'
-          )"
+      - name: Pull and Up docker container in GCP
+        run: gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} \
+          --zone us-west1-a \
+          --quiet \
+          --command '${{ env.GCP_SSH_COMMAND }}'
