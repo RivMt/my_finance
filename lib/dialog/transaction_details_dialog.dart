@@ -33,6 +33,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
     final category = ref.watch(provider.categories).where((item) => item.pid == widget.data.category).first;
     final account = ref.watch(provider.accounts).where((item) => item.pid == widget.data.accountId).first;
     final payment = ref.watch(provider.payments).where((item) => item.pid == widget.data.paymentId).first;
+    final hasAlt = widget.data.altAmount != null;
     return AlertDialog(
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
@@ -40,12 +41,23 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              // Title
+              // Amount (Primary)
               ListTile(
-                leading: Icon(widget.data.currency.icon),
+                leading: Icon((hasAlt ? widget.data.altCurrency! : widget.data.currency).icon),
                 title: Text(
-                  widget.data.amount.toString(),
+                  (hasAlt ? widget.data.altAmount : widget.data.amount).toString(),
                   style: Theme.of(context).textTheme.displayLarge,
+                ),
+              ),
+              // Amount (Secondary)
+              Visibility(
+                visible: hasAlt,
+                child: ListTile(
+                  leading: Icon(widget.data.currency.icon),
+                  title: Text(
+                    widget.data.amount.toString(),
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
                 ),
               ),
               // Category

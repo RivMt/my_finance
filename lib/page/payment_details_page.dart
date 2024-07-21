@@ -9,6 +9,8 @@ import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
 
+const _tag = "PaymentDetailsPage";
+
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final date = ref.watch(_dateFilter);
   final begin = DateTime(date.year, date.month, 1);
@@ -105,7 +107,17 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
   Widget build(BuildContext context) {
     final payment = ref.watch(provider.payments).firstWhere((element) => element.pid == ref.watch(local_provider.selectedPayment));
     final transactions = ref.watch(_filteredTransactions);
-    final total = transactions.fold(Decimal.zero, (previousValue, element) => previousValue + element.amount);
+    final total = transactions.fold(Decimal.zero, (previousValue, element) {
+      if (payment.currency == element.currency) {
+        return previousValue + element.amount;
+      } else if (payment.currency == element.altCurrency) {
+        if (element.altAmount == null) {
+          Log.w(_tag, "Transaction ${element.pid} - Null AltAmount");
+        }
+        return previousValue + (element.altAmount ?? Decimal.zero);
+      }
+      return previousValue;
+    });
     return Scaffold(
       body: WalletItemDetailsFragment<Payment>(
         item: payment,
