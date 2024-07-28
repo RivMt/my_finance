@@ -360,8 +360,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                       IconButton(
-                        icon: const Icon(Icons.circle),
-                        color: editing.foreground,
+                        icon: Icon(
+                          Icons.circle,
+                          color: editing.foreground,
+                        ),
                         onPressed: () => onForegroundPressed(context),
                       ),
                     ],
@@ -376,8 +378,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                       IconButton(
-                        icon: const Icon(Icons.circle),
-                        color: editing.background,
+                        icon: Icon(
+                          Icons.circle,
+                          color: editing.background,
+                        ),
                         onPressed: () => onBackgroundPressed(context),
                       ),
                     ],
