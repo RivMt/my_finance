@@ -17,8 +17,8 @@ final _filteredTransactions = Provider<List<Transaction>>((ref) {
   List<Transaction> list = ref.watch(provider.transactions);
   list = list.where((item) {
     return !item.deleted
-        && item.paidDate.compareTo(begin) >= 0
-        && item.paidDate.compareTo(end) == -1
+        && item.calculatedDate.compareTo(begin) >= 0
+        && item.calculatedDate.compareTo(end) == -1
         && item.accountId == account;
   }).toList();
   if (sort) {
