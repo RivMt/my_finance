@@ -17,6 +17,7 @@ class TransactionsFragment extends ConsumerStatefulWidget {
     this.useSliver = false,
     this.onEditFinish,
     this.isReverse = false,
+    this.useCalculatedDate = false,
     this.groupSeparator,
   });
 
@@ -29,6 +30,8 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   final bool useSliver;
 
   final bool isReverse;
+
+  final bool useCalculatedDate;
 
   final String Function(DateTime)? groupSeparator;
 
@@ -78,7 +81,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   }
 
   DateTime groupBy(Transaction data) {
-    final date = data.paidDate;
+    final date = widget.useCalculatedDate ? data.calculatedDate : data.paidDate;
     return DateTime(date.year, date.month, date.day);
   }
 

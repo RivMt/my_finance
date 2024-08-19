@@ -113,6 +113,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
         transactions: transactions,
         month: month,
         isReverse: isReverse,
+        sortByCalculatedDate: true,
         onEditButtonPressed: () => showAccountEditingModal(context, account),
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,

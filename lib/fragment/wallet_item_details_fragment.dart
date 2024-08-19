@@ -19,6 +19,7 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
     required this.onRefreshButtonPressed,
     required this.onTransactionEdit,
     this.isReverse = false,
+    this.sortByCalculatedDate = false,
   });
 
   final T item;
@@ -40,6 +41,8 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
   final DateTime month;
 
   final bool isReverse;
+
+  final bool sortByCalculatedDate;
 
   @override
   State createState() => _WalletItemDetailsFragmentState<T>();
@@ -121,6 +124,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
             useSliver: true,
             items: widget.transactions,
             isReverse: widget.isReverse,
+            useCalculatedDate: widget.sortByCalculatedDate,
             groupSeparator: (date) => DateFormat.d().format(date),
             onEditFinish: widget.onTransactionEdit,
           ),
