@@ -2,12 +2,14 @@ import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
+import 'package:my_finance/dialog/color_picker_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class AccountEditFragment extends StatefulWidget {
+class AccountEditFragment extends ConsumerStatefulWidget {
   const AccountEditFragment({
     super.key,
     required this.onFinish,
@@ -19,10 +21,10 @@ class AccountEditFragment extends StatefulWidget {
   final Function(Account?) onFinish;
 
   @override
-  State createState() => _AccountEditFragmentState();
+  ConsumerState createState() => _AccountEditFragmentState();
 }
 
-class _AccountEditFragmentState extends State<AccountEditFragment> {
+class _AccountEditFragmentState extends ConsumerState<AccountEditFragment> {
 
   final TextEditingController descriptionController = TextEditingController();
 
@@ -56,6 +58,30 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
   set progressing(bool value) {
     _progressing = value;
     setState(() {});
+  }
+
+  /// Build list of colors
+  List<Color> buildColorHistory() {
+    List<Color> colors = [];
+    // Colors of accounts
+    final accounts = ref.watch(provider.accounts);
+    accounts.sort((a, b) {
+      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+    });
+    for (Account account in accounts) {
+      colors.add(account.foreground);
+      colors.add(account.background);
+    }
+    // Colors of payments
+    final payments = ref.watch(provider.payments);
+    payments.sort((a, b) {
+      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+    });
+    for (Payment payment in payments) {
+      colors.add(payment.foreground);
+      colors.add(payment.background);
+    }
+    return colors;
   }
 
   /// Show [T] item selection dialog
@@ -108,20 +134,10 @@ class _AccountEditFragmentState extends State<AccountEditFragment> {
       context: context,
       builder: (context) {
         Color selected = color;
-        return AlertDialog(
-          content: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: ColorPicker(
-              pickerColor: selected,
-              onColorChanged: (value) => selected = value,
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, selected),
-              child: Text(LocaleKeys.confirm.tr()),
-            ),
-          ],
+        return ColorPickerDialog(
+          color: selected,
+          onColorChanged: (value) => selected = value,
+          palettes: buildColorHistory(),
         );
       }
     );
