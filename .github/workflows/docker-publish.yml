@@ -72,7 +72,7 @@ jobs:
       - name: Generate DEV icons
         if: ${{ github.ref_name == 'dev' }}
         run: |
-          dart run flutter_launcher_icons -f flutter_launcher_icons_dev.yaml
+          dart run flutter_launcher_icons -v -f flutter_launcher_icons_dev.yaml
       
       # Build web
       - name: Build web
