@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46667"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="icon-dev.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="0.5946522"
+     inkscape:cx="385.93988"
+     inkscape:cy="190.02704"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer3" />
+  <defs
+     id="defs2">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="39.822258 : -11.618992 : 1"
+       inkscape:vp_y="-582.18499 : 813.05633 : 0"
+       inkscape:vp_z="111.99628 : 120.27227 : 1"
+       inkscape:persp3d-origin="68.604383 : 64.528353 : 1"
+       id="perspective840" />
+  </defs>
+  <g
+     inkscape:label="Base"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:none">
+    <rect
+       style="fill:#ffccbc;stroke-width:7.92432;stroke-linecap:round;stroke-linejoin:round"
+       id="rect912"
+       width="68.551399"
+       height="68.551399"
+       x="38.952141"
+       y="-38.952133"
+       transform="matrix(0.86944305,0.49403318,-0.86944305,0.49403318,0,0)" />
+    <path
+       id="rect914"
+       style="fill:#ffab91;stroke-width:7.34472;stroke-linecap:round;stroke-linejoin:round"
+       d="m 8.131795,33.866667 59.601534,33.866665 4e-6,67.733328 L 8.1317928,101.6 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="rect917"
+       style="fill:#ff8a65;stroke-width:7.34472;stroke-linecap:round;stroke-linejoin:round"
+       d="m 127.33486,33.866667 10e-6,67.733333 -59.601537,33.86666 -4e-6,-67.733328 z"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Back">
+    <path
+       id="path944"
+       style="fill:#81d4fa;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="M 55.942256,20.492987 103.40665,47.463111 V 101.40336 L 55.942254,74.433237 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path941"
+       style="fill:#4fc3f7;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="m 115.19772,40.763209 1e-5,53.940253 -11.79108,6.699908 V 47.463111 Z"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#b3e5fc;stroke-width:6.31063;stroke-linecap:round;stroke-linejoin:round"
+       id="rect937"
+       width="54.591724"
+       height="13.561642"
+       x="52.911816"
+       y="-24.99246"
+       transform="matrix(0.86944305,0.49403317,-0.86944305,0.49403317,0,0)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g2260"
+     inkscape:label="Middle"
+     transform="translate(-22.39768,12.726764)">
+    <path
+       id="path2254"
+       style="fill:#81d4fa;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="M 60.503276,17.901334 107.96767,44.871458 V 98.811707 L 60.503274,71.841584 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path2256"
+       style="fill:#4fc3f7;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="m 119.75874,38.171556 1e-5,53.940253 -11.79108,6.699905 V 44.871458 Z"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#b3e5fc;stroke-width:6.31063;stroke-linecap:round;stroke-linejoin:round"
+       id="rect2258"
+       width="54.591724"
+       height="13.561642"
+       x="52.911816"
+       y="-30.238369"
+       transform="matrix(0.86944305,0.49403317,-0.86944305,0.49403317,0,0)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g953"
+     inkscape:label="Front"
+     transform="translate(-44.79536,25.453531)">
+    <path
+       id="path947"
+       style="fill:#81d4fa;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="M 65.064295,15.30968 112.52869,42.279804 V 96.220046 L 65.064293,69.249931 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path949"
+       style="fill:#4fc3f7;stroke-width:5.84906;stroke-linecap:round;stroke-linejoin:round"
+       d="m 124.31976,35.579902 1e-5,53.940246 -11.79108,6.699906 v -53.94025 z"
+       sodipodi:nodetypes="ccccc" />
+    <rect
+       style="fill:#b3e5fc;stroke-width:6.31063;stroke-linecap:round;stroke-linejoin:round"
+       id="rect951"
+       width="54.591724"
+       height="13.561642"
+       x="52.911816"
+       y="-35.48428"
+       transform="matrix(0.86944305,0.49403317,-0.86944305,0.49403317,0,0)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Label">
+    <rect
+       style="fill:#76ff03;fill-rule:evenodd;stroke:#76ff03;stroke-width:2.11666664;stroke-linecap:round;stroke-opacity:0.56102359;stroke-dasharray:none;stroke-linejoin:round;paint-order:stroke fill markers"
+       id="rect1"
+       width="57.575211"
+       height="25.012182"
+       x="64.496819"
+       y="99.104874"
+       ry="4.2333331"
+       rx="4.2333331"
+       inkscape:label="Label" />
+    <text
+       xml:space="preserve"
+       style="font-size:22.5778px;line-height:1.1;font-family:'Noto Sans CJK JP';-inkscape-font-specification:'Noto Sans CJK JP';text-align:end;letter-spacing:0px;text-anchor:end;fill:#76ff03;fill-rule:evenodd;stroke:none;stroke-width:0.499999;stroke-linecap:round"
+       x="92.211975"
+       y="120.02119"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-family:'Noto Sans CJK JP';-inkscape-font-specification:'Noto Sans CJK JP Heavy';text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke-width:0.5"
+         x="92.211975"
+         y="120.02119">DEV</tspan></text>
+  </g>
+</svg>
