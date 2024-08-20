@@ -1,15 +1,15 @@
 flutter_icons:
   image_path: "assets/icon/icon-desktop.png" # 512x512
   # Android
-  android: "launcher_icon"
+  android: false #"launcher_icon"
   adaptive_icon_foreground: "assets/icon/icon-foreground.png" # 1024x1024
   adaptive_icon_background: "#FFFFFF"
   # iOS
-  ios: true
+  ios: false
   image_path_ios: "assets/icon/icon-full.png" # 1024x1024
   # Windows
   windows:
-    generate: true
+    generate: false
     icon_size: 48
   # Web
   web:
@@ -18,5 +18,5 @@ flutter_icons:
     theme_color: "#2196F3"
   # macOS
   macos:
-    generate: true
+    generate: false
     image_path: "assets/icon/icon-full.png" # 1024x1024
