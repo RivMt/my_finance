@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -26,6 +28,9 @@ class ColorPickerDialog extends StatefulWidget {
 }
 
 class _ColorPickerDialogState extends State<ColorPickerDialog> {
+
+  /// Number of palettes
+  final maxPaletteNumber = 10;
 
   /// Selected [Color] of widget
   Color selected = Colors.white;
@@ -67,7 +72,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
                   physics: const BouncingScrollPhysics(),
                   shrinkWrap: true,
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.palettes.length,
+                  itemCount: math.min(widget.palettes.length, maxPaletteNumber),
                   itemBuilder: (context, index) {
                     final color = widget.palettes[index];
                     return IconButton(

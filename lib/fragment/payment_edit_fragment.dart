@@ -81,7 +81,7 @@ class _PaymentEditFragmentState extends ConsumerState<PaymentEditFragment> {
       colors.add(payment.foreground);
       colors.add(payment.background);
     }
-    return colors;
+    return colors.toSet().toList();
   }
 
   /// Show [T] item selection dialog
