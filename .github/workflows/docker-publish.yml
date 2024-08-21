@@ -77,13 +77,12 @@ jobs:
       # Build web
       - name: Build web
         run: |
-          flutter build web --release --web-renderer canvaskit --base-href "/"
+          flutter build web --release --web-renderer canvaskit
 
       # Copy assets
       - name: Copy assets
         run: |
           cp ./assets/icon/icon.svg ./build/web/icons/icon.svg
-          cp -r ./assets/splash ./build/web/splashes
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
