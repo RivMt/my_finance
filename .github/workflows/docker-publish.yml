@@ -77,7 +77,7 @@ jobs:
       # Build web
       - name: Build web
         run: |
-          flutter build web --release --web-renderer canvaskit --no-tree-shake-icons --base-href "/"
+          flutter build web --release --web-renderer canvaskit --base-href "/"
 
       # Copy assets
       - name: Copy assets
