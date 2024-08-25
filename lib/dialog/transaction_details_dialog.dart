@@ -5,8 +5,10 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
-import 'package:my_finance/page/payments_page.dart';
+import 'package:my_finance/page/payment_details_page.dart';
+import 'package:my_finance/local_provider.dart' as local_provider;
 
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({
@@ -22,9 +24,23 @@ class TransactionDetailsDialog extends ConsumerStatefulWidget {
 
 class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDialog> {
 
-  void openPage(Widget page) {
+  void openCategoryPage() {
     Navigator.push(context, MaterialPageRoute(
-      builder: (context) => page,
+      builder: (context) => const CategoriesPage(),
+    ));
+  }
+
+  void openAccountPage(Account account) {
+    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => const AccountDetailsPage(),
+    ));
+  }
+
+  void openPaymentPage(Payment payment) {
+    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => const PaymentDetailsPage(),
     ));
   }
 
@@ -32,7 +48,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
   Widget build(BuildContext context) {
     final category = ref.watch(provider.categories).where((item) => item.pid == widget.data.category).first;
     final account = ref.watch(provider.accounts).where((item) => item.pid == widget.data.accountId).first;
-    final payment = ref.watch(provider.payments).where((item) => item.pid == widget.data.paymentId).first;
+    final payments = ref.watch(provider.payments).where((item) => item.pid == widget.data.paymentId);
     final hasAlt = widget.data.altAmount != null;
     return AlertDialog(
       content: SizedBox(
@@ -66,7 +82,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                 child: ListTile(
                   leading: Icon(category.icon.icon),
                   title: Text(category.name),
-                  onTap: () => openPage(const CategoriesPage()),
+                  onTap: () => openCategoryPage(),
                 ),
               ),
               // Descriptions
@@ -84,23 +100,22 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                 child: ListTile(
                   leading: Icon(account.icon.icon),
                   title: Text(account.descriptions),
-                  onTap: () => {},
+                  onTap: () => openAccountPage(account),
                 ),
               ),
-              Visibility(
-                visible: widget.data.paymentId != Payment.unknown.pid
-                    && widget.data.paymentId != Payment.none.pid,
-                child: Tooltip(
-                  message: payment.serialNumber,
-                  child: ListTile(
-                    leading: Icon(payment.icon.icon),
-                    title: Text(payment.descriptions),
-                    onTap: () => openPage(PaymentsPage(
-                      init: payment,
-                    )),
+              if (payments.isNotEmpty)
+                Visibility(
+                  visible: widget.data.paymentId != Payment.unknown.pid
+                      && widget.data.paymentId != Payment.none.pid,
+                  child: Tooltip(
+                    message: payments.first.serialNumber,
+                    child: ListTile(
+                      leading: Icon(payments.first.icon.icon),
+                      title: Text(payments.first.descriptions),
+                      onTap: () => openPaymentPage(payments.first),
+                    ),
                   ),
-                )
-              ),
+                ),
               const Divider(),
               // Date
               Tooltip(

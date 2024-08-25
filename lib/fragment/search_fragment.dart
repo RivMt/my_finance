@@ -3,7 +3,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
-import 'package:my_finance/page/payments_page.dart';
+import 'package:my_finance/page/account_details_page.dart';
+import 'package:my_finance/page/categories_page.dart';
+import 'package:my_finance/page/payment_details_page.dart';
+import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
   return SearchState<FinanceSearchResult>(ref);
@@ -27,8 +30,24 @@ class SearchFragment extends ConsumerStatefulWidget {
 
 class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
-  void openPage(Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  void openCategoryPage() {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => const CategoriesPage(),
+    ));
+  }
+
+  void openAccountPage(Account account) {
+    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => const AccountDetailsPage(),
+    ));
+  }
+
+  void openPaymentPage(Payment payment) {
+    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => const PaymentDetailsPage(),
+    ));
   }
 
   void getCategories() async {
@@ -67,20 +86,13 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
             final data = Account(item.map);
             return AccountCard(
               data: data,
-              onTap: () => {},
+              onTap: () => openAccountPage(data),
             );
           case FinanceModelType.payment:
             final data = Payment(item.map);
             return PaymentCard(
               data: data,
-              onTap: () => openPage(PaymentsPage(
-                init: data,
-                paymentCondition: const [{
-                  ModelKeys.keyPid: {
-                    "min": 0,
-                  }
-                }],
-              )),
+              onTap: () => openPaymentPage(data),
             );
           case FinanceModelType.transaction:
             final data = Transaction(item.map);
@@ -98,6 +110,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
             final data = Category(item.map);
             return CategoryCard(
               category: data,
+              onTap: () => openCategoryPage(),
             );
         }
         return const SizedBox();
