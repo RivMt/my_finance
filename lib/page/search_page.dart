@@ -5,11 +5,6 @@ import 'package:my_finance/fragment/search_fragment.dart';
 class SearchPage extends SearchDelegate {
 
   @override
-  void showResults(BuildContext context) {
-    super.showResults(context);
-  }
-
-  @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back_outlined),
