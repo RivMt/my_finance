@@ -37,7 +37,8 @@
     "icons": [
         {
             "src": "icons/Icon.svg",
-            "sizes": "512x512",
+            "sizes": "any",
+            "purpose": "any",
             "type": "image/svg+xml"
         },
         {
