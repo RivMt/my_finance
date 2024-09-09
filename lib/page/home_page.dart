@@ -175,6 +175,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     showDialog(
       context: context,
       builder: (context) => MainMenuDialog(
+        router: widget.router,
         onRefreshPressed: refreshAll,
       ),
     );

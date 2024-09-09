@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/csv_page.dart';
 import 'package:my_finance/page/read_csv_page.dart';
@@ -18,9 +19,12 @@ const String _tag = "MainMenuDialog";
 class MainMenuDialog extends StatefulWidget {
   const MainMenuDialog({
     super.key,
+    required this.router,
     this.onAccountButtonPressed,
     this.onRefreshPressed,
   });
+
+  final FinanceRouterDelegate router;
 
   final Function()? onAccountButtonPressed;
 
@@ -77,7 +81,9 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             UserCard(
               user: ApiClient().user,
               onTap: widget.onAccountButtonPressed,
-              onLongPress: () => openPage(const LoginPage()),
+              onLongPress: () => openPage(LoginPage(
+                router: widget.router,
+              )),
             ),
             const Divider(),
             // Refresh
