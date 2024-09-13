@@ -79,6 +79,21 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
+  /// Show currency selection dialog
+  Future<double?> showPieChartMaxEntriesInputDialog(BuildContext context) async {
+    return await showDialog(
+        context: context,
+        builder: (context) {
+          return ValueEditDialog(
+            title: LocaleKeys.preferencePieChartMaxEntries.tr(),
+            value: (provider.getPreference<int>(ref, PreferenceKeys.pieChartMaxEntries) ?? 5).toDouble(),
+            tick: 1.0,
+            isDecimal: true,
+          );
+        }
+    );
+  }
+
   /// Show budget editing modal
   void showBudgetEditingModal(Currency currency, [Decimal? value]) {
     showModalBottomSheet<Account>(
@@ -133,6 +148,15 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     await set(PreferenceKeys.defaultCurrency, currency.value);
   }
 
+  /// Triggers on default currency preference pressed
+  void onPieChartMaxEntriesPressed(BuildContext context) async {
+    final double? value = await showPieChartMaxEntriesInputDialog(context);
+    if (value == null) {
+      return;
+    }
+    await set(PreferenceKeys.pieChartMaxEntries, value.toInt());
+  }
+
   /// Triggers on budget add pressed
   void onBudgetAddButtonPressed(BuildContext context) async {
     final Currency? currency = await showCurrencySelectionDialog(context);
@@ -148,6 +172,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final budgets = provider.getPreference(ref, PreferenceKeys.budgets);
+    final pieChartMaxEntries = provider.getPreference(ref, PreferenceKeys.pieChartMaxEntries);
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.settings.tr()),
@@ -177,6 +202,11 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     title: LocaleKeys.preferenceDefaultCurrency.tr(),
                     subtitle: Currency.fromValue(provider.getDefaultCurrency(ref).value).key.tr(),
                     onTap: () => onDefaultCurrencyPressed(context),
+                  ),
+                  PreferenceTile(
+                    title: LocaleKeys.preferencePieChartMaxEntries.tr(),
+                    subtitle: pieChartMaxEntries.toString(),
+                    onTap: () => onPieChartMaxEntriesPressed(context),
                   ),
                   // Budgets
                   PreferenceHeader(

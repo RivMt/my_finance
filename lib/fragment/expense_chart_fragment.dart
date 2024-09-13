@@ -57,12 +57,13 @@ class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
     final currency = provider.getDefaultCurrency(ref);
     final map = ref.watch(_expenseTransactions);
     final total = map.values.toList(growable: false).fold(Decimal.zero, (prev, element) => prev + element);
+    final entries = provider.getPreference<int>(ref, PreferenceKeys.pieChartMaxEntries) ?? maxEntries;
     return PieChartFragment<Category, Decimal>(
       title: LocaleKeys.currentMonthExpense.tr(),
       subtitle: currency.format(total),
       keys: map.keys.toList(),
       values: map.values.toList(),
-      entries: maxEntries,
+      entries: entries,
       width: 200,
       height: 200,
       getName: (category) => category.name,

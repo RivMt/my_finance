@@ -107,6 +107,7 @@
 
   "preferenceGeneral": "일반",
   "preferenceDefaultCurrency": "기본 통화",
+  "preferencePieChartMaxEntries": "원 그래프 항목 개수",
 
   "msgPleaseSelect_object": "{object}를 선택해주세요",
   "msgError": "에러가 발생했습니다\n{}",

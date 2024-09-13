@@ -111,6 +111,7 @@
 
   "preferenceGeneral": "General",
   "preferenceDefaultCurrency": "Default currency",
+  "preferencePieChartMaxEntries": "Number of entries in pie chart",
 
   "msgPleaseSelect_object": "Please select {object}",
   "msgError": "Error occurred\n{}",
