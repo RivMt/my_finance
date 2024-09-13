@@ -128,10 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       provider.refreshAccounts(ref);
       provider.refreshPayments(ref);
       provider.refreshCategories(ref);
-      provider.syncPreferences(ref, {
-        PreferenceKeys.defaultCurrency: Currency.unknown.value,
-        PreferenceKeys.budgets: {},
-      });
+      provider.syncPreferences(ref, provider.initFinancePreference);
     } on Exception catch(e) {
       Log.e(_tag, "Error: $e");
       return;

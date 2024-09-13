@@ -80,17 +80,27 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Show currency selection dialog
-  Future<double?> showPieChartMaxEntriesInputDialog(BuildContext context) async {
-    return await showDialog(
-        context: context,
-        builder: (context) {
-          return ValueEditDialog(
-            title: LocaleKeys.preferencePieChartMaxEntries.tr(),
-            value: (provider.getPreference<int>(ref, PreferenceKeys.pieChartMaxEntries) ?? 5).toDouble(),
-            tick: 1.0,
-            isDecimal: true,
-          );
-        }
+  Future<double?> showPieChartMaxEntriesInputModal(BuildContext context) async {
+    return await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxWidth: ScreenPlanner(context).panelWidth,
+      ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            ValueEditModal(
+              title: LocaleKeys.preferencePieChartMaxEntries.tr(),
+              value: (provider.getPreference<int>(ref, PreferenceKeys.pieChartMaxEntries) ?? 5).toDouble(),
+              tick: 1.0,
+              isDecimal: true,
+              positiveButtonTitle: LocaleKeys.confirm.tr(),
+              negativeButtonTitle: LocaleKeys.cancel.tr(),
+            ),
+          ],
+        );
+      }
     );
   }
 
@@ -150,7 +160,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
 
   /// Triggers on default currency preference pressed
   void onPieChartMaxEntriesPressed(BuildContext context) async {
-    final double? value = await showPieChartMaxEntriesInputDialog(context);
+    final double? value = await showPieChartMaxEntriesInputModal(context);
     if (value == null) {
       return;
     }
