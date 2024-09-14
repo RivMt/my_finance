@@ -105,6 +105,8 @@
   },
   "date": "날짜",
 
+  "formatDateMd": "M월 d일",
+
   "preferenceGeneral": "일반",
   "preferenceDefaultCurrency": "기본 통화",
   "preferencePieChartMaxEntries": "원 그래프 항목 개수",
@@ -117,6 +119,9 @@
   "msgMinusAsExpense": "음수를 지출로 설정",
   "msgMinusAsIncome": "음수를 수입으로 설정",
   "msgTaskComplete": "작업이 성공적으로 완료되었습니다",
+  "msgNoCategory": "카테고리가 존재하지 않습니다",
+  "msgNoPayment": "결제 수단이 존재하지 않습니다",
+  "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",

@@ -109,6 +109,8 @@
   },
   "date": "Date",
 
+  "formatDateMd": "MMMM, d",
+
   "preferenceGeneral": "General",
   "preferenceDefaultCurrency": "Default currency",
   "preferencePieChartMaxEntries": "Number of entries in pie chart",
@@ -121,6 +123,9 @@
   "msgMinusAsExpense": "Negative number as expense",
   "msgMinusAsIncome": "Negative number as income",
   "msgTaskComplete": "Task has been successfully completed",
+  "msgNoCategory": "No category found",
+  "msgNoPayment": "No payment found",
+  "msgUnknownDefaultCurrency": "Default currency is unknown",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
@@ -157,7 +162,7 @@
   "currencyTypeYuanRenminbi": "Yuan Renminbi",
 
   "currentMonthExpense": "Expenses of current month",
-  "amountBePaid": "Amount to be paid",
+  "amountBePaid": "Amount due to be paid",
 
   "totalBalance": "Total balance",
 
