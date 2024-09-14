@@ -15,23 +15,34 @@ class HomeFragment extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomeFragment> {
 
+  final GlobalKey<DueToPaidFragmentState> _dueToPaidKey = GlobalKey();
+
   final List<Widget> children = [
     const ExpenseChartFragment(),
     const DueToPaidFragment(),
   ];
 
+  /// Triggers on scroll down
+  Future<void> refresh() {
+    _dueToPaidKey.currentState?.fetch();
+    return Future<void>.value();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: MasonryGridView.count(
-        itemCount: children.length,
-        crossAxisCount: ScreenPlanner(context).panelNumber,
-        mainAxisSpacing: 4,
-        crossAxisSpacing: 4,
-        itemBuilder: (context, index) {
-          return children[index];
-        },
+    return RefreshIndicator(
+      onRefresh: refresh,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: MasonryGridView.count(
+          itemCount: children.length,
+          crossAxisCount: ScreenPlanner(context).panelNumber,
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 4,
+          itemBuilder: (context, index) {
+            return children[index];
+          },
+        ),
       ),
     );
   }

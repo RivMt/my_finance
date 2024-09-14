@@ -43,10 +43,10 @@ class DueToPaidFragment extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState createState() => _DueToPaidFragmentState();
+  ConsumerState createState() => DueToPaidFragmentState();
 }
 
-class _DueToPaidFragmentState extends ConsumerState<DueToPaidFragment> {
+class DueToPaidFragmentState extends ConsumerState<DueToPaidFragment> {
 
   /// Fetch transaction data
   void fetch() async {
