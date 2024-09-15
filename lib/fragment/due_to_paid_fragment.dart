@@ -7,18 +7,17 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_api/provider.dart' as provider;
 
+final _dateBegin = DateTime.now();
+final _dateEnd = DateTime(_dateBegin.year, _dateBegin.month + 1, 1);
+
 final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
-  final date = ref.watch(_dateFilter);
-  final begin = DateTime.now();
-  final end = DateTime(date.year, date.month + 1, 1);
   final List<Transaction> list = ref.watch(provider.transactions)
       .where((item) {
     return !item.deleted
         && item.type == TransactionType.expense
-        && item.isIncluded
-        && item.calculatedDate.compareTo(begin) >= 0
-        && item.calculatedDate.compareTo(end) == -1;
+        && item.calculatedDate.compareTo(_dateBegin) >= 0
+        && item.calculatedDate.compareTo(_dateEnd) == -1;
   }).toList();
   if (list.isEmpty) {
     state = StatefulDataState.loading;
@@ -38,10 +37,6 @@ final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((re
   return StatefulData(Map.fromEntries(entries), state);
 });
 
-final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
-  return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
-});
-
 class DueToPaidFragment extends ConsumerStatefulWidget {
   const DueToPaidFragment({
     super.key,
@@ -52,6 +47,25 @@ class DueToPaidFragment extends ConsumerStatefulWidget {
 }
 
 class _DueToPaidFragmentState extends ConsumerState<DueToPaidFragment> {
+
+  /// Fetch transaction data
+  void fetch() async {
+    // Request
+    provider.fetchTransactions(ref, [{
+      ModelKeys.keyDeleted: false,
+      ModelKeys.keyType: TransactionType.expense.code,
+      ModelKeys.keyCalculatedDate: [
+        _dateBegin.millisecondsSinceEpoch,
+        _dateEnd.millisecondsSinceEpoch,
+      ],
+    }]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetch();
+  }
 
   @override
   Widget build(BuildContext context) {
