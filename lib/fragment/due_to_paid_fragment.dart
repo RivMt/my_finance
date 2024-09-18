@@ -8,7 +8,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_api/provider.dart' as provider;
 
 final _dateBegin = DateTime.now();
-final _dateEnd = DateTime(_dateBegin.year, _dateBegin.month + 1, 1);
+final _dateEnd = DateTime(_dateBegin.year, _dateBegin.month + 2, 1);
 
 final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
