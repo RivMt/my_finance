@@ -144,7 +144,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     provider.fetchTransactions(ref, [{
       ModelKeys.keyPaidDate: [
         DateTime(now.year, now.month-3, 1).millisecondsSinceEpoch,
-        DateTime(now.year, now.month+1, 0).millisecondsSinceEpoch,
+        DateTime(now.year, now.month+2, 0).millisecondsSinceEpoch,
       ]
     }]);
     provider.refreshAccounts(ref);
