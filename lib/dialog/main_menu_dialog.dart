@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +11,6 @@ import 'package:my_finance/page/csv_page.dart';
 import 'package:my_finance/page/read_csv_page.dart';
 import 'package:my_finance/page/restore_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
-
-const String _tag = "MainMenuDialog";
 
 class MainMenuDialog extends StatefulWidget {
   const MainMenuDialog({
@@ -37,14 +33,6 @@ class MainMenuDialog extends StatefulWidget {
 class _MainMenuDialogState extends State<MainMenuDialog> {
 
   /// Check host platform is desktop or not
-  bool isDesktop() {
-    try {
-      return Platform.isMacOS || Platform.isWindows || Platform.isLinux;
-    } on UnsupportedError {
-      Log.w(_tag, "Attempt to get Platform in Web");
-      return false;
-    }
-  }
 
   /// Open [page]
   ///
@@ -104,23 +92,13 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
             ),
             // Trash can
             ListTile(
-              leading: const Icon(Icons.visibility_off_outlined),
-              title: Text(LocaleKeys.hiddenItems.tr()),
-              onTap: () => openPage(const RestoreItemsPage(
-                type: RestoreItemType.visible,
-              )),
-            ),
-            // Trash can
-            ListTile(
-              leading: const Icon(Icons.delete_outline_outlined),
+              leading: const Icon(Icons.delete_outline),
               title: Text(LocaleKeys.trashCan.tr()),
-              onTap: () => openPage(const RestoreItemsPage(
-                type: RestoreItemType.deleted,
-              )),
+              onTap: () => openPage(const RestoreItemsPage()),
             ),
             // CSV
             Visibility(
-              visible: isDesktop() || kDebugMode,
+              visible: ScreenPlanner(context).isDesktop || kDebugMode,
               child: ListTile(
                 leading: const Icon(Icons.table_view_outlined),
                 title: Text(LocaleKeys.advancedQuery.tr()),

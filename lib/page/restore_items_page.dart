@@ -48,39 +48,13 @@ final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
   return ModelState<String>(ref, ModelKeys.keyLastUsed);
 });
 
-enum RestoreItemType {
-  visible,
-  deleted;
-
-  String get title {
-    if (this == RestoreItemType.deleted) {
-      return LocaleKeys.trashCan.tr();
-    }
-    return LocaleKeys.hiddenItems.tr();
-  }
-
-  static RestoreItemType getByName(String name) {
-    for(RestoreItemType type in RestoreItemType.values) {
-      if (type.name == name) {
-        return type;
-      }
-    }
-    return RestoreItemType.visible;
-  }
-}
-
 class RestoreItemsPage extends ConsumerStatefulWidget {
 
   static const String routeTrash = "/trash";
 
-  static const String routeInvisible = "/visible";
-
   const RestoreItemsPage({
     super.key,
-    required this.type,
   });
-
-  final RestoreItemType type;
 
   @override
   ConsumerState createState() => _RestoreItemsPageState();
@@ -90,19 +64,9 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
 
   late final TabController tabController;
 
-  List<Map<String, dynamic>> get conditions {
-    if (widget.type == RestoreItemType.deleted) {
-      return const [{
-        ModelKeys.keyDeleted: true,
-      }];
-    } else {
-      return const [{
-        ModelKeys.keyPriority: {
-          "max": -1
-        },
-      }];
-    }
-  }
+  List<Map<String, dynamic>> conditions = const [{
+    ModelKeys.keyDeleted: true,
+  }];
 
   /// Restore [item] when opened [SnackBar] closed successfully
   void onItemTap<T extends WalletItem>(BuildContext context, T item) {
@@ -115,11 +79,7 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((value) async {
       if (value != SnackBarClosedReason.action) {
-        if (widget.type == RestoreItemType.deleted) {
-          item.deleted = false;
-        } else {
-          item.priority = 0;
-        }
+        item.deleted = false;
         await ApiClient().update<T>([item.map]);
         setState(() {});
       }
@@ -140,7 +100,7 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.type.title),
+        title: Text(LocaleKeys.trashCan.tr()),
         bottom: TabBar(
           controller: tabController,
           tabs: [
@@ -178,5 +138,11 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
   }
 }
