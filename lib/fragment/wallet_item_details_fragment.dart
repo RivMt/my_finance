@@ -47,6 +47,16 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
 
 class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<WalletItemDetailsFragment<T>> {
 
+  /// Build group separator by given [date]
+  String buildGroupSeparator(DateTime date) {
+    if (widget.month.year != date.year) {
+      return DateFormat.yMd().format(date);
+    } else if (widget.month.month != date.month) {
+      return DateFormat.Md().format(date);
+    }
+    return DateFormat.d().format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     const height = 170.0;
@@ -129,7 +139,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
             items: widget.transactions,
             isReverse: widget.isReverse,
             useCalculatedDate: widget.sortByCalculatedDate,
-            groupSeparator: (date) => DateFormat.d().format(date),
+            groupSeparator: buildGroupSeparator,
             onEditFinish: widget.onTransactionEdit,
           ),
         ),
