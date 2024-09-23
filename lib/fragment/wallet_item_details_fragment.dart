@@ -13,7 +13,6 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
     required this.content,
     required this.transactions,
     required this.month,
-    required this.onEditButtonPressed,
     required this.onMonthChanged,
     required this.onSortButtonPressed,
     required this.onRefreshButtonPressed,
@@ -25,8 +24,6 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
   final T item;
 
   final Decimal content;
-
-  final void Function() onEditButtonPressed;
 
   final void Function(DateTime) onMonthChanged;
 
@@ -52,70 +49,77 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
 
   @override
   Widget build(BuildContext context) {
+    const height = 170.0;
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          title: Text(widget.item.descriptions),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              onPressed: widget.onEditButtonPressed,
-            )
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(200),
-            child: Card(
-              margin: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.item.serialNumber,
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                        Text(
-                          widget.item.currency.format(widget.content),
-                          style: Theme.of(context).textTheme.displayLarge,
-                        )
-                      ],
-                    ),
-                  ),
-                  Row(
+          automaticallyImplyLeading: false,
+          floating: true,
+          snap: true,
+          pinned: false,
+          expandedHeight: height,
+          flexibleSpace: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxHeight < height) {
+                return const SizedBox();
+              }
+              return Card(
+                elevation: 4,
+                margin: const EdgeInsets.all(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton.icon(
-                        icon: Icon(widget.isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
-                        onPressed: widget.onSortButtonPressed,
-                        label: Text(LocaleKeys.sort.tr()),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.item.serialNumber,
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
+                            Text(
+                              widget.item.currency.format(widget.content),
+                              style: Theme.of(context).textTheme.displayLarge,
+                            )
+                          ],
+                        ),
                       ),
-                      MonthPicker(
-                        date: widget.month,
-                        displayText: (date) {
-                          final now = DateTime.now();
-                          if (date.year == now.year) {
-                            return DateFormat.MMM().format(date);
-                          }
-                          return DateFormat.yMMM().format(date);
-                        },
-                        onDateChanged: widget.onMonthChanged,
-                      ),
-                      TextButton.icon(
-                        icon: const Icon(Icons.refresh),
-                        onPressed: widget.onRefreshButtonPressed,
-                        label: Text(LocaleKeys.refresh.tr()),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton.icon(
+                            icon: Icon(widget.isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
+                            onPressed: widget.onSortButtonPressed,
+                            label: Text(LocaleKeys.sort.tr()),
+                          ),
+                          MonthPicker(
+                            date: widget.month,
+                            displayText: (date) {
+                              final now = DateTime.now();
+                              if (date.year == now.year) {
+                                return DateFormat.MMM().format(date);
+                              }
+                              return DateFormat.yMMM().format(date);
+                            },
+                            onDateChanged: widget.onMonthChanged,
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(Icons.refresh),
+                            onPressed: widget.onRefreshButtonPressed,
+                            label: Text(LocaleKeys.refresh.tr()),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
         SliverPadding(

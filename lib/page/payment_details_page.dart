@@ -119,13 +119,21 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
       return previousValue;
     });
     return Scaffold(
+      appBar: AppBar(
+        title: Text(payment.descriptions),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => showPaymentEditingModal(context, payment),
+          ),
+        ],
+      ),
       body: WalletItemDetailsFragment<Payment>(
         item: payment,
         content: total,
         transactions: transactions,
         month: month,
         isReverse: isReverse,
-        onEditButtonPressed: () => showPaymentEditingModal(context, payment),
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,

@@ -107,6 +107,15 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   Widget build(BuildContext context) {
     final account = ref.watch(provider.accounts).firstWhere((element) => element.pid == ref.watch(local_provider.selectedAccount));
     return Scaffold(
+      appBar: AppBar(
+        title: Text(account.descriptions),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => showAccountEditingModal(context, account),
+          ),
+        ],
+      ),
       body: WalletItemDetailsFragment<Account>(
         item: account,
         content: account.balance,
@@ -114,7 +123,6 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
         month: month,
         isReverse: isReverse,
         sortByCalculatedDate: true,
-        onEditButtonPressed: () => showAccountEditingModal(context, account),
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,
