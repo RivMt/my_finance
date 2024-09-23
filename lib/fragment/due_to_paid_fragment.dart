@@ -76,6 +76,7 @@ class DueToPaidFragmentState extends ConsumerState<DueToPaidFragment> {
       state: state,
       children: [
         ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: map.length,
           itemBuilder: (context, index) {
