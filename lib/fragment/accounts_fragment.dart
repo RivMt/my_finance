@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
@@ -78,17 +79,20 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+    return Padding(
       padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Head
-          Visibility(
-            visible: !widget.hideHeader,
-            child: GroupCard(
+      child: MasonryGridView.count(
+        itemCount: AccountSymbol.values.length + 1,
+        crossAxisCount: ScreenPlanner(context).panelNumber,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        itemBuilder: (context, index) {
+          // Header
+          if (index == 0) {
+            if (widget.hideHeader) {
+              return const SizedBox();
+            }
+            return GroupCard(
               title: LocaleKeys.totalBalance.tr(),
               count: Currency.values.length,
               build: (context, index) {
@@ -109,54 +113,38 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                   amount: sum,
                 );
               },
-            ),
-          ),
-          // List
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: AccountSymbol.values.length,
-            itemBuilder: (context, index) {
-              final icon = AccountSymbol.values[index];
-              final sublist = widget.accounts.where((element) => (element.icon == icon)).toList(growable: false);
-              // Hide when sublist is empty
-              if (sublist.isEmpty) {
-                return const SizedBox();
-              }
-              // Group
-              return GroupCard(
-                title: icon.key.tr(),
-                count: sublist.length,
-                build: (context, index) {
-                  final account = sublist[index];
-                  return AccountCard(
-                    data: account,
-                    selected: widget.selected == account,
-                    onTap: () {
-                      if (widget.onItemTap == null) {
-                        return;
-                      }
-                      widget.onItemTap!(account);
-                    },
-                    onLongPress: () {
-                      showAccountEditingModal(context, account);
-                    },
-                  );
+            );
+          }
+          // Accounts
+          final icon = AccountSymbol.values[index-1];
+          final sublist = widget.accounts.where((element) => (element.icon == icon)).toList(growable: false);
+          // Hide when sublist is empty
+          if (sublist.isEmpty) {
+            return const SizedBox();
+          }
+          // Group
+          return GroupCard(
+            title: icon.key.tr(),
+            count: sublist.length,
+            build: (context, index) {
+              final account = sublist[index];
+              return AccountCard(
+                data: account,
+                selected: widget.selected == account,
+                onTap: () {
+                  if (widget.onItemTap == null) {
+                    return;
+                  }
+                  widget.onItemTap!(account);
+                },
+                onLongPress: () {
+                  showAccountEditingModal(context, account);
                 },
               );
             },
-          ),
-          // Add
-          Visibility(
-            visible: !widget.hideCreateButton,
-            child: ListTailButton(
-              icon: Icons.add,
-              title: LocaleKeys.add.tr(),
-              onTap: () => onAccountAddButtonPressed(context),
-            ),
-          ),
-        ],
-      ),
+          );
+        },
+      )
     );
   }
 }

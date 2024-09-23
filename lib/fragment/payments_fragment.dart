@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
-import 'package:my_finance/generated/locale_keys.g.dart';
 
 class PaymentsFragment extends ConsumerStatefulWidget {
   const PaymentsFragment({
@@ -96,58 +96,42 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+    return Padding(
       padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // List
-          ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: PaymentSymbol.values.length,
-            itemBuilder: (context, index) {
-              final icon = PaymentSymbol.values[index];
-              final sublist = widget.payments.where((element) => (element.icon == icon)).toList(growable: false);
-              // Hide when sublist is empty
-              if (sublist.isEmpty) {
-                return const SizedBox();
-              }
-              // Group
-              return GroupCard(
-                title: icon.key.tr(),
-                count: sublist.length,
-                build: (context, index) {
-                  final payment = sublist[index];
-                  return PaymentCard(
-                    data: payment,
-                    selected: widget.selected == payment,
-                    onTap: () {
-                      if (widget.onItemTap == null) {
-                        return;
-                      }
-                      widget.onItemTap!(payment);
-                    },
-                    onLongPress: () {
-                      showPaymentEditingModal(context, payment);
-                    },
-                  );
+      child: MasonryGridView.count(
+        itemCount: PaymentSymbol.values.length,
+        crossAxisCount: ScreenPlanner(context).panelNumber,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        itemBuilder: (context, index) {
+          final icon = PaymentSymbol.values[index];
+          final sublist = widget.payments.where((element) => (element.icon == icon)).toList(growable: false);
+          // Hide when sublist is empty
+          if (sublist.isEmpty) {
+            return const SizedBox();
+          }
+          // Group
+          return GroupCard(
+            title: icon.key.tr(),
+            count: sublist.length,
+            build: (context, index) {
+              final payment = sublist[index];
+              return PaymentCard(
+                data: payment,
+                selected: widget.selected == payment,
+                onTap: () {
+                  if (widget.onItemTap == null) {
+                    return;
+                  }
+                  widget.onItemTap!(payment);
+                },
+                onLongPress: () {
+                  showPaymentEditingModal(context, payment);
                 },
               );
             },
-          ),
-          // Add
-          Visibility(
-            visible: !widget.hideCreateButton,
-            child: ListTailButton(
-              icon: Icons.add,
-              title: LocaleKeys.add.tr(),
-              onTap: () => onPaymentAddButtonPressed(context),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
