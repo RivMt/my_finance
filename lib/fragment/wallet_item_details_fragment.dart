@@ -59,7 +59,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
 
   @override
   Widget build(BuildContext context) {
-    const height = 170.0;
+    const height = 100.0;
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -67,69 +67,61 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
           floating: true,
           snap: true,
           pinned: false,
-          expandedHeight: height,
-          flexibleSpace: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxHeight < height) {
-                return const SizedBox();
-              }
-              return Card(
-                elevation: 4,
-                margin: const EdgeInsets.all(16),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.item.serialNumber,
-                              style: Theme.of(context).textTheme.labelLarge,
-                            ),
-                            Text(
-                              widget.item.currency.format(widget.content),
-                              style: Theme.of(context).textTheme.displayLarge,
-                            )
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton.icon(
-                            icon: Icon(widget.isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
-                            onPressed: widget.onSortButtonPressed,
-                            label: Text(LocaleKeys.sort.tr()),
-                          ),
-                          MonthPicker(
-                            date: widget.month,
-                            displayText: (date) {
-                              final now = DateTime.now();
-                              if (date.year == now.year) {
-                                return DateFormat.MMM().format(date);
-                              }
-                              return DateFormat.yMMM().format(date);
-                            },
-                            onDateChanged: widget.onMonthChanged,
-                          ),
-                          TextButton.icon(
-                            icon: const Icon(Icons.refresh),
-                            onPressed: widget.onRefreshButtonPressed,
-                            label: Text(LocaleKeys.refresh.tr()),
-                          ),
-                        ],
-                      ),
-                    ],
+          stretch: true,
+          bottom: PreferredSize(
+            preferredSize: Size(MediaQuery.of(context).size.width, height),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SelectableText(
+                    widget.item.serialNumber,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppTheme.contentSecondary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppTheme.contentSecondary,
+                    ),
                   ),
+                  Text(
+                    widget.item.currency.format(widget.content),
+                    style: Theme.of(context).textTheme.displayLarge,
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton.icon(
+                  icon: Icon(widget.isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
+                  onPressed: widget.onSortButtonPressed,
+                  label: Text(LocaleKeys.sort.tr()),
                 ),
-              );
-            },
+                MonthPicker(
+                  date: widget.month,
+                  displayText: (date) {
+                    final now = DateTime.now();
+                    if (date.year == now.year) {
+                      return DateFormat.MMM().format(date);
+                    }
+                    return DateFormat.yMMM().format(date);
+                  },
+                  onDateChanged: widget.onMonthChanged,
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: widget.onRefreshButtonPressed,
+                  label: Text(LocaleKeys.refresh.tr()),
+                ),
+              ],
+            ),
           ),
         ),
         SliverPadding(
