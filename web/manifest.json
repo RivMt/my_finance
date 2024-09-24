@@ -6,7 +6,7 @@
     "background_color": "#FFFFFF",
     "theme_color": "#2196F3",
     "description": "Personal finance management application",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "prefer_related_applications": false,
     "shortcuts": [
         {
@@ -17,7 +17,7 @@
             "icons": [
                 {
                     "src": "icons/shortcut-accounts.png",
-                    "size": "192x192"
+                    "sizes": "192x192"
                 }
             ]
         },
@@ -29,7 +29,7 @@
             "icons": [
                 {
                     "src": "icons/shortcut-payments.png",
-                    "size": "192x192"
+                    "sizes": "192x192"
                 }
             ]
         }
