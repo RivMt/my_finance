@@ -61,7 +61,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
         bottom: TabBar(
           indicatorColor: Theme.of(context).primaryColor,
           labelColor: Theme.of(context).primaryColor,
-          unselectedLabelColor: AppTheme.contentSecondary,
+          unselectedLabelColor: AppTheme.swatches.contentSecondary,
           controller: tabController,
           tabs: [
             Tab(text: LocaleKeys.transactionTypeExpense.tr(),),

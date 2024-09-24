@@ -28,8 +28,8 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
                 : Icons.star_border_outlined
             ),
             color: data.priority > 0
-                ? AppTheme.primary
-                : AppTheme.contentSecondary,
+                ? Theme.of(context).primaryColor
+                : AppTheme.swatches.contentSecondary,
             onPressed: () => onPressed(data.priority > 0 ? 0 : 1),
           ),
         ),
@@ -42,8 +42,8 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
                 : Icons.visibility
             ),
             color: data.priority < 0
-                ? AppTheme.contentSecondary
-                : AppTheme.primary,
+                ? AppTheme.swatches.contentSecondary
+                : Theme.of(context).primaryColor,
             onPressed: () => onPressed(data.priority < 0 ? 0 : -1),
           ),
         ),

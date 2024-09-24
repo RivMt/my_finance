@@ -276,17 +276,22 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: isWide ? null : BottomNavigationBar(
-        currentIndex: convertNavigationIndex(navigationRailIndex),
-        onTap: (index) {
-          return onNavigationIndexChanged(convertNavigationIndex(index));
-        },
-        items: List.generate(barDestinations.
+      bottomNavigationBar: isWide ? null : Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+        ),
+        child: BottomNavigationBar(
+          currentIndex: convertNavigationIndex(navigationRailIndex),
+          onTap: (index) {
+            return onNavigationIndexChanged(convertNavigationIndex(index));
+          },
+          items: List.generate(barDestinations.
           length, (index) => BottomNavigationBarItem(
-          icon: barDestinations[index].icon,
-          activeIcon: barDestinations[index].selectedIcon,
-          label: barDestinations[index].label,
-        )),
+            icon: barDestinations[index].icon,
+            activeIcon: barDestinations[index].selectedIcon,
+            label: barDestinations[index].label,
+          )),
+        ),
       ),
       floatingActionButton: isWide ? null : TransactionAddButton(
         onFinish: onTransactionCreated,

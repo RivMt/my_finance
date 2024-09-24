@@ -79,9 +79,9 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
                   SelectableText(
                     widget.item.serialNumber,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppTheme.contentSecondary,
+                      color: AppTheme.swatches.contentSecondary,
                       decoration: TextDecoration.underline,
-                      decorationColor: AppTheme.contentSecondary,
+                      decorationColor: AppTheme.swatches.contentSecondary,
                     ),
                   ),
                   Text(

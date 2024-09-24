@@ -9,6 +9,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final brightness = Theme.of(context).brightness;
+    AppTheme.isDarkMode = brightness == Brightness.dark;
     return MaterialApp.router(
       title: 'MyFinance',
       theme: AppTheme.light(Colors.blue),
