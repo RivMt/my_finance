@@ -22,8 +22,11 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
   final max = ref.watch(_maxPriorityFilter);
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.accounts);
-  List<Account> result = list
-      .where((account) => (account.priority >= min && account.priority <= max)).toList();
+  List<Account> result = list.where((account) {
+    return account.priority >= min
+        && account.priority <= max
+        && !account.deleted;
+  }).toList();
   if (Account.unknown.map.containsKey(sort)) {
     result.sort((a1, a2) =>
         (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
@@ -36,8 +39,11 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   final max = ref.watch(_maxPriorityFilter);
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.payments);
-  List<Payment> result = list
-      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  List<Payment> result = list.where((payment) {
+    return payment.priority >= min
+        && payment.priority <= max
+        && !payment.deleted;
+  }).toList();
   if ( Payment.unknown.map.containsKey(sort)) {
     result.sort((a1, a2) =>
         (a1.map[sort] as Comparable).compareTo(a2.map[sort]));

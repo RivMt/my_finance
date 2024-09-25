@@ -9,12 +9,9 @@ import 'package:my_finance/fragment/payments_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 final _filteredAccounts = Provider<List<Account>>((ref) {
-  final min = ref.watch(_minPriorityFilter);
-  final max = ref.watch(_maxPriorityFilter);
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.accounts);
-  List<Account> result = list
-      .where((account) => (account.priority >= min && account.priority <= max)).toList();
+  List<Account> result = list.where((account) => account.deleted).toList();
   if (Account.unknown.map.containsKey(sort)) {
     result.sort((a1, a2) =>
         (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
@@ -23,25 +20,14 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
 });
 
 final _filteredPayments = Provider<List<Payment>>((ref) {
-  final min = ref.watch(_minPriorityFilter);
-  final max = ref.watch(_maxPriorityFilter);
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.payments);
-  List<Payment> result = list
-      .where((payment) => (payment.priority >= min && payment.priority <= max)).toList();
+  List<Payment> result = list.where((payment) => payment.deleted).toList();
   if ( Payment.unknown.map.containsKey(sort)) {
     result.sort((a1, a2) =>
         (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
   }
   return result;
-});
-
-final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, -1000);
-});
-
-final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, -1);
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
@@ -64,25 +50,40 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
 
   late final TabController tabController;
 
-  List<Map<String, dynamic>> conditions = const [{
+  final PageController pageController = PageController(
+    initialPage: 0,
+  );
+
+  final List<Map<String, dynamic>> conditions = [{
     ModelKeys.keyDeleted: true,
   }];
 
+  /// Restore [item]
+  Future<ApiResponse<List<T>>> restoreItem<T extends WalletItem>(T item) async {
+    item.deleted = false;
+    return await ApiClient().update<T>([item.map]);
+  }
+
+  /// Change index of [pageController] by index of [tabController]
+  void onTabChanged(int index) {
+    setState(() {
+      pageController.jumpToPage(index);
+    });
+  }
+
   /// Restore [item] when opened [SnackBar] closed successfully
   void onItemTap<T extends WalletItem>(BuildContext context, T item) {
-    final snackBar = SnackBar(
-      content: Text(LocaleKeys.msgItemRestored.tr(args: [item.descriptions])),
-      action: SnackBarAction(
-        label: LocaleKeys.undo.tr(),
-        onPressed: () {},
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((value) async {
-      if (value != SnackBarClosedReason.action) {
-        item.deleted = false;
-        await ApiClient().update<T>([item.map]);
-        setState(() {});
+    restoreItem<T>(item).then((value) {
+      // Escape if restore failed
+      if (value.result != ApiResultCode.success) {
+        return;
       }
+      provider.refreshAccounts(ref);
+      provider.refreshPayments(ref);
+      final snackBar = SnackBar(
+        content: Text(LocaleKeys.msgItemRestored.tr(args: [item.descriptions])),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
   }
 
@@ -107,33 +108,32 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
             Tab(text: LocaleKeys.account.plural(1),),
             Tab(text: LocaleKeys.payment.plural(1),),
           ],
-          onTap: (index) => setState(() {}),
+          splashBorderRadius: const BorderRadius.all(Radius.circular(8)),
+          onTap: onTabChanged,
         ),
       ),
       body: SafeArea(
         child: Align(
           alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: ScreenPlanner(context).panelWidth,
-            child: IndexedStack(
-              index: tabController.index,
-              children: [
-                // 0: Accounts
-                AccountsFragment(
-                  accounts: ref.watch(_filteredAccounts).reversed.toList(),
-                  hideCreateButton: true,
-                  hideHeader: true,
-                  onItemTap: (item) => onItemTap<Account>(context, item),
-                ),
-                // 1: Payments
-                PaymentsFragment(
-                  payments: ref.watch(_filteredPayments).reversed.toList(),
-                  hideCreateButton: true,
-                  paymentsConditions: conditions,
-                  onItemTap: (item) => onItemTap<Payment>(context, item),
-                ),
-              ],
-            ),
+          child: PageView(
+            controller: pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              // 0: Accounts
+              AccountsFragment(
+                accounts: ref.watch(_filteredAccounts).reversed.toList(),
+                hideCreateButton: true,
+                hideHeader: true,
+                onItemTap: (item) => onItemTap<Account>(context, item),
+              ),
+              // 1: Payments
+              PaymentsFragment(
+                payments: ref.watch(_filteredPayments).reversed.toList(),
+                hideCreateButton: true,
+                paymentsConditions: conditions,
+                onItemTap: (item) => onItemTap<Payment>(context, item),
+              ),
+            ],
           ),
         ),
       ),
@@ -144,5 +144,6 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   void dispose() {
     super.dispose();
     tabController.dispose();
+    pageController.dispose();
   }
 }
