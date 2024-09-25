@@ -82,7 +82,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: MasonryGridView.count(
-        itemCount: AccountSymbol.values.length + 1,
+        itemCount: AccountSymbol.values.length + 2,
         crossAxisCount: ScreenPlanner(context).panelNumber,
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
@@ -113,6 +113,17 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                   amount: sum,
                 );
               },
+            );
+          }
+          // Tailing button
+          if (index == AccountSymbol.values.length + 1) {
+            return Visibility(
+              visible: !widget.hideCreateButton,
+              child: ListTailButton(
+                icon: Icons.add,
+                title: LocaleKeys.add.tr(),
+                onTap: () => onAccountAddButtonPressed(context),
+              ),
             );
           }
           // Accounts

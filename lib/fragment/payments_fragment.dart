@@ -6,6 +6,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/payment_edit_fragment.dart';
+import 'package:my_finance/generated/locale_keys.g.dart';
 
 class PaymentsFragment extends ConsumerStatefulWidget {
   const PaymentsFragment({
@@ -99,11 +100,22 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: MasonryGridView.count(
-        itemCount: PaymentSymbol.values.length,
+        itemCount: PaymentSymbol.values.length + 1,
         crossAxisCount: ScreenPlanner(context).panelNumber,
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
+          // Tailing button
+          if (index == PaymentSymbol.values.length) {
+            return Visibility(
+              visible: !widget.hideCreateButton,
+              child: ListTailButton(
+                icon: Icons.add,
+                title: LocaleKeys.add.tr(),
+                onTap: () => onPaymentAddButtonPressed(context),
+              ),
+            );
+          }
           final icon = PaymentSymbol.values[index];
           final sublist = widget.payments.where((element) => (element.icon == icon)).toList(growable: false);
           // Hide when sublist is empty
