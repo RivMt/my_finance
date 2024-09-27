@@ -22,6 +22,10 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
 
   late final TabController tabController;
 
+  final PageController pageController = PageController(
+    initialPage: 0,
+  );
+
   /// Show [CategoryEditFragment]
   void showCategoryEditingModal([Category? category]) {
     showModalBottomSheet(
@@ -43,6 +47,15 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
     });
   }
 
+  /// On tab page changed
+  void onTabChanged(int index) {
+    pageController.animateToPage(
+      index,
+      duration: tabController.animationDuration,
+      curve: Curves.ease,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +68,13 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.watch(provider.categories);
+    final expenses = categories.where((element) {
+      return element.type == TransactionType.expense;
+    }).toList(growable: false);
+    final incomes = categories.where((element) {
+      return element.type == TransactionType.income;
+    }).toList(growable: false);
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.category.plural(2)),
@@ -67,14 +87,24 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
             Tab(text: LocaleKeys.transactionTypeExpense.tr(),),
             Tab(text: LocaleKeys.transactionTypeIncome.tr(),),
           ],
-          onTap: (index) => setState(() {
-            ref.read(provider.transactionTypeFilter.notifier).set(TransactionType.fromCode(index));
-          }),
+          onTap: onTabChanged,
         ),
       ),
       body: SafeArea(
-        child: CategoriesFragment(
-          onTap: showCategoryEditingModal,
+        child: PageView(
+          controller: pageController,
+          children: [
+            // Expenses
+            CategoriesFragment(
+              categories: expenses,
+              onTap: showCategoryEditingModal,
+            ),
+            // Incomes
+            CategoriesFragment(
+              categories: incomes,
+              onTap: showCategoryEditingModal,
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -82,5 +112,12 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
+    pageController.dispose();
   }
 }

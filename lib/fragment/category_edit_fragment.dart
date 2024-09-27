@@ -64,23 +64,20 @@ class _CategoryEditFragmentState extends State<CategoryEditFragment> {
             child: GridView.builder(
               physics: const BouncingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: size,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
+                maxCrossAxisExtent: size + 16,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
               ),
               itemCount: list.length,
               itemBuilder: (context, index) {
                 final category = list[index];
-                return SizedBox(
-                  width: size,
-                  height: size,
-                  child: IconButton(
-                    icon: Icon(
-                      category.icon,
-                      color: Theme.of(context).textTheme.titleMedium?.color,
-                    ),
-                    onPressed: () => Navigator.pop(context, category),
+                return IconButton(
+                  icon: Icon(
+                    size: size,
+                    category.icon,
+                    color: Theme.of(context).textTheme.titleMedium?.color,
                   ),
+                  onPressed: () => Navigator.pop(context, category),
                 );
               },
             ),
