@@ -59,7 +59,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     ref.read(_dateFilter.notifier).set(value);
   }
 
-  void refresh() {
+  Future<void> refresh() async {
     provider.fetchTransactions(ref, [{
       ModelKeys.keyPaymentID: ref.watch(local_provider.selectedPayment),
     }]);
@@ -101,7 +101,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
-  void onRefreshButtonPressed() => refresh();
+  Future<void> onRefreshButtonPressed() => refresh();
 
   @override
   Widget build(BuildContext context) {

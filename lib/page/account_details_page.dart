@@ -58,7 +58,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     ref.read(_dateFilter.notifier).set(value);
   }
 
-  void refresh() {
+  Future<void> refresh() async {
     final account = ref.watch(local_provider.selectedAccount);
     provider.refreshAccounts(ref);
     provider.fetchTransactions(ref, [{
@@ -101,7 +101,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
-  void onRefreshButtonPressed() => refresh();
+  Future<void> onRefreshButtonPressed() => refresh();
 
   @override
   Widget build(BuildContext context) {
