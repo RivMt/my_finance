@@ -80,8 +80,6 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
                     widget.item.serialNumber,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: AppTheme.swatches.contentSecondary,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppTheme.swatches.contentSecondary,
                     ),
                   ),
                   Text(
