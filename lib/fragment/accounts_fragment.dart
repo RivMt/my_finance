@@ -142,6 +142,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
               return AccountCard(
                 data: account,
                 selected: widget.selected == account,
+                ignoreDeleted: true,
                 onTap: () {
                   if (widget.onItemTap == null) {
                     return;

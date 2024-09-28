@@ -131,6 +131,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
               return PaymentCard(
                 data: payment,
                 selected: widget.selected == payment,
+                ignoreDeleted: true,
                 onTap: () {
                   if (widget.onItemTap == null) {
                     return;
