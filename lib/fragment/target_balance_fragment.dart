@@ -77,7 +77,7 @@ final _balance = Provider<Decimal>((ref) {
   final accounts = ref.watch(provider.accounts);
   final currency = provider.getDefaultCurrency(ref);
   return accounts.fold(Decimal.zero, (prev, item) {
-    if (item.currency == currency) {
+    if (item.currency == currency && !item.deleted) {
       return prev + item.balance;
     }
     return prev;
@@ -96,11 +96,8 @@ class TargetBalanceFragment extends ConsumerWidget {
     required Currency currency,
     required Decimal balance,
     required Decimal target,
-    required Decimal expense,
-    required Decimal income,
   }) {
-    final delta = income - expense;
-    final residual = balance - target + delta;
+    final residual = balance - target;
     return LocaleKeys.msgTargetBalance.tr(namedArgs: {
       "target": currency.format(target),
       "residual": currency.format(residual.abs()),
@@ -124,8 +121,6 @@ class TargetBalanceFragment extends ConsumerWidget {
         currency: currency,
         target: target,
         balance: balance,
-        expense: expense,
-        income: income,
       ),
       state: state,
       children: [
