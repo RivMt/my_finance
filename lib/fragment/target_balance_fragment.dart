@@ -18,11 +18,13 @@ final _dateBegin = DateTime(_dateNow.year, _dateNow.month, 1);
 final _dateEnd = DateTime(_dateNow.year, _dateNow.month + 1, 0);
 
 final _transactions = Provider<List<Transaction>>((ref) {
+  final currency = provider.getDefaultCurrency(ref);
   return ref.watch(provider.transactions).where((item) {
     return !item.deleted
         && item.calculatedDate.compareTo(_dateBegin) >= 0
         && item.calculatedDate.compareTo(_dateEnd) == -1
-        && item.isIncluded;
+        && item.isIncluded
+        && item.currency == currency;
   }).toList();
 });
 
