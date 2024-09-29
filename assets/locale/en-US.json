@@ -90,6 +90,8 @@
   "dateFormat": "Date format",
   "preview": "Preview",
   "home": "Home",
+  "excess": "excess",
+  "short": "short",
 
   "month": "Month",
   "nMonthBefore": {
@@ -126,6 +128,7 @@
   "msgNoCategory": "No category found",
   "msgNoPayment": "No payment found",
   "msgUnknownDefaultCurrency": "Default currency is unknown",
+  "msgTargetBalance": "{residual} {judge}ed to {target}",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
@@ -163,6 +166,7 @@
 
   "currentMonthExpense": "Expenses of current month",
   "amountBePaid": "Amount due to be paid",
+  "targetBalance": "Target balance",
 
   "totalBalance": "Total balance",
 

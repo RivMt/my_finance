@@ -86,6 +86,8 @@
   "dateFormat": "날짜 형식",
   "preview": "미리보기",
   "home": "홈",
+  "excess": "초과",
+  "short": "부족",
 
   "month": "월",
   "nMonthBefore": {
@@ -122,6 +124,7 @@
   "msgNoCategory": "카테고리가 존재하지 않습니다",
   "msgNoPayment": "결제 수단이 존재하지 않습니다",
   "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
+  "msgTargetBalance": "{target}까지 {residual} {judge}",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
@@ -159,6 +162,7 @@
 
   "currentMonthExpense": "이번 달 지출",
   "amountBePaid": "지불할 대금",
+  "targetBalance": "목표 잔고",
 
   "totalBalance": "총 자산",
 

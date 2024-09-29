@@ -105,7 +105,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Show budget editing modal
-  void showBudgetEditingModal(Currency currency, [Decimal? value]) {
+  void showAmountEditingModal(Currency currency, String key, [Decimal? value]) {
     showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
@@ -119,21 +119,21 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
               base: value,
               currency: currency,
               onConfirmButtonPressed: (value) {
-                final pref = ref.watch(provider.preferences)[PreferenceKeys.budgets];
+                final pref = ref.watch(provider.preferences)[key];
                 if (pref != null) {
                   final map = pref.value;
                   map[currency.value] = value;
-                  set(PreferenceKeys.budgets, map);
+                  set(key, map);
                 }
                 Navigator.pop(context);
               },
               onNegativeButtonPressed: () {
-                final pref = ref.watch(provider.preferences)[PreferenceKeys.budgets];
+                final pref = ref.watch(provider.preferences)[key];
                 // Check edit mode
                 if (pref != null && value != null) {
                   final map = pref.value as Map;
                   map.remove(currency.value);
-                  set(PreferenceKeys.budgets, map);
+                  set(key, map);
                 }
                 Navigator.pop(context);
               },
@@ -168,20 +168,21 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Triggers on budget add pressed
-  void onBudgetAddButtonPressed(BuildContext context) async {
+  void onAmountAddButtonPressed(BuildContext context, String key) async {
     final Currency? currency = await showCurrencySelectionDialog(context);
     // If no currency selected, escape
     if (currency == null) {
       return;
     }
     // Show modal
-    showBudgetEditingModal(currency);
+    showAmountEditingModal(currency, key);
   }
 
   @override
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final budgets = provider.getPreference(ref, PreferenceKeys.budgets);
+    final targetBalances = provider.getPreference(ref, PreferenceKeys.targetBalance);
     final pieChartMaxEntries = provider.getPreference(ref, PreferenceKeys.pieChartMaxEntries);
     return Scaffold(
       appBar: AppBar(
@@ -224,7 +225,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => onBudgetAddButtonPressed(context),
+                      onPressed: () => onAmountAddButtonPressed(context, PreferenceKeys.budgets),
                     ),
                   ),
                   ListView.builder(
@@ -238,7 +239,32 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => showBudgetEditingModal(currency, value),
+                        onTap: () => showAmountEditingModal(currency, PreferenceKeys.budgets, value),
+                      );
+                    },
+                  ),
+                  // Target balance
+                  // Budgets
+                  PreferenceHeader(
+                    title: LocaleKeys.targetBalance.tr(),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add_circle_outline_outlined),
+                      color: Theme.of(context).primaryColor,
+                      onPressed: () => onAmountAddButtonPressed(context, PreferenceKeys.targetBalance),
+                    ),
+                  ),
+                  ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: targetBalances.keys.length,
+                    itemBuilder: (context, index) {
+                      final key = targetBalances.keys.toList(growable: false)[index];
+                      final value = targetBalances[key];
+                      final currency = Currency.fromValue(key);
+                      return PreferenceTile(
+                        title: currency.key.tr(),
+                        subtitle: currency.format(value ?? Decimal.zero),
+                        onTap: () => showAmountEditingModal(currency, PreferenceKeys.targetBalance, value),
                       );
                     },
                   ),

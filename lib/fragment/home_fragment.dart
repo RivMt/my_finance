@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/fragment/due_to_paid_fragment.dart';
 import 'package:my_finance/fragment/expense_chart_fragment.dart';
+import 'package:my_finance/fragment/target_balance_fragment.dart';
 
 class HomeFragment extends ConsumerStatefulWidget {
 
@@ -20,6 +21,7 @@ class _HomePageState extends ConsumerState<HomeFragment> {
   final List<Widget> children = [
     const ExpenseChartFragment(),
     const DueToPaidFragment(),
+    const TargetBalanceFragment(),
   ];
 
   /// Triggers on scroll down
