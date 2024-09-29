@@ -58,6 +58,14 @@ jobs:
           mkdir ../my_api
           git clone https://${{ secrets.MYAPI_GIT }} ../my_api
 
+      # Switch branch if DEV mode
+      - name: Switch branch
+        if: github.ref_name == 'dev'
+        run: |
+          cd ../my_api
+          git switch dev
+          cd ../my_finance
+
       # Install flutter
       - name: Install Flutter
         uses: subosito/flutter-action@v2.16.0
