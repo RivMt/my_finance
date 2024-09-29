@@ -14,7 +14,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 typedef _DataType = SplayTreeMap<DateTime, List<Decimal>>;
 
 final _dateNow = DateTime.now();
-final _dateBegin = DateTime(_dateNow.year, _dateNow.month, 1);
+final _dateBegin = DateTime(_dateNow.year, _dateNow.month, _dateNow.day-14);
 final _dateEnd = DateTime(_dateNow.year, _dateNow.month + 1, 0);
 
 final _transactions = Provider<List<Transaction>>((ref) {
