@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/payment_edit_fragment.dart';
+import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class PaymentsFragment extends ConsumerStatefulWidget {
@@ -73,7 +73,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            PaymentEditFragment(
+            PaymentEditModal(
               base: editing,
               onFinish: (payment) {
                 Navigator.pop(context, payment);

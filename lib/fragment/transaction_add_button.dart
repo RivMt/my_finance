@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
-import 'package:my_finance/fragment/transaction_edit_fragment.dart';
+import 'package:my_finance/modal/transaction_edit_modal.dart';
 
 class TransactionAddButton extends StatelessWidget {
   const TransactionAddButton({
@@ -33,7 +33,7 @@ class TransactionAddButton extends StatelessWidget {
       constraints: BoxConstraints(
         maxWidth: ScreenPlanner(context).panelWidth,
       ),
-      builder: (context) => TransactionEditFragment(
+      builder: (context) => TransactionEditModal(
         base: data,
         onFinish: (item) => Navigator.pop(context, item),
       ),

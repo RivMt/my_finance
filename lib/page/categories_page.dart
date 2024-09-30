@@ -5,7 +5,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/categories_fragment.dart';
-import 'package:my_finance/fragment/category_edit_fragment.dart';
+import 'package:my_finance/modal/category_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class CategoriesPage extends ConsumerStatefulWidget {
@@ -26,7 +26,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
     initialPage: 0,
   );
 
-  /// Show [CategoryEditFragment]
+  /// Show [CategoryEditModal]
   void showCategoryEditingModal([Category? category]) {
     showModalBottomSheet(
       context: context,
@@ -36,7 +36,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
       ),
       builder: (context) => Wrap(
         children: [
-          CategoryEditFragment(
+          CategoryEditModal(
             base: category,
             onFinish: (item) => Navigator.pop(context, item),
           ),

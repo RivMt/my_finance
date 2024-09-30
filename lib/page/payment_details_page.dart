@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/payment_edit_fragment.dart';
+import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
@@ -83,7 +83,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
       builder: (context) {
         return Wrap(
           children: [
-            PaymentEditFragment(
+            PaymentEditModal(
               base: editing,
               onFinish: (payment) {
                 Navigator.pop(context, payment);

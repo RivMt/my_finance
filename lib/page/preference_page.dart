@@ -6,7 +6,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/currency_select_dialog.dart';
-import 'package:my_finance/fragment/budget_edit_fragment.dart';
+import 'package:my_finance/modal/budget_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class PreferencePage extends ConsumerStatefulWidget {
@@ -95,7 +95,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
       builder: (context) {
         return Wrap(
           children: [
-            BudgetEditFragment(
+            BudgetEditModal(
               value: amount,
               currency: currency,
               onConfirmButtonPressed: (cur, value) {

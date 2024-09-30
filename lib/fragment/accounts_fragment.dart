@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/account_edit_fragment.dart';
+import 'package:my_finance/modal/account_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountsFragment extends ConsumerStatefulWidget {
@@ -50,7 +50,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            AccountEditFragment(
+            AccountEditModal(
               base: editing,
               onFinish: (account) {
                 Navigator.pop(context, account);

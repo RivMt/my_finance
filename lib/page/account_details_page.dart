@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/fragment/account_edit_fragment.dart';
+import 'package:my_finance/modal/account_edit_modal.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
@@ -83,7 +83,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
       builder: (context) {
         return Wrap(
           children: [
-            AccountEditFragment(
+            AccountEditModal(
               base: editing,
               onFinish: (account) {
                 Navigator.pop(context, account);

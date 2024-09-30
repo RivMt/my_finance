@@ -7,7 +7,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
-import 'package:my_finance/fragment/transaction_edit_fragment.dart';
+import 'package:my_finance/modal/transaction_edit_modal.dart';
 
 class TransactionsFragment extends ConsumerStatefulWidget {
   const TransactionsFragment({
@@ -63,7 +63,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            TransactionEditFragment(
+            TransactionEditModal(
               base: editing,
               isEdit: true,
               onFinish: (account) {
