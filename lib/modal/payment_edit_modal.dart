@@ -392,7 +392,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                         final int value = index + 1;
                         return DropdownMenuEntry<int>(
                           value: value,
-                          label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                          label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
                         );
                       }).toList(growable: false),
                       onSelected: onPayDateChanged,
@@ -437,7 +437,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                             final int value = index + 1;
                             return DropdownMenuEntry<int>(
                               value: value,
-                              label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                              label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
                             );
                           }).toList(growable: false),
                           onSelected: (value) => onPayRangeBeginChanged(editing.payBegin.month, value),
@@ -480,7 +480,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                             final int value = index + 1;
                             return DropdownMenuEntry<int>(
                               value: value,
-                              label: LocaleKeys.nDay.plural(value%10, args: [value.toString()]),
+                              label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
                             );
                           }).toList(growable: false),
                           onSelected: (value) => onPayRangeEndChanged(editing.payEnd.month, value),

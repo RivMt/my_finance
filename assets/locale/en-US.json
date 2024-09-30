@@ -101,13 +101,19 @@
     "other": "{} months before"
   },
   "day": "Day",
-  "nDay": {
+  "nthDay": {
     "zero": "{}th",
     "one": "{}st",
     "two": "{}nd",
     "three": "{}rd",
     "many": "{}th",
     "other": "{}th"
+  },
+  "nDay": {
+    "zero": "{} day",
+    "one": "{} day",
+    "many": "{} days",
+    "other": "{} days"
   },
   "date": "Date",
 
