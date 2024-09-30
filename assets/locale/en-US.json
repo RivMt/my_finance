@@ -93,6 +93,7 @@
   "excess": "excess",
   "short": "short",
   "amount": "Amount",
+  "delta": "Delta",
 
   "month": "Month",
   "nMonthBefore": {
@@ -136,7 +137,7 @@
   "msgNoCategory": "No category found",
   "msgNoPayment": "No payment found",
   "msgUnknownDefaultCurrency": "Default currency is unknown",
-  "msgTargetBalance": "{residual} {judge}ed to {target} until {date}",
+  "msgTargetBalance": "{residual} {judge}ed to {target}",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",

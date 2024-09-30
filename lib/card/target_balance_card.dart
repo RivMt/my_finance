@@ -85,10 +85,31 @@ final _data = Provider<StatefulData<_DataType>>((ref) {
   for(Transaction item in list) {
     final key = DateTime(item.calculatedDate.year, item.calculatedDate.month, item.calculatedDate.day);
     if (!data.containsKey(key)) {
-      data[key] = [Decimal.zero, Decimal.zero];
+      // Expense, Income, Withdraw, Deposit, Balance
+      data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
     }
-    final index = item.type == TransactionType.expense ? 0 : 1;
+    final index = item.type.code + (item.isIncluded ? 0 : 1) * 2;
     data[key]![index] = data[key]![index] + item.amount;
+  }
+  // Target Balance
+  DateTime key = ref.watch(_dateEnd);
+  Decimal balance = ref.watch(_balance);
+  if (!data.containsKey(key)) {
+    data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
+  }
+  data[key]![4] = balance;
+  // Balance history
+  key = DateTime(_dateNow.year, _dateNow.month, _dateNow.day);
+  if (!data.containsKey(key)) {
+    data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
+  }
+  balance += _sum(data[key]!);
+  while(key.compareTo(_dateBegin) >= 0) {
+    if (data.containsKey(key)) {
+      balance -= _sum(data[key]!);
+      data[key]![4] = balance;
+    }
+    key = key.add(const Duration(days: -1));
   }
   return StatefulData(data, state);
 });
@@ -104,6 +125,11 @@ final _balance = Provider<Decimal>((ref) {
   });
 });
 
+/// Calculate delta of given [list]
+Decimal _sum(List<Decimal> list) {
+  return -list[0] + list[1] - list[2] + list[3];
+}
+
 class TargetBalanceCard extends ConsumerWidget {
 
   const TargetBalanceCard({super.key});
@@ -112,19 +138,35 @@ class TargetBalanceCard extends ConsumerWidget {
 
   static const _colorIncome = Colors.greenAccent;
 
+  /// [BorderRadius] of upper direction chart bar
+  final borderUp = const BorderRadius.vertical(
+    top: Radius.circular(8),
+    bottom: Radius.zero,
+  );
+
+  /// [BorderRadius] of upper direction chart bar
+  final borderDown = const BorderRadius.vertical(
+    top: Radius.zero,
+    bottom: Radius.circular(8),
+  );
+
+  /// Generate subtitle from given [currency], [balance], and [target]
   String getSubtitle({
-    required DateTime date,
     required Currency currency,
     required Decimal balance,
     required Decimal target,
   }) {
     final residual = balance - target;
     return LocaleKeys.msgTargetBalance.tr(namedArgs: {
-      "date": DateFormat.yMd().format(date),
       "target": currency.format(target),
       "residual": currency.format(residual.abs()),
       "judge": residual > Decimal.zero ? LocaleKeys.excess.tr() : LocaleKeys.short.tr()
     });
+  }
+
+  /// Scaling chart value
+  double scaleValue(double value) {
+    return value;
   }
 
   @override
@@ -136,11 +178,9 @@ class TargetBalanceCard extends ConsumerWidget {
     final balance = ref.watch(_balance);
     final currency = provider.getDefaultCurrency(ref);
     final target = ref.watch(_target);
-    final dateEnd = ref.watch(_dateEnd);
     return HomeCard(
       title: LocaleKeys.targetBalance.tr(),
       subtitle: target == null ? "" : getSubtitle(
-        date: dateEnd,
         currency: currency,
         target: target[ModelKeys.keyAmount],
         balance: balance,
@@ -152,56 +192,122 @@ class TargetBalanceCard extends ConsumerWidget {
           height: 200,
           child: BarChart(BarChartData(
             alignment: BarChartAlignment.spaceEvenly,
-            minY: 0,
-            maxY: (math.max(expense.toDouble(), income.toDouble()) / 9).ceil() * 10,
-            baselineY: 0,
-            gridData: const FlGridData(show: false),
+            minY: -scaleValue((expense.toDouble() / 9).ceil() * 10),
+            maxY: scaleValue((math.max(income.toDouble(), balance.toDouble()) / 9).ceil() * 10),
+            gridData: FlGridData(
+              drawHorizontalLine: true,
+              drawVerticalLine: false,
+              checkToShowHorizontalLine: (value) => value == 0.0,
+            ),
             borderData: FlBorderData(show: false),
             titlesData: FlTitlesData(
               show: true,
               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  reservedSize: 64,
-                  getTitlesWidget: (value, meta) {
-                    return Text(currency.format(Decimal.parse(value.toString())));
-                  },
-                  showTitles: false,
-                ),
-              ),
+              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
-                axisNameWidget: Text(DateFormat.M().format(DateTime(
-                  _dateNow.year,
-                  _dateNow.month,
-                  1,
-                ))),
                 sideTitles: SideTitles(
                   getTitlesWidget: (value, meta) {
-                    return Text(DateFormat.d().format(DateTime(
-                      _dateNow.year,
-                      _dateNow.month,
-                      value.toInt(),
-                    )));
+                    final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                    final format = (
+                        date.year != _dateNow.year ||
+                        date.month != _dateNow.month ||
+                        date == data.keys.first
+                    ) ? DateFormat.MMMd() : DateFormat.d();
+                    return Text(
+                      format.format(date),
+                      softWrap: true,
+                      maxLines: 2,
+                    );
                   },
                   showTitles: true,
                 ),
               ),
             ),
+            barTouchData: BarTouchData(
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipItem: (group, i, rod, j) {
+                  final key = data.keys.toList(growable: false)[i];
+                  return BarTooltipItem(
+                    "",
+                    Theme.of(context).textTheme.labelMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                    ),
+                    textAlign: TextAlign.start,
+                    children: [
+                      // Balance
+                      TextSpan(
+                        text: currency.format(data[key]![4]),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppTheme.sizeLabelLarge
+                        ),
+                      ),
+                      const TextSpan(text: "\n"),
+                      // Expense
+                      TextSpan(
+                        text: LocaleKeys.transactionTypeExpense.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text: " "),
+                      TextSpan(text: currency.format(data[key]![0])),
+                      const TextSpan(text: "\n"),
+                      // Income
+                      TextSpan(
+                        text: LocaleKeys.transactionTypeIncome.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text: " "),
+                      TextSpan(text: currency.format(data[key]![1])),
+                      const TextSpan(text: "\n"),
+                      // Delta
+                      TextSpan(
+                        text: LocaleKeys.delta.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const TextSpan(text: " "),
+                      TextSpan(
+                        text: currency.format(data[key]![3] - data[key]![2]),
+                      ),
+                    ]
+                  );
+                }
+              )
+            ),
             barGroups: List.generate(data.keys.length, (index) {
               final key = data.keys.toList(growable: false)[index];
+              final value = _sum(data[key]!);
+              final bal = data[key]![4];
               return BarChartGroupData(
-                  x: key.day,
+                  x: key.millisecondsSinceEpoch,
+                  groupVertically: true,
                   barRods: [
+                    // Balance
                     BarChartRodData(
                       fromY: 0,
-                      toY: data[key]![0].toDouble(),
-                      color: _colorExpense,
+                      toY: scaleValue(bal.toDouble()),
+                      color: _dateNow.compareTo(key) > 0
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: borderUp,
                     ),
+                    // Delta
                     BarChartRodData(
                       fromY: 0,
-                      toY: data[key]![1].toDouble(),
-                      color: _colorIncome,
+                      toY: scaleValue(value.toDouble()),
+                      color: value < Decimal.zero
+                          ? _colorExpense
+                          : _colorIncome,
+                      borderRadius: value < Decimal.zero
+                          ? borderDown
+                          : borderUp,
                     ),
                   ]
               );
