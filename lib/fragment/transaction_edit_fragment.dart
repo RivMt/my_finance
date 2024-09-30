@@ -220,8 +220,10 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
 
   /// Set [editing.paidDate]
   void setPaidDate(DateTime date) {
-    editing.paidDate = date;
-    setCalculatedDate();
+    setState(() {
+      editing.paidDate = date;
+      setCalculatedDate();
+    });
   }
 
   /// Set [editing.calculatedDate]
@@ -232,12 +234,14 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
   ///
   /// Make [override] `true` to override [editing.calculatedDate] whether its value.
   void setCalculatedDate([DateTime? date]) {
-    if (date != null) {
-      editing.calculatedDate = date;
-      return;
-    }
-    final payment = selectedPayment;
-    editing.calculatedDate = payment.getCalculatedDate(editing.paidDate);
+    setState(() {
+      if (date != null) {
+        editing.calculatedDate = date;
+        return;
+      }
+      final payment = selectedPayment;
+      editing.calculatedDate = payment.getCalculatedDate(editing.paidDate);
+    });
   }
 
   /// Set [editing.accountId] and [editing.currency]
@@ -452,26 +456,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                             : LocaleKeys.paidDate.tr(),
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => onPaidDateButtonPressed(context),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(
-                                DateFormat.yMd().format(editing.paidDate),
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(width: 8,),
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
+                      DateButton(
+                        date: editing.paidDate,
+                        onChanged: setPaidDate,
                       ),
                     ],
                   ),
@@ -486,26 +473,9 @@ class _TransactionEditFragmentState extends ConsumerState<TransactionEditFragmen
                           LocaleKeys.paidDate.tr(),
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
-                        InkWell(
-                          borderRadius: BorderRadius.circular(8),
-                          onTap: () => onCalculatedDateButtonPressed(context),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  DateFormat.yMd().format(editing.calculatedDate),
-                                  style: Theme.of(context).textTheme.titleMedium,
-                                ),
-                                const SizedBox(width: 8,),
-                                Icon(
-                                  Icons.calendar_today_outlined,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              ],
-                            ),
-                          ),
+                        DateButton(
+                          date: editing.calculatedDate,
+                          onChanged: setCalculatedDate,
                         ),
                       ],
                     ),

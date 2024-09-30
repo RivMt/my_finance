@@ -114,28 +114,16 @@ class _CsvPageState extends ConsumerState<CsvPage> {
   }
 
   /// Triggers on [minDate] setting [DateButton] pressed
-  void onMinDatePressed(BuildContext context) async {
-    final result = await showDatePicker(
-      context: context,
-      initialDate: minDate,
-      firstDate: Model.minDate,
-      lastDate: Model.maxDate,
-    );
+  void onMinDateChanged(DateTime date) async {
     setState(() {
-      minDate = result ?? minDate;
+      minDate = date;
     });
   }
 
   /// Triggers on [maxDate] setting [DateButton] pressed
-  void onMaxDatePressed(BuildContext context) async {
-    final result = await showDatePicker(
-      context: context,
-      initialDate: maxDate,
-      firstDate: Model.minDate,
-      lastDate: Model.maxDate,
-    );
+  void onMaxDateChanged(DateTime date) async {
     setState(() {
-      maxDate = result ?? maxDate;
+      maxDate = date;
     });
   }
 
@@ -179,12 +167,12 @@ class _CsvPageState extends ConsumerState<CsvPage> {
               ),
               DateButton(
                 date: minDate,
-                onTap: () => onMinDatePressed(context),
+                onChanged: onMinDateChanged,
               ),
               const Text('~'),
               DateButton(
                 date: maxDate,
-                onTap: () => onMaxDatePressed(context),
+                onChanged: onMaxDateChanged,
               ),
             ],
           ),
