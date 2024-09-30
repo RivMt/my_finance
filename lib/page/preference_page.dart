@@ -8,6 +8,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/modal/budget_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/modal/target_balance_edit_modal.dart';
 
 class PreferencePage extends ConsumerStatefulWidget {
 
@@ -84,49 +85,15 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
-  /// Show budget editing modal
-  void showBudgetEditingModal(String key, [Currency currency = Currency.unknown, Decimal? amount]) {
-    showModalBottomSheet<Account>(
+  /// Show modal
+  void showModal({required Widget child}) {
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       constraints: BoxConstraints(
         maxWidth: ScreenPlanner(context).panelWidth,
       ),
-      builder: (context) {
-        return Wrap(
-          children: [
-            BudgetEditModal(
-              value: amount,
-              currency: currency,
-              onConfirmButtonPressed: (cur, value) {
-                final pref = ref.watch(provider.preferences)[key];
-                // Update
-                if (pref != null) {
-                  final Map map = pref.value;
-                  // Remove old
-                  if (currency != Currency.unknown) {
-                    map.remove(currency.value);
-                    set(key, map);
-                  }
-                  map[cur.value] = value;
-                  set(key, map);
-                }
-                Navigator.pop(context);
-              },
-              onNegativeButtonPressed: () {
-                final pref = ref.watch(provider.preferences)[key];
-                // Check edit mode
-                if (pref != null && amount != null) {
-                  final map = pref.value as Map;
-                  map.remove(currency.value);
-                  set(key, map);
-                }
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+      builder: (context) => child,
     ).then((value) {
       provider.syncPreferences(ref);
     });
@@ -151,9 +118,86 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Triggers on budget add pressed
-  void onBudgetAddButtonPressed(BuildContext context, String key) async {
+  void addOrEditBudget(BuildContext context, String key, [
+    Currency currency = Currency.unknown,
+    Decimal? amount,
+  ]) async {
     // Show modal
-    showBudgetEditingModal(key);
+    showModal(
+      child: BudgetEditModal(
+        value: amount,
+        currency: currency,
+        onConfirmButtonPressed: (cur, value) {
+          final pref = ref.watch(provider.preferences)[key];
+          // Update
+          if (pref != null) {
+            final Map map = pref.value;
+            // Remove old
+            if (currency != Currency.unknown) {
+              map.remove(currency.value);
+              set(key, map);
+            }
+            map[cur.value] = value;
+            set(key, map);
+          }
+          Navigator.pop(context);
+        },
+        onNegativeButtonPressed: () {
+          final pref = ref.watch(provider.preferences)[key];
+          // Check edit mode
+          if (pref != null && amount != null) {
+            final map = pref.value as Map;
+            map.remove(currency.value);
+            set(key, map);
+          }
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
+  /// Triggers on target balance add pressed
+  void addOrEditTargetBalance(BuildContext context, String key, [
+    DateTime? date,
+    Currency currency = Currency.unknown,
+    Decimal? amount,
+  ]) async {
+    // Show modal
+    showModal(
+      child: TargetBalanceEditModal(
+        date: date,
+        currency: currency,
+        value: amount,
+        onConfirmButtonPressed: (date, cur, value) {
+          final pref = ref.watch(provider.preferences)[key];
+          // Update
+          if (pref != null) {
+            final Map map = pref.value;
+            // Remove old
+            if (currency != Currency.unknown) {
+              map.remove(currency.value);
+              set(key, map);
+            }
+            map[cur.value] = {
+              ModelKeys.keyDate: date,
+              ModelKeys.keyAmount: value,
+            };
+            set(key, map);
+          }
+          Navigator.pop(context);
+        },
+        onNegativeButtonPressed: () {
+          final pref = ref.watch(provider.preferences)[key];
+          // Check edit mode
+          if (pref != null && amount != null) {
+            final map = pref.value as Map;
+            map.remove(currency.value);
+            set(key, map);
+          }
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -203,7 +247,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => onBudgetAddButtonPressed(context, PreferenceKeys.budgets),
+                      onPressed: () => addOrEditBudget(context, PreferenceKeys.budgets),
                     ),
                   ),
                   ListView.builder(
@@ -217,7 +261,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => showBudgetEditingModal(PreferenceKeys.budgets, currency, value),
+                        onTap: () => addOrEditBudget(context, PreferenceKeys.budgets, currency, value),
                       );
                     },
                   ),
@@ -228,7 +272,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => onBudgetAddButtonPressed(context, PreferenceKeys.targetBalance),
+                      onPressed: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance),
                     ),
                   ),
                   ListView.builder(
@@ -237,12 +281,15 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     itemCount: targetBalances.keys.length,
                     itemBuilder: (context, index) {
                       final key = targetBalances.keys.toList(growable: false)[index];
-                      final value = targetBalances[key];
+                      final target = targetBalances[key] ?? {};
+                      final date = target[ModelKeys.keyDate] ?? DateTime.now();
+                      final value = target[ModelKeys.keyAmount];
                       final currency = Currency.fromValue(key);
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => showBudgetEditingModal(PreferenceKeys.targetBalance, currency, value),
+                        trailing: Text(LocaleKeys.nToDate.tr(args: [DateFormat.yMd().format(date)])),
+                        onTap: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance, date, currency, value),
                       );
                     },
                   ),

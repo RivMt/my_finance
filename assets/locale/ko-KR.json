@@ -88,6 +88,7 @@
   "home": "홈",
   "excess": "초과",
   "short": "부족",
+  "amount": "금액",
 
   "month": "월",
   "nMonthBefore": {
@@ -112,6 +113,7 @@
     "other": "{}일"
   },
   "date": "날짜",
+  "nToDate": "{}까지",
 
   "formatDateMd": "M월 d일",
 
@@ -130,7 +132,7 @@
   "msgNoCategory": "카테고리가 존재하지 않습니다",
   "msgNoPayment": "결제 수단이 존재하지 않습니다",
   "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
-  "msgTargetBalance": "{target}까지 {residual} {judge}",
+  "msgTargetBalance": "{date} {target}까지 {residual} {judge}",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",

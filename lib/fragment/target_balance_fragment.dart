@@ -12,17 +12,37 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 typedef _DataType = SplayTreeMap<DateTime, List<Decimal>>;
+typedef _TargetType = Map<dynamic, dynamic>;
+
+final _target = Provider<_TargetType?>((ref) {
+  final targets = provider.getPreference(ref, PreferenceKeys.targetBalance);
+  final currency = provider.getDefaultCurrency(ref);
+  if (targets == null ||
+      !targets.containsKey(currency.value) ||
+      !targets[currency.value]!.containsKey(ModelKeys.keyDate) ||
+      !targets[currency.value]!.containsKey(ModelKeys.keyAmount)
+  ) {
+    return null;
+  }
+  return targets[currency.value];
+});
 
 final _dateNow = DateTime.now();
 final _dateBegin = DateTime(_dateNow.year, _dateNow.month, _dateNow.day-14);
-final _dateEnd = DateTime(_dateNow.year, _dateNow.month + 1, 0);
+final _dateEnd = Provider<DateTime>((ref) {
+  final target = ref.watch(_target);
+  if (target == null) {
+    return DateTime(_dateNow.year, _dateNow.month + 1, 0);
+  }
+  return target[ModelKeys.keyDate];
+});
 
 final _transactions = Provider<List<Transaction>>((ref) {
   final currency = provider.getDefaultCurrency(ref);
   return ref.watch(provider.transactions).where((item) {
     return !item.deleted
         && item.calculatedDate.compareTo(_dateBegin) >= 0
-        && item.calculatedDate.compareTo(_dateEnd) == -1
+        && item.calculatedDate.compareTo(ref.watch(_dateEnd)) == -1
         && item.isIncluded
         && item.currency == currency;
   }).toList();
@@ -93,12 +113,14 @@ class TargetBalanceFragment extends ConsumerWidget {
   static const _colorIncome = Colors.greenAccent;
 
   String getSubtitle({
+    required DateTime date,
     required Currency currency,
     required Decimal balance,
     required Decimal target,
   }) {
     final residual = balance - target;
     return LocaleKeys.msgTargetBalance.tr(namedArgs: {
+      "date": DateFormat.yMd().format(date),
       "target": currency.format(target),
       "residual": currency.format(residual.abs()),
       "judge": residual > Decimal.zero ? LocaleKeys.excess.tr() : LocaleKeys.short.tr()
@@ -113,13 +135,14 @@ class TargetBalanceFragment extends ConsumerWidget {
     final income = ref.watch(_income);
     final balance = ref.watch(_balance);
     final currency = provider.getDefaultCurrency(ref);
-    final targetBalances = provider.getPreference(ref, PreferenceKeys.targetBalance);
-    final target = targetBalances != null ? (targetBalances[currency.value] ?? Decimal.zero) : Decimal.zero;
+    final target = ref.watch(_target);
+    final dateEnd = ref.watch(_dateEnd);
     return HomeCard(
       title: LocaleKeys.targetBalance.tr(),
-      subtitle: target == Decimal.zero ? "" : getSubtitle(
+      subtitle: target == null ? "" : getSubtitle(
+        date: dateEnd,
         currency: currency,
-        target: target,
+        target: target[ModelKeys.keyAmount],
         balance: balance,
       ),
       state: state,

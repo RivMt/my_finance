@@ -92,6 +92,7 @@
   "home": "Home",
   "excess": "excess",
   "short": "short",
+  "amount": "Amount",
 
   "month": "Month",
   "nMonthBefore": {
@@ -116,6 +117,7 @@
     "other": "{} days"
   },
   "date": "Date",
+  "nToDate": "To {}",
 
   "formatDateMd": "MMMM, d",
 
@@ -134,7 +136,7 @@
   "msgNoCategory": "No category found",
   "msgNoPayment": "No payment found",
   "msgUnknownDefaultCurrency": "Default currency is unknown",
-  "msgTargetBalance": "{residual} {judge}ed to {target}",
+  "msgTargetBalance": "{residual} {judge}ed to {target} until {date}",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",
