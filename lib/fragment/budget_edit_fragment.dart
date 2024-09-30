@@ -4,27 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class BudgetEditFragment extends ConsumerStatefulWidget {
   const BudgetEditFragment({
     super.key,
-    required this.onFinish,
-    required this.currency,
+    this.value,
+    this.currency = Currency.unknown,
     required this.onConfirmButtonPressed,
     required this.onNegativeButtonPressed,
-    this.base,
   });
 
-  final Decimal? base;
+  final Decimal? value;
 
   final Currency currency;
 
-  final Function(Decimal?) onFinish;
-
   final Function() onNegativeButtonPressed;
 
-  final Function(Decimal) onConfirmButtonPressed;
+  final Function(Currency, Decimal) onConfirmButtonPressed;
 
   @override
   ConsumerState createState() => _BudgetEditFragmentState();
@@ -34,16 +32,19 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
 
   /// Is this fragment editing [Preference]
   ///
-  /// This returns `true` when [widget.base] is not `null`
-  bool get isEdit => widget.base != null;
+  /// This returns `true` when [widget.value] is not `null`
+  bool get isEdit => widget.value != null;
 
   /// [Decimal] which is now editing
-  Decimal editing = Decimal.zero;
+  Decimal amount = Decimal.zero;
 
-  /// Value of sent [editing] and waiting for response
+  /// Selected [Currency]
+  Currency currency = Currency.unknown;
+
+  /// Value of sent [amount] and waiting for response
   bool _progressing = false;
 
-  /// Value of sent [editing] and waiting for response
+  /// Value of sent [amount] and waiting for response
   ///
   /// This is wrapper of [_progressing]. When setting this, [setState] called
   /// automatically
@@ -57,12 +58,23 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
   /// [TextEditingController] for budget amount
   final budgetController = TextEditingController();
 
+  /// Show currency selection dialog
+  void onCurrencyChanged(BuildContext context) async {
+    final result =  await showDialog(
+      context: context,
+      builder: (context) => const CurrencySelectDialog(),
+    );
+    setState(() {
+      currency = result;
+    });
+  }
+
   /// Triggers on budget text field changed
   void onBudgetChanged(String value) {
     if (FinanceModel.getRegex(Account.maxIntegerPartDigits, widget.currency.decimalDigits).hasMatch(value)) {
-      editing = value == "" ? Decimal.zero : Decimal.parse(value);
+      amount = value == "" ? Decimal.zero : Decimal.parse(value);
     } else {
-      budgetController.text = editing.toString();
+      budgetController.text = amount.toString();
     }
     setState(() {});
   }
@@ -70,8 +82,9 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
   @override
   void initState() {
     super.initState();
-    editing = widget.base ?? Decimal.zero;
-    budgetController.text = editing.toString();
+    amount = widget.value ?? Decimal.zero;
+    currency = widget.currency;
+    budgetController.text = amount.toString();
   }
 
   @override
@@ -95,7 +108,7 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
               }),
               positiveButtonTitle: LocaleKeys.confirm.tr(),
               negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
-              onPositiveButtonPressed: progressing ? null : () => widget.onConfirmButtonPressed(editing),
+              onPositiveButtonPressed: progressing ? null : () => widget.onConfirmButtonPressed(currency, amount),
               onNegativeButtonPressed: progressing ? null : widget.onNegativeButtonPressed,
             ),
             // Body
@@ -116,7 +129,10 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
                     controller: budgetController,
                     decoration: InputDecoration(
                       labelText: LocaleKeys.limitation.tr(),
-                      prefixIcon: Icon(widget.currency.icon),
+                      prefix: IconButton(
+                        icon: Icon(currency.icon),
+                        onPressed: () => onCurrencyChanged(context),
+                      ),
                     ),
                     onChanged: onBudgetChanged,
                   ),

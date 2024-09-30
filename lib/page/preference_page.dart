@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
+import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/fragment/budget_edit_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
@@ -54,28 +55,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   Future<Currency?> showCurrencySelectionDialog(BuildContext context) async {
     return await showDialog(
         context: context,
-        builder: (context) {
-          final currencies = Currency.validValues;
-          return AlertDialog(
-            title: Text(LocaleKeys.object_action.tr(namedArgs: {
-              "object": LocaleKeys.currency.plural(1),
-              "action": LocaleKeys.select.tr(),
-            })),
-            content: SizedBox(
-              width: ScreenPlanner(context).dialogWidth,
-              child: ListView.builder(
-                itemCount: currencies.length,
-                itemBuilder: (context, index) {
-                  return CurrencyCard(
-                    data: currencies[index],
-                    useIconBackground: false,
-                    onTap: () => Navigator.pop(context, currencies[index]),
-                  );
-                },
-              ),
-            ),
-          );
-        }
+        builder: (context) => const CurrencySelectDialog(),
     );
   }
 
@@ -105,7 +85,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Show budget editing modal
-  void showAmountEditingModal(Currency currency, String key, [Decimal? value]) {
+  void showBudgetEditingModal(String key, [Currency currency = Currency.unknown, Decimal? amount]) {
     showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
@@ -116,13 +96,19 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
         return Wrap(
           children: [
             BudgetEditFragment(
-              base: value,
+              value: amount,
               currency: currency,
-              onConfirmButtonPressed: (value) {
+              onConfirmButtonPressed: (cur, value) {
                 final pref = ref.watch(provider.preferences)[key];
+                // Update
                 if (pref != null) {
-                  final map = pref.value;
-                  map[currency.value] = value;
+                  final Map map = pref.value;
+                  // Remove old
+                  if (currency != Currency.unknown) {
+                    map.remove(currency.value);
+                    set(key, map);
+                  }
+                  map[cur.value] = value;
                   set(key, map);
                 }
                 Navigator.pop(context);
@@ -130,15 +116,12 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
               onNegativeButtonPressed: () {
                 final pref = ref.watch(provider.preferences)[key];
                 // Check edit mode
-                if (pref != null && value != null) {
+                if (pref != null && amount != null) {
                   final map = pref.value as Map;
                   map.remove(currency.value);
                   set(key, map);
                 }
                 Navigator.pop(context);
-              },
-              onFinish: (value) {
-                Navigator.pop(context, value);
               },
             ),
           ],
@@ -168,14 +151,9 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   }
 
   /// Triggers on budget add pressed
-  void onAmountAddButtonPressed(BuildContext context, String key) async {
-    final Currency? currency = await showCurrencySelectionDialog(context);
-    // If no currency selected, escape
-    if (currency == null) {
-      return;
-    }
+  void onBudgetAddButtonPressed(BuildContext context, String key) async {
     // Show modal
-    showAmountEditingModal(currency, key);
+    showBudgetEditingModal(key);
   }
 
   @override
@@ -225,7 +203,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => onAmountAddButtonPressed(context, PreferenceKeys.budgets),
+                      onPressed: () => onBudgetAddButtonPressed(context, PreferenceKeys.budgets),
                     ),
                   ),
                   ListView.builder(
@@ -239,7 +217,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => showAmountEditingModal(currency, PreferenceKeys.budgets, value),
+                        onTap: () => showBudgetEditingModal(PreferenceKeys.budgets, currency, value),
                       );
                     },
                   ),
@@ -250,7 +228,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => onAmountAddButtonPressed(context, PreferenceKeys.targetBalance),
+                      onPressed: () => onBudgetAddButtonPressed(context, PreferenceKeys.targetBalance),
                     ),
                   ),
                   ListView.builder(
@@ -264,7 +242,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => showAmountEditingModal(currency, PreferenceKeys.targetBalance, value),
+                        onTap: () => showBudgetEditingModal(PreferenceKeys.targetBalance, currency, value),
                       );
                     },
                   ),
