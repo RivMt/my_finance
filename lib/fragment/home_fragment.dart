@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
-import 'package:my_finance/fragment/due_to_paid_fragment.dart';
-import 'package:my_finance/fragment/expense_chart_fragment.dart';
-import 'package:my_finance/fragment/target_balance_fragment.dart';
+import 'package:my_finance/card/due_to_paid_card.dart';
+import 'package:my_finance/card/expense_chart_card.dart';
+import 'package:my_finance/card/target_balance_card.dart';
 
 class HomeFragment extends ConsumerStatefulWidget {
 
@@ -16,12 +16,12 @@ class HomeFragment extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomeFragment> {
 
-  final GlobalKey<DueToPaidFragmentState> _dueToPaidKey = GlobalKey();
+  final GlobalKey<DueToPaidCardState> _dueToPaidKey = GlobalKey();
 
   final List<Widget> children = [
-    const ExpenseChartFragment(),
-    const DueToPaidFragment(),
-    const TargetBalanceFragment(),
+    const ExpenseChartCard(),
+    const DueToPaidCard(),
+    const TargetBalanceCard(),
   ];
 
   /// Triggers on scroll down

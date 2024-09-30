@@ -37,16 +37,16 @@ final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((re
   return StatefulData(Map.fromEntries(entries), state);
 });
 
-class DueToPaidFragment extends ConsumerStatefulWidget {
-  const DueToPaidFragment({
+class DueToPaidCard extends ConsumerStatefulWidget {
+  const DueToPaidCard({
     super.key,
   });
 
   @override
-  ConsumerState createState() => DueToPaidFragmentState();
+  ConsumerState createState() => DueToPaidCardState();
 }
 
-class DueToPaidFragmentState extends ConsumerState<DueToPaidFragment> {
+class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
 
   /// Fetch transaction data
   void fetch() async {

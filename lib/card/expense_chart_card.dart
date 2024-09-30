@@ -49,16 +49,16 @@ final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) 
   return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
-class ExpenseChartFragment extends ConsumerStatefulWidget {
-  const ExpenseChartFragment({
+class ExpenseChartCard extends ConsumerStatefulWidget {
+  const ExpenseChartCard({
     super.key,
   });
 
   @override
-  ConsumerState createState() => _ExpenseChartFragmentState();
+  ConsumerState createState() => _ExpenseChartFragmentCard();
 }
 
-class _ExpenseChartFragmentState extends ConsumerState<ExpenseChartFragment> {
+class _ExpenseChartFragmentCard extends ConsumerState<ExpenseChartCard> {
 
   final maxEntries = 5;
 

@@ -104,9 +104,9 @@ final _balance = Provider<Decimal>((ref) {
   });
 });
 
-class TargetBalanceFragment extends ConsumerWidget {
+class TargetBalanceCard extends ConsumerWidget {
 
-  const TargetBalanceFragment({super.key});
+  const TargetBalanceCard({super.key});
 
   static const _colorExpense = Colors.redAccent;
 
