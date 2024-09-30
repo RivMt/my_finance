@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
-import 'package:my_finance/dialog/currency_select_dialog.dart';
+import 'package:my_finance/fragment/amount_field.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class BudgetEditFragment extends ConsumerStatefulWidget {
   const BudgetEditFragment({
     super.key,
-    this.value,
     this.currency = Currency.unknown,
+    this.value,
     required this.onConfirmButtonPressed,
     required this.onNegativeButtonPressed,
   });
@@ -55,28 +55,18 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
     setState(() {});
   }
 
-  /// [TextEditingController] for budget amount
-  final budgetController = TextEditingController();
-
-  /// Show currency selection dialog
-  void onCurrencyChanged(BuildContext context) async {
-    final result =  await showDialog(
-      context: context,
-      builder: (context) => const CurrencySelectDialog(),
-    );
+  /// Triggers on currency changed
+  void onCurrencyChanged(Currency currency) {
     setState(() {
-      currency = result;
+      this.currency = currency;
     });
   }
 
   /// Triggers on budget text field changed
-  void onBudgetChanged(String value) {
-    if (FinanceModel.getRegex(Account.maxIntegerPartDigits, widget.currency.decimalDigits).hasMatch(value)) {
-      amount = value == "" ? Decimal.zero : Decimal.parse(value);
-    } else {
-      budgetController.text = amount.toString();
-    }
-    setState(() {});
+  void onBudgetChanged(Decimal value) {
+    setState(() {
+      amount = value;
+    });
   }
 
   @override
@@ -84,7 +74,6 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
     super.initState();
     amount = widget.value ?? Decimal.zero;
     currency = widget.currency;
-    budgetController.text = amount.toString();
   }
 
   @override
@@ -125,16 +114,12 @@ class _BudgetEditFragmentState extends ConsumerState<BudgetEditFragment> {
                   ),
                   const SizedBox(height: 8,),
                   // Limitation
-                  TextField(
-                    controller: budgetController,
-                    decoration: InputDecoration(
-                      labelText: LocaleKeys.limitation.tr(),
-                      prefix: IconButton(
-                        icon: Icon(currency.icon),
-                        onPressed: () => onCurrencyChanged(context),
-                      ),
-                    ),
-                    onChanged: onBudgetChanged,
+                  AmountField(
+                    label: LocaleKeys.limitation.tr(),
+                    currency: currency,
+                    amount: amount,
+                    onCurrencyChanged: onCurrencyChanged,
+                    onAmountChanged: onBudgetChanged,
                   ),
                 ],
               ),
