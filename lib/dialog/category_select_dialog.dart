@@ -48,7 +48,9 @@ class _CategorySelectDialogState extends State<CategorySelectDialog> {
   /// Refresh list of categories according to conditions
   void refresh() {
     categories = widget.list.where((item) {
-      return item.type == selectedType && item.isIncluded == include;
+      return item.type == selectedType &&
+          item.isIncluded == include &&
+          !item.deleted;
     }).toList(growable: false);
   }
 
