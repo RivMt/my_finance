@@ -238,9 +238,8 @@ class TargetBalanceCard extends ConsumerWidget {
                   getTitlesWidget: (value, meta) {
                     final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
                     final format = (
-                        date.year != _dateNow.year ||
-                        date.month != _dateNow.month ||
-                        date == data.keys.first
+                        (date.compareTo(_dateNow) > 0 || date == data.keys.first) &&
+                            !(date.year == _dateNow.year && date.month == _dateNow.month)
                     ) ? DateFormat.MMMd() : DateFormat.d();
                     return Text(
                       format.format(date),
