@@ -28,7 +28,9 @@ final _target = Provider<_TargetType?>((ref) {
 });
 
 final _dateNow = DateTime.now();
-final _dateBegin = DateTime(_dateNow.year, _dateNow.month, _dateNow.day-14);
+
+final _dateBegin = DateTime(_dateNow.year, _dateNow.month, _dateNow.day-7);
+
 final _dateEnd = Provider<DateTime>((ref) {
   final target = ref.watch(_target);
   if (target == null) {
@@ -48,21 +50,29 @@ final _transactions = Provider<List<Transaction>>((ref) {
   }).toList();
 });
 
-final _expense = Provider<Decimal>((ref) {
-  final list = ref.watch(_transactions);
-  return list.fold(Decimal.zero, (prev, item) {
-    if (item.type == TransactionType.expense) {
-      return prev + item.amount;
+final _max = Provider<List<double>>((ref) {
+  final list = <double>[
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+  ];
+  final items = ref.watch(_data).data.values;
+  for(List<Decimal> item in items) {
+    for(int i=0; i < list.length; i++) {
+      list[i] = math.max(list[i], item[i].toDouble());
     }
-    return prev;
-  });
+  }
+  return list;
 });
 
-final _income = Provider<Decimal>((ref) {
-  final list = ref.watch(_transactions);
-  return list.fold(Decimal.zero, (prev, item) {
-    if (item.type == TransactionType.income) {
-      return prev + item.amount;
+final _balance = Provider<Decimal>((ref) {
+  final accounts = ref.watch(provider.accounts);
+  final currency = provider.getDefaultCurrency(ref);
+  return accounts.fold(Decimal.zero, (prev, item) {
+    if (item.currency == currency && !item.deleted) {
+      return prev + item.balance;
     }
     return prev;
   });
@@ -92,37 +102,33 @@ final _data = Provider<StatefulData<_DataType>>((ref) {
     data[key]![index] = data[key]![index] + item.amount;
   }
   // Target Balance
-  DateTime key = ref.watch(_dateEnd);
+  final DateTime end = ref.watch(_dateEnd);
   Decimal balance = ref.watch(_balance);
-  if (!data.containsKey(key)) {
-    data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
+  if (!data.containsKey(end)) {
+    data[end] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
   }
-  data[key]![4] = balance;
-  // Balance history
-  key = DateTime(_dateNow.year, _dateNow.month, _dateNow.day);
-  if (!data.containsKey(key)) {
-    data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
+  data[end]![4] = balance;
+  // Balances
+  final DateTime now = DateTime(_dateNow.year, _dateNow.month, _dateNow.day);
+  if (!data.containsKey(now)) {
+    data[now] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
   }
-  balance += _sum(data[key]!);
-  while(key.compareTo(_dateBegin) >= 0) {
-    if (data.containsKey(key)) {
-      balance -= _sum(data[key]!);
-      data[key]![4] = balance;
+  for(DateTime key in data.keys.toList().reversed) {
+    if (key.compareTo(now) > 0) {
+      continue;
     }
-    key = key.add(const Duration(days: -1));
+    data[key]![4] = balance;
+    balance -= _sum(data[key]!);
+  }
+  balance = ref.watch(_balance);
+  for(DateTime key in data.keys.toList()) {
+    if (key.compareTo(now) <= 0) {
+      continue;
+    }
+    balance += _sum(data[key]!);
+    data[key]![4] = balance;
   }
   return StatefulData(data, state);
-});
-
-final _balance = Provider<Decimal>((ref) {
-  final accounts = ref.watch(provider.accounts);
-  final currency = provider.getDefaultCurrency(ref);
-  return accounts.fold(Decimal.zero, (prev, item) {
-    if (item.currency == currency && !item.deleted) {
-      return prev + item.balance;
-    }
-    return prev;
-  });
 });
 
 /// Calculate delta of given [list]
@@ -139,16 +145,22 @@ class TargetBalanceCard extends ConsumerWidget {
   static const _colorIncome = Colors.greenAccent;
 
   /// [BorderRadius] of upper direction chart bar
-  final borderUp = const BorderRadius.vertical(
+  final _borderUp = const BorderRadius.vertical(
     top: Radius.circular(8),
     bottom: Radius.zero,
   );
 
   /// [BorderRadius] of upper direction chart bar
-  final borderDown = const BorderRadius.vertical(
+  final _borderDown = const BorderRadius.vertical(
     top: Radius.zero,
     bottom: Radius.circular(8),
   );
+
+  /// Height of bar chart
+  final _height = 90.0;
+
+  /// Minimum size of bar height
+  final _minBarHeight = 10.0;
 
   /// Generate subtitle from given [currency], [balance], and [target]
   String getSubtitle({
@@ -165,19 +177,35 @@ class TargetBalanceCard extends ConsumerWidget {
   }
 
   /// Scaling chart value
-  double scaleValue(double value) {
-    return value;
+  double scaleValue({
+    required double value,
+    required double max,
+    required double factor,
+  }) {
+    if (value == 0 || max == 0) return 0;
+    return math.max(_minBarHeight, math.sqrt(1 - math.pow(value / max - 1, 2)) * _height * factor);
+  }
+
+  /// Factor of bar scale
+  ///
+  /// [local] is local maximum, [global] is global maximum.
+  double scaleFactor(double local, double global) {
+    return 0.5 + local/global * 0.5;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Provider
     final data = ref.watch(_data).data;
     final state = ref.watch(_data).state;
-    final expense = ref.watch(_expense);
-    final income = ref.watch(_income);
-    final balance = ref.watch(_balance);
+    final dateEnd = ref.watch(_dateEnd);
+    final balance = data[dateEnd]![4];
     final currency = provider.getDefaultCurrency(ref);
     final target = ref.watch(_target);
+    // Value scaling
+    final maxes = ref.watch(_max);
+    final deltaMax = math.max(maxes[0], maxes[1]);
+    final globalMax = math.max(deltaMax, maxes[4]);
     return HomeCard(
       title: LocaleKeys.targetBalance.tr(),
       subtitle: target == null ? "" : getSubtitle(
@@ -189,11 +217,11 @@ class TargetBalanceCard extends ConsumerWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          height: 200,
+          height: _height*2 + 32,
           child: BarChart(BarChartData(
             alignment: BarChartAlignment.spaceEvenly,
-            minY: -scaleValue((expense.toDouble() / 9).ceil() * 10),
-            maxY: scaleValue((math.max(income.toDouble(), balance.toDouble()) / 9).ceil() * 10),
+            minY: -(_height + 10),
+            maxY: _height + 10,
             gridData: FlGridData(
               drawHorizontalLine: true,
               drawVerticalLine: false,
@@ -226,6 +254,7 @@ class TargetBalanceCard extends ConsumerWidget {
             ),
             barTouchData: BarTouchData(
               touchTooltipData: BarTouchTooltipData(
+                getTooltipColor: (group) => Theme.of(context).colorScheme.inverseSurface,
                 getTooltipItem: (group, i, rod, j) {
                   final key = data.keys.toList(growable: false)[i];
                   return BarTooltipItem(
@@ -283,33 +312,50 @@ class TargetBalanceCard extends ConsumerWidget {
             ),
             barGroups: List.generate(data.keys.length, (index) {
               final key = data.keys.toList(growable: false)[index];
-              final value = _sum(data[key]!);
               final bal = data[key]![4];
               return BarChartGroupData(
-                  x: key.millisecondsSinceEpoch,
-                  groupVertically: true,
-                  barRods: [
-                    // Balance
+                x: key.millisecondsSinceEpoch,
+                groupVertically: true,
+                barRods: [
+                  // Balance
+                  if (maxes[4] > 0)
                     BarChartRodData(
                       fromY: 0,
-                      toY: scaleValue(bal.toDouble()),
+                      toY: scaleValue(
+                        value: bal.toDouble(),
+                        max: maxes[4],
+                        factor: scaleFactor(maxes[4], globalMax),
+                      ),
                       color: _dateNow.compareTo(key) > 0
                           ? Theme.of(context).primaryColor
                           : Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: borderUp,
+                      borderRadius: _borderUp,
                     ),
-                    // Delta
+                  // Expense
+                  if (maxes[0] > 0)
                     BarChartRodData(
                       fromY: 0,
-                      toY: scaleValue(value.toDouble()),
-                      color: value < Decimal.zero
-                          ? _colorExpense
-                          : _colorIncome,
-                      borderRadius: value < Decimal.zero
-                          ? borderDown
-                          : borderUp,
+                      toY: -scaleValue(
+                        value: data[key]![0].toDouble(),
+                        max: maxes[0],
+                        factor: scaleFactor(maxes[0], globalMax),
+                      ),
+                      color: _colorExpense,
+                      borderRadius: _borderDown,
                     ),
-                  ]
+                  // Income
+                  if (maxes[1] > 0)
+                    BarChartRodData(
+                      fromY: 0,
+                      toY: scaleValue(
+                        value: data[key]![1].toDouble(),
+                        max: maxes[1],
+                        factor: scaleFactor(maxes[1], globalMax),
+                      ),
+                      color: _colorIncome,
+                      borderRadius: _borderUp,
+                    ),
+                ],
               );
             }),
           )),
