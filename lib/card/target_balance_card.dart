@@ -61,7 +61,7 @@ final _max = Provider<List<double>>((ref) {
   final items = ref.watch(_data).data.values;
   for(List<Decimal> item in items) {
     for(int i=0; i < list.length; i++) {
-      list[i] = math.max(list[i], item[i].toDouble());
+      list[i] = math.max(list[i], item[i].toDouble().abs());
     }
   }
   return list;
@@ -183,7 +183,10 @@ class TargetBalanceCard extends ConsumerWidget {
     required double factor,
   }) {
     if (value == 0 || max == 0) return 0;
-    return math.max(_minBarHeight, math.sqrt(1 - math.pow(value / max - 1, 2)) * _height * factor);
+    return math.max(
+      _minBarHeight,
+      math.sqrt(1 - math.pow(value.abs() / max - 1, 2)) * _height * factor,
+    ) * value.sign;
   }
 
   /// Factor of bar scale
@@ -311,7 +314,11 @@ class TargetBalanceCard extends ConsumerWidget {
             ),
             barGroups: List.generate(data.keys.length, (index) {
               final key = data.keys.toList(growable: false)[index];
-              final bal = data[key]![4];
+              final bal = scaleValue(
+                value: data[key]![4].toDouble(),
+                max: maxes[4],
+                factor: scaleFactor(maxes[4], globalMax),
+              );
               return BarChartGroupData(
                 x: key.millisecondsSinceEpoch,
                 groupVertically: true,
@@ -320,15 +327,11 @@ class TargetBalanceCard extends ConsumerWidget {
                   if (maxes[4] > 0)
                     BarChartRodData(
                       fromY: 0,
-                      toY: scaleValue(
-                        value: bal.toDouble(),
-                        max: maxes[4],
-                        factor: scaleFactor(maxes[4], globalMax),
-                      ),
+                      toY: bal,
                       color: _dateNow.compareTo(key) > 0
                           ? Theme.of(context).primaryColor
                           : Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: _borderUp,
+                      borderRadius: bal > 0 ? _borderUp : _borderDown,
                     ),
                   // Expense
                   if (maxes[0] > 0)
