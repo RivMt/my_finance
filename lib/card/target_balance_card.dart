@@ -45,7 +45,6 @@ final _transactions = Provider<List<Transaction>>((ref) {
     return !item.deleted
         && item.calculatedDate.compareTo(_dateBegin) >= 0
         && item.calculatedDate.compareTo(ref.watch(_dateEnd)) == -1
-        && item.isIncluded
         && item.currency == currency;
   }).toList();
 });
