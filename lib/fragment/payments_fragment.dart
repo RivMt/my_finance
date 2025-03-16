@@ -14,7 +14,6 @@ class PaymentsFragment extends ConsumerStatefulWidget {
     required this.payments,
     this.subtitle = "",
     this.selected,
-    this.currency = Currency.unknown,
     this.hideCreateButton = false,
     this.onItemTap,
     this.onEditFinish,
@@ -25,8 +24,6 @@ class PaymentsFragment extends ConsumerStatefulWidget {
   final List<Payment> payments;
 
   final Payment? selected;
-
-  final Currency currency;
 
   final String subtitle;
 
@@ -45,21 +42,6 @@ class PaymentsFragment extends ConsumerStatefulWidget {
 }
 
 class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
-
-  /// Currently selected [Currency]
-  ///
-  /// **DO NOT** use this directly. Use [currency] than.
-  /// This save user selected currency. By the default, it is `null` and
-  /// user selects a currency, the value will be saved here.
-  Currency? _currency;
-
-  /// Currently selected [Currency]
-  ///
-  /// If [_currency] is `null`, return [widget.currency].
-  /// This i
-  Currency get currency => _currency ?? widget.currency;
-
-  set currency(Currency value) => _currency = value;
 
   /// Show payment editing modal
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {

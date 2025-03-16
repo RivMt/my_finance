@@ -106,13 +106,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Currently selected [Account]
   Account get selectedAccount {
-    return ref.watch(_filteredAccounts).firstWhere((item) => item.pid == editing.accountId, orElse: () => Account.unknown);
+    return ref.watch(_filteredAccounts).firstWhere((item) => item.uuid == editing.accountId, orElse: () => Account.unknown);
   }
 
   /// Currently selected [Payment]
   Payment get selectedPayment {
-    return ref.watch(_filteredPayments).firstWhere((item) => item.pid == editing.paymentId, orElse: () {
-      if (editing.paymentId == Payment.none.pid) {
+    return ref.watch(_filteredPayments).firstWhere((item) => item.uuid == editing.paymentId, orElse: () {
+      if (editing.paymentId == Payment.none.uuid) {
         return Payment.none;
       }
       return Payment.unknown;
@@ -121,7 +121,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Currently selected [Category]
   Category get selectedCategory {
-    return ref.watch(provider.categories).firstWhere((item) => item.pid == editing.category, orElse: () => Category.unknown);
+    return ref.watch(provider.categories).firstWhere((item) => item.uuid == editing.categoryId, orElse: () => Category.unknown);
   }
 
   /// Show [T] item selection dialog
@@ -167,7 +167,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Transaction>> result = await ApiClient().delete([widget.base!.map]);
+    final ApiResponse<List<Transaction>> result = await ApiClient().delete(widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -186,10 +186,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     late ApiResponse<List<Transaction>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update([editing.map]);
+      result = await ApiClient().update(editing.map);
       Log.v(_tag, "Update: ${editing.map}");
     } else {
-      result = await ApiClient().create([editing.map]);
+      result = await ApiClient().create(editing.map);
       Log.v(_tag, "Create: ${editing.map}");
     }
     // Check
@@ -246,7 +246,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Set [editing.minusCategory] and [editing.type]
   void setCategory(Category category) {
-    editing.category = category.pid;
+    editing.categoryId = category.uuid;
     editing.type = category.type;
     editing.isIncluded = category.isIncluded;
     if (editing.type != TransactionType.expense) {
@@ -388,8 +388,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     final payment = selectedPayment;
     final bool useAlt = (payment != Payment.none) &&
         (account != Account.unknown) &&
-        (editing.altCurrency != null) &&
-        (editing.altCurrency != editing.currency);
+        (editing.altCurrencyId != null) &&
+        (editing.altCurrencyId != editing.currencyId);
+    final currency = provider.getCurrency(ref, editing.currencyId);
+    final altCurrency = provider.getCurrency(ref, editing.altCurrencyId);
     return Modal(
       ready: ready,
       title: LocaleKeys.object_action.tr(namedArgs: {
@@ -526,12 +528,12 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             child: TextField(
               controller: altAmountController,
               keyboardType: TextInputType.numberWithOptions(
-                decimal: (editing.altCurrency == null) || (editing.altCurrency!.decimalDigits > 0),
+                decimal: (altCurrency == Currency.unknown) || (altCurrency.decimalPoint > 0),
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.paidAmount.tr(),
-                prefixIcon: Icon(editing.altCurrency == null ? CurrencySymbol.sign : editing.altCurrency!.icon),
-                errorText: editing.regex.hasMatch(altAmountController.text)
+                prefixIcon: Icon(altCurrency == Currency.unknown ? CurrencySymbol.sign : altCurrency.icon),
+                errorText: Transaction.getAmountRegex(altCurrency).hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput,
               ),
@@ -546,12 +548,12 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           TextField(
             controller: amountController,
             keyboardType: TextInputType.numberWithOptions(
-              decimal: editing.currency.decimalDigits > 0,
+              decimal: currency.decimalPoint > 0,
             ),
             decoration: InputDecoration(
               labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
-              prefixIcon: Icon(editing.currency.icon),
-              errorText: editing.regex.hasMatch(amountController.text)
+              prefixIcon: Icon(currency.icon),
+              errorText: Transaction.getAmountRegex(currency).hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput,
             ),

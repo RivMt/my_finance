@@ -61,9 +61,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   Future<void> refresh() async {
     final account = ref.watch(local_provider.selectedAccount);
     provider.refreshAccounts(ref);
-    provider.fetchTransactions(ref, [{
-      ModelKeys.keyAccountID: account,
-    }]);
+    provider.fetchTransactions(ref, {
+      ModelKeys.keyAccountId: account,
+    });
   }
 
   void onMonthChanged(DateTime value) {
@@ -105,7 +105,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final account = ref.watch(provider.accounts).firstWhere((element) => element.pid == ref.watch(local_provider.selectedAccount));
+    final account = ref.watch(provider.accounts).firstWhere((element) => element.uuid == ref.watch(local_provider.selectedAccount));
     return Scaffold(
       appBar: AppBar(
         title: Text(account.descriptions),

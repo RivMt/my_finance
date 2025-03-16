@@ -1,12 +1,14 @@
 import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
+class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerStatefulWidget {
   const WalletItemDetailsFragment({
     super.key,
     required this.item,
@@ -42,10 +44,10 @@ class WalletItemDetailsFragment<T extends WalletItem> extends StatefulWidget {
   final bool sortByCalculatedDate;
 
   @override
-  State createState() => _WalletItemDetailsFragmentState<T>();
+  ConsumerState createState() => _WalletItemDetailsFragmentState<T>();
 }
 
-class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<WalletItemDetailsFragment<T>> {
+class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerState<WalletItemDetailsFragment<T>> {
 
   /// Build group separator by given [date]
   String buildGroupSeparator(DateTime date) {
@@ -59,6 +61,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
 
   @override
   Widget build(BuildContext context) {
+    final currency = provider.getCurrency(ref, widget.item.currencyId);
     const height = 100.0;
     return RefreshIndicator(
       onRefresh: widget.onRefreshButtonPressed,
@@ -85,7 +88,7 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends State<Wallet
                       ),
                     ),
                     Text(
-                      widget.item.currency.format(widget.content),
+                      currency.format(widget.content),
                       style: Theme.of(context).textTheme.displayLarge,
                     )
                   ],

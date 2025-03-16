@@ -51,7 +51,6 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
     await ApiClient().init(
       onLoginRequired: () {},
       preferences: prefs,
-      useTest: ApiClient().serverType == ServerType.production,
     );
     setState(() {});
   }
@@ -112,20 +111,6 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
               onTap: () => openPage(const ReadCsvPage()),
             ),
             const Divider(),
-            Visibility(
-              visible: kDebugMode,
-              child: ListTile(
-                leading: Icon(ApiClient().serverType == ServerType.production
-                    ? Icons.work_outline_outlined
-                    : Icons.adb_outlined
-                ),
-                title: Text(ApiClient().serverType == ServerType.production
-                    ? LocaleKeys.productionMode.tr()
-                    : LocaleKeys.testMode.tr()
-                ),
-                onTap: onTestModeTapped,
-              ),
-            ),
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(LocaleKeys.settings.tr()),

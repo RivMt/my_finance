@@ -37,14 +37,14 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
   }
 
   void openAccountPage(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
+    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => const AccountDetailsPage(),
     ));
   }
 
   void openPaymentPage(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
+    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => const PaymentDetailsPage(),
     ));
@@ -52,7 +52,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
   void getCategories() async {
     // Get categories
-    await ref.read(_categories.notifier).request([{}]);
+    await ref.read(_categories.notifier).request({});
   }
 
   void request() async {
@@ -98,7 +98,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
             final data = Transaction(item.map);
             return TransactionCard(
               data: data,
-              category: categories.firstWhere((item) => item.pid == data.category, orElse: () => Category.unknown),
+              category: categories.firstWhere((item) => item.uuid == data.categoryId, orElse: () => Category.unknown),
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => TransactionDetailsDialog(

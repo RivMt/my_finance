@@ -79,6 +79,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
 
   @override
   Widget build(BuildContext context) {
+    final currencies = ref.watch(provider.currencies);
     return Padding(
       padding: const EdgeInsets.all(8),
       child: MasonryGridView.count(
@@ -94,12 +95,12 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
             }
             return GroupCard(
               title: LocaleKeys.totalBalance.tr(),
-              count: Currency.values.length,
+              count: currencies.length,
               build: (context, index) {
-                final currency = Currency.values[index];
+                final currency = currencies[index];
                 bool exist = false;
                 final sum = widget.accounts.fold<Decimal>(Decimal.zero, (total, account) {
-                  if (account.currency == currency) {
+                  if (account.currencyId == currency.uuid) {
                     exist = true;
                     return total + account.balance;
                   }

@@ -28,7 +28,7 @@ final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((re
   }
   Map<_DataType, Decimal> map = {};
   for(Transaction item in list) {
-    final payment = payments.firstWhere((e) => e.pid == item.paymentId, orElse: () => Payment.unknown);
+    final payment = payments.firstWhere((e) => e.uuid == item.paymentId, orElse: () => Payment.unknown);
     final key = _DataType(item.calculatedDate, payment);
     map[key] = (map[key] ?? Decimal.zero) + item.amount;
   }
@@ -51,14 +51,14 @@ class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
   /// Fetch transaction data
   void fetch() async {
     // Request
-    provider.fetchTransactions(ref, [{
+    provider.fetchTransactions(ref, {
       ModelKeys.keyDeleted: false,
       ModelKeys.keyType: TransactionType.expense.code,
-      ModelKeys.keyCalculatedDate: [
-        _dateBegin.millisecondsSinceEpoch,
-        _dateEnd.millisecondsSinceEpoch,
-      ],
-    }]);
+      ModelKeys.keyCalculatedDate: {
+        ApiQuery.keyQueryRangeBegin: _dateBegin.toIso8601String(),
+        ApiQuery.keyQueryRangeEnd: _dateEnd.toIso8601String(),
+      },
+    });
   }
 
   @override
@@ -81,8 +81,9 @@ class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
           itemCount: map.length,
           itemBuilder: (context, index) {
             final item = map.entries.toList(growable: false)[index];
+            final currency = provider.getCurrency(ref, item.key.payment.currencyId);
             return ListTile(
-              title: Text(item.key.payment.currency.format(item.value)),
+              title: Text(currency.format(item.value)),
               subtitle: Text(DateFormat(LocaleKeys.formatDateMd.tr()).format(item.key.date.toLocal())),
               leading: Tooltip(
                 message: item.key.payment.descriptions,
@@ -114,7 +115,7 @@ class _DataType {
 
   @override
   int get hashCode {
-    return (date.year * 10000 + date.month * 100 + date.day) * 1000 + payment.pid;
+    return (date.year * 10000 + date.month * 100 + date.day) * 1000 + payment.uuid.hashCode;
   }
 
   @override

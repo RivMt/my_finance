@@ -60,7 +60,7 @@ final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, ModelKeys.keyPid);
+  return ModelState<String>(ref, ModelKeys.keyUuid);
 });
 
 class HomePage extends ConsumerStatefulWidget {
@@ -147,12 +147,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   void refresh() async {
     // Request
     final now = DateTime.now();
-    provider.fetchTransactions(ref, [{
-      ModelKeys.keyPaidDate: [
-        DateTime(now.year, now.month-3, 1).millisecondsSinceEpoch,
-        DateTime(now.year, now.month+2, 0).millisecondsSinceEpoch,
-      ]
-    }]);
+    provider.fetchTransactions(ref, {
+      ModelKeys.keyPaidDate: {
+        ApiQuery.keyQueryRangeBegin: DateTime(now.year, now.month - 3, 1).toIso8601String(),
+        ApiQuery.keyQueryRangeEnd: DateTime(now.year, now.month + 2, 0).toIso8601String(),
+      }
+    });
     provider.refreshAccounts(ref);
   }
 
@@ -193,14 +193,14 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Triggers on account item selected
   void onAccountPressed(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
-    openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.pid));
+    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
+    openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.uuid));
   }
 
   /// Triggers on payment item selected
   void onPaymentPressed(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
-    openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.pid));
+    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
+    openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.uuid));
   }
 
   /// Get [GridView] cross axis count

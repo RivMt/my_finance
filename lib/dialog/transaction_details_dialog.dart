@@ -31,14 +31,14 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
   }
 
   void openAccountPage(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.pid);
+    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => const AccountDetailsPage(),
     ));
   }
 
   void openPaymentPage(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.pid);
+    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => const PaymentDetailsPage(),
     ));
@@ -46,9 +46,10 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
 
   @override
   Widget build(BuildContext context) {
-    final category = ref.watch(provider.categories).where((item) => item.pid == widget.data.category).first;
-    final account = ref.watch(provider.accounts).where((item) => item.pid == widget.data.accountId).first;
-    final payments = ref.watch(provider.payments).where((item) => item.pid == widget.data.paymentId);
+    final category = ref.watch(provider.categories).where((item) => item.uuid == widget.data.categoryId).first;
+    final account = ref.watch(provider.accounts).where((item) => item.uuid == widget.data.accountId).first;
+    final payments = ref.watch(provider.payments).where((item) => item.uuid == widget.data.paymentId);
+    final currency = provider.getCurrency(ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
     final hasAlt = widget.data.altAmount != null;
     return AlertDialog(
       content: SizedBox(
@@ -105,8 +106,8 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
               ),
               if (payments.isNotEmpty)
                 Visibility(
-                  visible: widget.data.paymentId != Payment.unknown.pid
-                      && widget.data.paymentId != Payment.none.pid,
+                  visible: widget.data.paymentId != Payment.unknown.uuid
+                      && widget.data.paymentId != Payment.none.uuid,
                   child: Tooltip(
                     message: payments.first.serialNumber,
                     child: ListTile(
@@ -123,13 +124,6 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                 child: ListTile(
                   leading: const Icon(Icons.calendar_today_outlined),
                   title: Text(DateFormat.yMd().format(widget.data.paidDate)),
-                ),
-              ),
-              Tooltip(
-                message: LocaleKeys.createdDate.tr(),
-                child: ListTile(
-                  leading: const Icon(Icons.add_circle_outline_outlined),
-                  title: Text(DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(widget.data.pid))),
                 ),
               ),
               Tooltip(

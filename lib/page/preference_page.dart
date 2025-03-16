@@ -105,7 +105,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     if (currency == null) {
       return;
     }
-    await set(PreferenceKeys.defaultCurrency, currency.value);
+    await set(PreferenceKeys.defaultCurrency, currency.uuid);
   }
 
   /// Triggers on default currency preference pressed
@@ -134,10 +134,10 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
             final Map map = pref.value;
             // Remove old
             if (currency != Currency.unknown) {
-              map.remove(currency.value);
+              map.remove(currency.uuid);
               set(key, map);
             }
-            map[cur.value] = value;
+            map[cur.uuid] = value;
             set(key, map);
           }
           Navigator.pop(context);
@@ -147,7 +147,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           // Check edit mode
           if (pref != null && amount != null) {
             final map = pref.value as Map;
-            map.remove(currency.value);
+            map.remove(currency.uuid);
             set(key, map);
           }
           Navigator.pop(context);
@@ -175,10 +175,10 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
             final Map map = pref.value;
             // Remove old
             if (currency != Currency.unknown) {
-              map.remove(currency.value);
+              map.remove(currency.uuid);
               set(key, map);
             }
-            map[cur.value] = {
+            map[cur.uuid] = {
               ModelKeys.keyDate: date,
               ModelKeys.keyAmount: value,
             };
@@ -191,7 +191,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           // Check edit mode
           if (pref != null && amount != null) {
             final map = pref.value as Map;
-            map.remove(currency.value);
+            map.remove(currency.uuid);
             set(key, map);
           }
           Navigator.pop(context);
@@ -233,7 +233,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                   ),
                   PreferenceTile(
                     title: LocaleKeys.preferenceDefaultCurrency.tr(),
-                    subtitle: Currency.fromValue(provider.getDefaultCurrency(ref).value).key.tr(),
+                    subtitle: provider.getDefaultCurrency(ref).key.tr(),
                     onTap: () => onDefaultCurrencyPressed(context),
                   ),
                   PreferenceTile(
@@ -255,9 +255,9 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     shrinkWrap: true,
                     itemCount: budgets.keys.length,
                     itemBuilder: (context, index) {
-                      final key = budgets.keys.toList(growable: false)[index];
-                      final value = budgets[key];
-                      final currency = Currency.fromValue(key);
+                      final uuid = budgets.keys.toList(growable: false)[index];
+                      final value = budgets[uuid];
+                      final currency = provider.getCurrency(ref, uuid);
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
@@ -280,11 +280,11 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     shrinkWrap: true,
                     itemCount: targetBalances.keys.length,
                     itemBuilder: (context, index) {
-                      final key = targetBalances.keys.toList(growable: false)[index];
-                      final target = targetBalances[key] ?? {};
+                      final uuid = targetBalances.keys.toList(growable: false)[index];
+                      final target = targetBalances[uuid] ?? {};
                       final date = target[ModelKeys.keyDate] ?? DateTime.now();
                       final value = target[ModelKeys.keyAmount];
-                      final currency = Currency.fromValue(key);
+                      final currency = provider.getCurrency(ref, uuid);
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),

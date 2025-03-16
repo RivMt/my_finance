@@ -60,9 +60,9 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
   }
 
   Future<void> refresh() async {
-    provider.fetchTransactions(ref, [{
-      ModelKeys.keyPaymentID: ref.watch(local_provider.selectedPayment),
-    }]);
+    provider.fetchTransactions(ref, {
+      ModelKeys.keyPaymentId: ref.watch(local_provider.selectedPayment),
+    });
     provider.refreshPayments(ref);
   }
 
@@ -105,14 +105,14 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final payment = ref.watch(provider.payments).firstWhere((element) => element.pid == ref.watch(local_provider.selectedPayment));
+    final payment = ref.watch(provider.payments).firstWhere((element) => element.uuid == ref.watch(local_provider.selectedPayment));
     final transactions = ref.watch(_filteredTransactions);
     final total = transactions.fold(Decimal.zero, (previousValue, element) {
-      if (payment.currency == element.currency) {
+      if (payment.currencyId == element.currencyId) {
         return previousValue + element.amount;
-      } else if (payment.currency == element.altCurrency) {
+      } else if (payment.currencyId == element.altCurrencyId) {
         if (element.altAmount == null) {
-          Log.w(_tag, "Transaction ${element.pid} - Null AltAmount");
+          Log.w(_tag, "Transaction ${element.uuid} - Null AltAmount");
         }
         return previousValue + (element.altAmount ?? Decimal.zero);
       }

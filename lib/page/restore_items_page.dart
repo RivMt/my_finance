@@ -59,9 +59,9 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   }];
 
   /// Restore [item]
-  Future<ApiResponse<List<T>>> restoreItem<T extends WalletItem>(T item) async {
+  Future<ApiResponse<T>> restoreItem<T extends WalletItem>(T item) async {
     item.deleted = false;
-    return await ApiClient().update<T>([item.map]);
+    return await ApiClient().update<T>(item.map);
   }
 
   /// Change index of [pageController] by index of [tabController]

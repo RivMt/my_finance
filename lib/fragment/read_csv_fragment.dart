@@ -106,7 +106,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     if (account == Account.unknown
         || payment == Payment.unknown
         || minusCategory == Category.unknown
-        || payment.currency != account.currency
+        || payment.currencyId != account.currencyId
     ) {
       return [];
     }
@@ -130,17 +130,17 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
           continue;
         }
         item.setAccount(account);
-        item.currency = account.currency;
+        item.currencyId = account.currencyId;
         item.setPayment(payment);
         item.calculatedDate = payment.getCalculatedDate(item.paidDate);
         item.amount = parseAmount(row[columnAmount]);
         if (item.amount < Decimal.zero) {
-          item.category = minusCategory.pid;
+          item.categoryId = minusCategory.uuid;
           item.type = minusCategory.type;
           item.isIncluded = minusCategory.isIncluded;
           item.amount *= Decimal.fromInt(-1);
         } else {
-          item.category = plusCategory.pid;
+          item.categoryId = plusCategory.uuid;
           item.type = plusCategory.type;
           item.isIncluded = plusCategory.isIncluded;
         }

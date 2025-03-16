@@ -98,7 +98,7 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
     return TransactionCard(
       data: data,
       category: categories.firstWhere((element) {
-        return element.type == data.type && element.pid == data.category;
+        return element.type == data.type && element.uuid == data.categoryId;
       }, orElse: () => Category.unknown),
       isPaid: data.calculatedDate.compareTo(DateTime.now()) <= 0,
       onTap: () => showTransactionDetailsDialog(context, data),

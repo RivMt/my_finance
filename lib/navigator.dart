@@ -58,13 +58,13 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
   Widget? getPage() {
     if (currentConfiguration.path == FinanceRoutePath.accounts.path) {
       // Accounts
-      final pid = currentConfiguration.pid;
+      final pid = currentConfiguration.uuid;
       if (pid != null) {
         return const AccountDetailsPage();
       }
     } else if (currentConfiguration.path == FinanceRoutePath.payments.path) {
       // Payments
-      final pid = currentConfiguration.pid;
+      final pid = currentConfiguration.uuid;
       if (pid != null) {
         return const PaymentDetailsPage();
       }

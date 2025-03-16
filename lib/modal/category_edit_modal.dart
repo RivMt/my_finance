@@ -79,7 +79,7 @@ class _CategoryEditModalState extends State<CategoryEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Category>> result = await ApiClient().delete([widget.base!.map]);
+    final ApiResponse<List<Category>> result = await ApiClient().delete(widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -94,9 +94,9 @@ class _CategoryEditModalState extends State<CategoryEditModal> {
     late ApiResponse<List<Category>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update([editing.map]);
+      result = await ApiClient().update(editing.map);
     } else {
-      result = await ApiClient().create([editing.map]);
+      result = await ApiClient().create(editing.map);
     }
     // Check
     if (result.result != ApiResultCode.success || result.data.length != 1) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "CsvPage";
@@ -46,9 +47,9 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     setState(() {
       progressing = true;
     });
-    ref.read(_transactions.notifier).request([], {}, {
-      "min": minDate.millisecondsSinceEpoch,
-      "max": maxDate.millisecondsSinceEpoch,
+    ref.read(_transactions.notifier).request({
+      ApiQuery.keyQueryRangeBegin: minDate.toIso8601String(),
+      ApiQuery.keyQueryRangeEnd: maxDate.toIso8601String(),
     });
     setState(() {
       progressing = false;
@@ -74,16 +75,18 @@ class _CsvPageState extends ConsumerState<CsvPage> {
           assert(type is int);
           return TransactionType.fromCode(type).key.tr();
         },
-        ModelKeys.keyCurrency: (value) {
-          assert(value is int);
-          return Currency.fromValue(value).key.tr();
+        ModelKeys.keyCurrencyId: (value) {
+          assert(value is String);
+          final currency = provider.getCurrency(ref, value);
+          return currency.key.tr();
         },
-        ModelKeys.keyAltCurrency: (alt) {
-          assert(alt is int?);
+        ModelKeys.keyAltCurrencyId: (alt) {
+          assert(alt is String?);
           if (alt == null) {
             return "";
           }
-          return Currency.fromValue(alt).key.tr();
+          final currency = provider.getCurrency(ref, alt);
+          return currency.key.tr();
         },
         ModelKeys.keyPaidDate: (date) {
           assert(date is int);
@@ -195,22 +198,24 @@ class _CsvPageState extends ConsumerState<CsvPage> {
                     }),
                     rows: List.generate(transactions.length, (index) {
                       final item = transactions[index];
+                      final currency = provider.getCurrency(ref, item.currencyId);
+                      final altCurrency = provider.getCurrency(ref, item.altCurrencyId);
                       return DataRow(
                         cells: [
-                          DataCell(Text(item.pid.toString())),
+                          DataCell(Text(item.uuid.toString())),
                           DataCell(Text(item.type.key.tr())),
                           DataCell(Text(item.categoryName)),
                           DataCell(Text(item.accountName)),
                           DataCell(Text(item.paymentName)),
-                          DataCell(Text(item.currency.code)),
-                          DataCell(Text(item.currency.format(item.amount))),
-                          DataCell(Text(item.altCurrency == null
+                          DataCell(Text(item.currencyId)),
+                          DataCell(Text(currency.format(item.amount))),
+                          DataCell(Text(item.altCurrencyId == null
                               ? ""
-                              : item.altCurrency!.code)
+                              : item.altCurrencyId!)
                           ),
-                          DataCell(Text(item.altAmount == null || item.altCurrency == null
+                          DataCell(Text(item.altAmount == null || item.altCurrencyId == null
                               ? ""
-                              : item.altCurrency!.format(item.altAmount!))
+                              : altCurrency.format(item.altAmount!))
                           ),
                           DataCell(Text(DateFormat.yMd().format(item.paidDate))),
                           DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),

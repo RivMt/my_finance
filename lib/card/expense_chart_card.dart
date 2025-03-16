@@ -21,7 +21,7 @@ final _expenseTransactions = Provider<StatefulData<Map<Category, Decimal>>>((ref
     return !item.deleted
         && item.type == TransactionType.expense
         && item.isIncluded
-        && item.currency == currency
+        && item.currencyId == currency.uuid
         && item.paidDate.compareTo(begin) >= 0
         && item.paidDate.compareTo(end) == -1;
   }).toList();
@@ -34,7 +34,7 @@ final _expenseTransactions = Provider<StatefulData<Map<Category, Decimal>>>((ref
   }
   Map<Category, Decimal> map = {};
   for(Transaction item in list) {
-    final Category category = categories.firstWhere((element) => element.pid == item.category, orElse: () => Category.unknown);
+    final Category category = categories.firstWhere((element) => element.uuid == item.categoryId, orElse: () => Category.unknown);
     if (map[category] == null) {
       map[category] = Decimal.zero;
     }

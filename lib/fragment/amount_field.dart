@@ -69,7 +69,7 @@ class _AmountFieldState extends State<AmountField> {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.numberWithOptions(
-        decimal: widget.currency.decimalDigits > 0,
+        decimal: widget.currency.decimalPoint > 0,
       ),
       decoration: InputDecoration(
         labelText: widget.label,

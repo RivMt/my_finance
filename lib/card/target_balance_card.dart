@@ -18,13 +18,13 @@ final _target = Provider<_TargetType?>((ref) {
   final targets = provider.getPreference(ref, PreferenceKeys.targetBalance);
   final currency = provider.getDefaultCurrency(ref);
   if (targets == null ||
-      !targets.containsKey(currency.value) ||
-      !targets[currency.value]!.containsKey(ModelKeys.keyDate) ||
-      !targets[currency.value]!.containsKey(ModelKeys.keyAmount)
+      !targets.containsKey(currency.uuid) ||
+      !targets[currency.uuid]!.containsKey(ModelKeys.keyDate) ||
+      !targets[currency.uuid]!.containsKey(ModelKeys.keyAmount)
   ) {
     return null;
   }
-  return targets[currency.value];
+  return targets[currency.uuid];
 });
 
 final _dateNow = DateTime.now();
@@ -45,7 +45,7 @@ final _transactions = Provider<List<Transaction>>((ref) {
     return !item.deleted
         && item.calculatedDate.compareTo(_dateBegin) >= 0
         && item.calculatedDate.compareTo(ref.watch(_dateEnd)) == -1
-        && item.currency == currency;
+        && item.currencyId == currency.uuid;
   }).toList();
 });
 
@@ -70,7 +70,7 @@ final _balance = Provider<Decimal>((ref) {
   final accounts = ref.watch(provider.accounts);
   final currency = provider.getDefaultCurrency(ref);
   return accounts.fold(Decimal.zero, (prev, item) {
-    if (item.currency == currency && !item.deleted) {
+    if (item.currencyId == currency.uuid && !item.deleted) {
       return prev + item.balance;
     }
     return prev;

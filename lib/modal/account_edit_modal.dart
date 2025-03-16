@@ -136,7 +136,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Account>> result = await ApiClient().delete([widget.base!.map]);
+    final ApiResponse<List<Account>> result = await ApiClient().delete(widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -151,9 +151,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     late ApiResponse<List<Account>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update([editing.map]);
+      result = await ApiClient().update(editing.map);
     } else {
-      result = await ApiClient().create([editing.map]);
+      result = await ApiClient().create(editing.map);
     }
     // Check
     if (result.result != ApiResultCode.success || result.data.length != 1) {
@@ -181,8 +181,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Triggers on limitation changed
   void onLimitationChanged(String value) {
+    final currency = provider.getCurrency(ref, editing.currencyId);
     setState(() {
-      if (editing.regex.hasMatch(value)) {
+      if (WalletItem.getAmountRegex(currency).hasMatch(value)) {
         if (value != "") {
           editing.limitation = Decimal.parse(value);
         }
@@ -209,11 +210,11 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     final currency = await showSelectDialog<Currency>(
       context,
       LocaleKeys.icon.tr(),
-      Currency.values,
+      currencies,
     );
     if (currency != null) {
       setState(() {
-        editing.currency = currency;
+        editing.currencyId = currency.uuid;
       });
     }
   }
@@ -252,6 +253,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   @override
   Widget build(BuildContext context) {
+    final currency = provider.getCurrency(ref, editing.currencyId);
     return Modal(
       ready: ready,
       title: LocaleKeys.object_action.tr(namedArgs: {
@@ -299,15 +301,15 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
           TextField(
             controller: limitationController,
             keyboardType: TextInputType.numberWithOptions(
-              decimal: editing.currency.decimalDigits > 0,
+              decimal: currency.decimalPoint > 0,
             ),
             decoration: InputDecoration(
               labelText: LocaleKeys.limitation.tr(),
               prefixIcon: IconButton(
-                icon: Icon(editing.currency.icon),
+                icon: Icon(currency.icon),
                 onPressed: () => onCurrencyButtonPressed(),
               ),
-              errorText: editing.regex.hasMatch(limitationController.text)
+              errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput,
             ),
