@@ -55,22 +55,23 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
     });
     bool failed = false;
     String message = "";
-    final List<Map<String, dynamic>> list = [];
+    final List<Transaction> list = [];
     for(final Transaction item in transactions) {
       if (!item.isValid) {
         failed = true;
         message = "ItemInvalid";
         break;
       }
-      list.add(item.map);
+      list.add(item);
     }
     if (!failed) {
-      final ApiResponse<List<Transaction>> response = await ApiClient().create(
-          list);
-      Log.v(_tag, "Send CSV record: ${response.result.name}");
-      if (response.result != ApiResultCode.success) {
-        failed = true;
-        message = "RequestFailed";
+      for (Transaction item in list) {
+        final ApiResponse<Transaction> response = await ApiClient().create(item.map);
+        Log.v(_tag, "Send CSV record (${item.uuid}): ${response.result.name}");
+        if (response.result != ApiResultCode.success) {
+          failed = true;
+          message = "RequestFailed";
+        }
       }
     }
     setState(() {

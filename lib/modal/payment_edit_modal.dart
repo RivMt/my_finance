@@ -89,7 +89,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                 switch(T) {
                   case Currency:
                     title = (item as Currency).key.tr();
-                    icon = Icon(item.icon);
+                    icon = CurrencyIcon(item);
                     break;
                   case PaymentSymbol:
                     title = (item as PaymentSymbol).key.tr();
@@ -207,10 +207,11 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
 
   /// Triggers on [Currency] button pressed
   void onCurrencyButtonPressed() async {
+    final currencies = ref.watch(provider.currencies);
     final currency = await showSelectDialog<Currency>(
       context,
       LocaleKeys.icon.tr(),
-      Currency.values,
+      currencies,
     );
     if (currency != null) {
       setState(() {
@@ -335,7 +336,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             decoration: InputDecoration(
               labelText: LocaleKeys.limitation.tr(),
               prefixIcon: IconButton(
-                icon: Icon(currency.icon),
+                icon: CurrencyIcon(currency),
                 onPressed: () => onCurrencyButtonPressed(),
               ),
               errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)

@@ -49,8 +49,9 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
     final category = ref.watch(provider.categories).where((item) => item.uuid == widget.data.categoryId).first;
     final account = ref.watch(provider.accounts).where((item) => item.uuid == widget.data.accountId).first;
     final payments = ref.watch(provider.payments).where((item) => item.uuid == widget.data.paymentId);
-    final currency = provider.getCurrency(ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
     final hasAlt = widget.data.altAmount != null;
+    final primaryCurrency = provider.getCurrency(ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
+    final secondaryCurrency = provider.getCurrency(ref, widget.data.currencyId);
     return AlertDialog(
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
@@ -60,7 +61,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
             children: [
               // Amount (Primary)
               ListTile(
-                leading: Icon((hasAlt ? widget.data.altCurrency! : widget.data.currency).icon),
+                leading: CurrencyIcon(primaryCurrency),
                 title: Text(
                   (hasAlt ? widget.data.altAmount : widget.data.amount).toString(),
                   style: Theme.of(context).textTheme.displayLarge,
@@ -70,7 +71,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
               Visibility(
                 visible: hasAlt,
                 child: ListTile(
-                  leading: Icon(widget.data.currency.icon),
+                  leading: CurrencyIcon(secondaryCurrency),
                   title: Text(
                     widget.data.amount.toString(),
                     style: Theme.of(context).textTheme.displayMedium,

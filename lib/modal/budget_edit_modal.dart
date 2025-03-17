@@ -10,7 +10,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 class BudgetEditModal extends ConsumerStatefulWidget {
   const BudgetEditModal({
     super.key,
-    this.currency = Currency.unknown,
+    this.currencyId = Currency.unknownUuid,
     this.value,
     required this.onConfirmButtonPressed,
     required this.onNegativeButtonPressed,
@@ -18,11 +18,11 @@ class BudgetEditModal extends ConsumerStatefulWidget {
 
   final Decimal? value;
 
-  final Currency currency;
+  final String currencyId;
 
   final Function() onNegativeButtonPressed;
 
-  final Function(Currency, Decimal) onConfirmButtonPressed;
+  final Function(String, Decimal) onConfirmButtonPressed;
 
   @override
   ConsumerState createState() => _BudgetEditModalState();
@@ -39,12 +39,12 @@ class _BudgetEditModalState extends ConsumerState<BudgetEditModal> {
   Decimal amount = Decimal.zero;
 
   /// Selected [Currency]
-  Currency currency = Currency.unknown;
+  String currencyId = Currency.unknownUuid;
 
   /// Triggers on currency changed
   void onCurrencyChanged(Currency currency) {
     setState(() {
-      this.currency = currency;
+      currencyId = currency.uuid;
     });
   }
 
@@ -57,7 +57,7 @@ class _BudgetEditModalState extends ConsumerState<BudgetEditModal> {
 
   /// Triggers on positive button pressed
   Future<bool> onPos() async {
-    widget.onConfirmButtonPressed(currency, amount);
+    widget.onConfirmButtonPressed(currencyId, amount);
     return true;
   }
 
@@ -71,7 +71,7 @@ class _BudgetEditModalState extends ConsumerState<BudgetEditModal> {
   void initState() {
     super.initState();
     amount = widget.value ?? Decimal.zero;
-    currency = widget.currency;
+    currencyId = widget.currencyId;
   }
 
   @override
@@ -99,7 +99,7 @@ class _BudgetEditModalState extends ConsumerState<BudgetEditModal> {
           // Limitation
           AmountField(
             label: LocaleKeys.limitation.tr(),
-            currency: currency,
+            currencyId: currencyId,
             amount: amount,
             onCurrencyChanged: onCurrencyChanged,
             onAmountChanged: onBudgetChanged,

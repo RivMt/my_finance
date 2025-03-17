@@ -119,25 +119,25 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
 
   /// Triggers on budget add pressed
   void addOrEditBudget(BuildContext context, String key, [
-    Currency currency = Currency.unknown,
+    String currencyId = Currency.unknownUuid,
     Decimal? amount,
   ]) async {
     // Show modal
     showModal(
       child: BudgetEditModal(
         value: amount,
-        currency: currency,
-        onConfirmButtonPressed: (cur, value) {
+        currencyId: currencyId,
+        onConfirmButtonPressed: (uuid, value) {
           final pref = ref.watch(provider.preferences)[key];
           // Update
           if (pref != null) {
             final Map map = pref.value;
             // Remove old
-            if (currency != Currency.unknown) {
-              map.remove(currency.uuid);
+            if (currencyId != Currency.unknownUuid) {
+              map.remove(currencyId);
               set(key, map);
             }
-            map[cur.uuid] = value;
+            map[uuid] = value;
             set(key, map);
           }
           Navigator.pop(context);
@@ -147,7 +147,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           // Check edit mode
           if (pref != null && amount != null) {
             final map = pref.value as Map;
-            map.remove(currency.uuid);
+            map.remove(currencyId);
             set(key, map);
           }
           Navigator.pop(context);
@@ -159,26 +159,26 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   /// Triggers on target balance add pressed
   void addOrEditTargetBalance(BuildContext context, String key, [
     DateTime? date,
-    Currency currency = Currency.unknown,
+    String currencyId = Currency.unknownUuid,
     Decimal? amount,
   ]) async {
     // Show modal
     showModal(
       child: TargetBalanceEditModal(
         date: date,
-        currency: currency,
+        currencyId: currencyId,
         value: amount,
-        onConfirmButtonPressed: (date, cur, value) {
+        onConfirmButtonPressed: (date, uuid, value) {
           final pref = ref.watch(provider.preferences)[key];
           // Update
           if (pref != null) {
             final Map map = pref.value;
             // Remove old
-            if (currency != Currency.unknown) {
-              map.remove(currency.uuid);
+            if (currencyId != Currency.unknownUuid) {
+              map.remove(currencyId);
               set(key, map);
             }
-            map[cur.uuid] = {
+            map[uuid] = {
               ModelKeys.keyDate: date,
               ModelKeys.keyAmount: value,
             };
@@ -191,7 +191,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           // Check edit mode
           if (pref != null && amount != null) {
             final map = pref.value as Map;
-            map.remove(currency.uuid);
+            map.remove(currencyId);
             set(key, map);
           }
           Navigator.pop(context);
@@ -261,7 +261,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       return PreferenceTile(
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => addOrEditBudget(context, PreferenceKeys.budgets, currency, value),
+                        onTap: () => addOrEditBudget(context, PreferenceKeys.budgets, uuid, value),
                       );
                     },
                   ),
@@ -289,7 +289,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                         title: currency.key.tr(),
                         subtitle: currency.format(value ?? Decimal.zero),
                         trailing: Text(LocaleKeys.nToDate.tr(args: [DateFormat.yMd().format(date)])),
-                        onTap: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance, date, currency, value),
+                        onTap: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance, date, uuid, value),
                       );
                     },
                   ),

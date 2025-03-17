@@ -1,21 +1,23 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class AmountField extends StatefulWidget {
+class AmountField extends ConsumerStatefulWidget {
   const AmountField({
     super.key,
-    this.currency = Currency.unknown,
+    this.currencyId = Currency.unknownUuid,
     this.label = "",
     required this.amount,
     required this.onCurrencyChanged,
     required this.onAmountChanged,
   });
 
-  final Currency currency;
+  final String currencyId;
 
   final Decimal amount;
 
@@ -26,17 +28,20 @@ class AmountField extends StatefulWidget {
   final Function(Decimal) onAmountChanged;
 
   @override
-  State createState() => _AmountFieldState();
+  ConsumerState createState() => _AmountFieldState();
 
 }
 
-class _AmountFieldState extends State<AmountField> {
+class _AmountFieldState extends ConsumerState<AmountField> {
 
   /// [TextEditingController] for budget amount
   final controller = TextEditingController();
 
+  /// Currency
+  Currency get currency => provider.getCurrency(ref, widget.currencyId);
+
   /// [RegExp] for verify amount
-  RegExp get regex => WalletItem.getAmountRegex(widget.currency);
+  RegExp get regex => WalletItem.getAmountRegex(currency);
 
   /// Show currency selection dialog
   void onCurrencyPressed(BuildContext context) async {
@@ -69,12 +74,12 @@ class _AmountFieldState extends State<AmountField> {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.numberWithOptions(
-        decimal: widget.currency.decimalPoint > 0,
+        decimal: currency.decimalPoint > 0,
       ),
       decoration: InputDecoration(
         labelText: widget.label,
         prefix: IconButton(
-          icon: Icon(widget.currency.icon),
+          icon: CurrencyIcon(currency),
           onPressed: () => onCurrencyPressed(context),
         ),
         errorText: regex.hasMatch(controller.text)

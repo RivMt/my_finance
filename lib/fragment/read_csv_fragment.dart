@@ -324,39 +324,45 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   /// Request
   void request() async {
     // Account
-    await ref.read(_accounts.notifier).request([{
+    await ref.read(_accounts.notifier).request({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
-        "min": 0,
+        ApiQuery.keyQueryRangeBegin: 0,
       },
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyLastUsed, SortType.desc),
+      ApiQuery.keySortField: [
+        ModelKeys.keyLastUsed,
       ],
-    ));
+      ApiQuery.keySortOrder: [
+        SortOrder.desc,
+      ]
+    });
     final account = this.account;
     setAccount(account);
     // Payment
-    await ref.read(_payments.notifier).request([{
+    await ref.read(_payments.notifier).request({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
-        "min": 0,
+        ApiQuery.keyQueryRangeBegin: 0,
       },
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyLastUsed, SortType.desc),
+      ApiQuery.keySortField: [
+        ModelKeys.keyLastUsed,
       ],
-    ));
+      ApiQuery.keySortOrder: [
+        SortOrder.desc,
+      ]
+    });
     final payment = this.payment;
     setPayment(payment);
     // Category
-    await ref.read(_categories.notifier).request([{
+    await ref.read(_categories.notifier).request({
       ModelKeys.keyDeleted: false,
-    }], ApiClient.buildOptions(
-      sorts: [
-        const Sort(ModelKeys.keyPid, SortType.asc),
+      ApiQuery.keySortField: [
+        ModelKeys.keyUuid,
       ],
-    ));
+      ApiQuery.keySortOrder: [
+        SortOrder.asc,
+      ]
+    });
   }
 
   @override

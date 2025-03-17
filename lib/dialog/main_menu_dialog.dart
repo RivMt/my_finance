@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
@@ -12,7 +12,7 @@ import 'package:my_finance/page/read_csv_page.dart';
 import 'package:my_finance/page/restore_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 
-class MainMenuDialog extends StatefulWidget {
+class MainMenuDialog extends ConsumerStatefulWidget {
   const MainMenuDialog({
     super.key,
     required this.router,
@@ -27,10 +27,10 @@ class MainMenuDialog extends StatefulWidget {
   final Function()? onRefreshPressed;
 
   @override
-  State createState() => _MainMenuDialogState();
+  ConsumerState createState() => _MainMenuDialogState();
 }
 
-class _MainMenuDialogState extends State<MainMenuDialog> {
+class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
 
   /// Check host platform is desktop or not
 
@@ -45,16 +45,6 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
     });
   }
 
-  /// Triggers on test mode tile tapped
-  void onTestModeTapped() async {
-    final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
-    await ApiClient().init(
-      onLoginRequired: () {},
-      preferences: prefs,
-    );
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -66,11 +56,8 @@ class _MainMenuDialogState extends State<MainMenuDialog> {
           children: [
             // User
             UserCard(
-              user: ApiClient().user,
+              user: ref.watch(provider.currentUser),
               onTap: widget.onAccountButtonPressed,
-              onLongPress: () => openPage(LoginPage(
-                router: widget.router,
-              )),
             ),
             const Divider(),
             // Refresh

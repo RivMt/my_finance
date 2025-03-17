@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
@@ -122,29 +119,22 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   /// Refresh all data
-  void refreshAll() async {
-    // Login or authenticate
-    try {
-      final Map<String, dynamic> prefs = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
-      await client.init(
-        onLoginRequired: () => openPage(RoutePath.login, (value) => refresh()),
-        preferences: prefs,
-      );
-      // Refresh providers
-      provider.refreshAccounts(ref);
-      provider.refreshPayments(ref);
-      provider.refreshCategories(ref);
-      provider.syncPreferences(ref, provider.initFinancePreference);
-    } on Exception catch(e) {
-      Log.e(_tag, "Error: $e");
-      return;
+  void refresh() async {
+    // Check user is valid or not
+    if (!ref.watch(provider.currentUser).isValid) {
+      client.login(ref);
     }
-    // Refresh widgets
-    refresh();
+    // Refresh providers
+    provider.refreshAccounts(ref);
+    provider.refreshPayments(ref);
+    provider.refreshCategories(ref);
+    provider.syncPreferences(ref, provider.initFinancePreference);
+    // Fetch transactions
+    fetch();
   }
 
   /// Refresh transaction data
-  void refresh() async {
+  void fetch() async {
     // Request
     final now = DateTime.now();
     provider.fetchTransactions(ref, {
@@ -179,7 +169,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       context: context,
       builder: (context) => MainMenuDialog(
         router: widget.router,
-        onRefreshPressed: refreshAll,
+        onRefreshPressed: refresh,
       ),
     );
   }
@@ -187,7 +177,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Triggers on transaction created
   void onTransactionCreated(Transaction? transaction) {
     if (transaction != null) {
-      refresh();
+      fetch();
     }
   }
 
@@ -216,7 +206,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    refreshAll();
+    refresh();
   }
 
   @override

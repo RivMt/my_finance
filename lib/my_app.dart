@@ -1,3 +1,7 @@
+
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -5,10 +9,16 @@ import 'package:my_api/core.dart';
 import 'package:my_finance/navigator.dart';
 
 class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.preferences,
+  });
+
+  final Map<String, String> preferences;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ApiClient().init(preferences);
     final brightness = Theme.of(context).brightness;
     AppTheme.isDarkMode = brightness == Brightness.dark;
     return MaterialApp.router(

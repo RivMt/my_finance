@@ -302,8 +302,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Triggers on alt amount changed
   void onAltAmountChanged(String value) {
+    final currency = provider.getCurrency(ref, editing.altCurrencyId);
     setState(() {
-      if (editing.regex.hasMatch(value)) {
+      if (Transaction.getAmountRegex(currency).hasMatch(value)) {
         if (value != "") {
           editing.altAmount = Decimal.parse(value);
         }
@@ -313,8 +314,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Triggers on amount changed
   void onAmountChanged(String value) {
+    final currency = provider.getCurrency(ref, editing.currencyId);
     setState(() {
-      if (editing.regex.hasMatch(value)) {
+      if (Transaction.getAmountRegex(currency).hasMatch(value)) {
         if (value != "") {
           editing.amount = Decimal.parse(value);
         }
@@ -532,7 +534,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.paidAmount.tr(),
-                prefixIcon: Icon(altCurrency == Currency.unknown ? CurrencySymbol.sign : altCurrency.icon),
+                prefixIcon: CurrencyIcon(altCurrency),
                 errorText: Transaction.getAmountRegex(altCurrency).hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput,
@@ -552,7 +554,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ),
             decoration: InputDecoration(
               labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
-              prefixIcon: Icon(currency.icon),
+              prefixIcon: CurrencyIcon(currency),
               errorText: Transaction.getAmountRegex(currency).hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput,

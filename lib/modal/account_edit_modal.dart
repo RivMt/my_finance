@@ -89,7 +89,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
                 switch(T) {
                   case Currency:
                     title = (item as Currency).key.tr();
-                    icon = Icon(item.icon);
+                    icon = CurrencyIcon(item);
                     break;
                   case AccountSymbol:
                     title = (item as AccountSymbol).key.tr();
@@ -207,6 +207,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Triggers on [Currency] button pressed
   void onCurrencyButtonPressed() async {
+    final currencies = ref.watch(provider.currencies);
     final currency = await showSelectDialog<Currency>(
       context,
       LocaleKeys.icon.tr(),
@@ -306,7 +307,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             decoration: InputDecoration(
               labelText: LocaleKeys.limitation.tr(),
               prefixIcon: IconButton(
-                icon: Icon(currency.icon),
+                icon: CurrencyIcon(currency),
                 onPressed: () => onCurrencyButtonPressed(),
               ),
               errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)
