@@ -122,7 +122,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void refresh() async {
     // Check user is valid or not
     if (!ref.watch(provider.currentUser).isValid) {
-      client.login(ref);
+      await client.login(ref);
     }
     // Refresh providers
     provider.refreshAccounts(ref);

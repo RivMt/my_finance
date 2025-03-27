@@ -12,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   usePathUrlStrategy();
-  final preferences = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
+  final Map<String, dynamic> preferences = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
 
   // Run
   runApp(ProviderScope(

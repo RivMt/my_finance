@@ -14,7 +14,7 @@ class MyApp extends ConsumerWidget {
     required this.preferences,
   });
 
-  final Map<String, String> preferences;
+  final Map<String, dynamic> preferences;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
