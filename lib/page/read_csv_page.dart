@@ -66,7 +66,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
     }
     if (!failed) {
       for (Transaction item in list) {
-        final ApiResponse<Transaction> response = await ApiClient().create(item.map);
+        final ApiResponse<Transaction> response = await ApiClient().create(Transaction.endpoint, item.map);
         Log.v(_tag, "Send CSV record (${item.uuid}): ${response.result.name}");
         if (response.result != ApiResultCode.success) {
           failed = true;

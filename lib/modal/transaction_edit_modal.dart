@@ -45,15 +45,15 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
 });
 
 final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, 0);
+  return ModelState<int>(ref, "", 0);
 });
 
 final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, 1000);
+  return ModelState<int>(ref, "", 1000);
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+  return ModelState<String>(ref, "", ModelKeys.keyLastUsed);
 });
 
 const String _tag = "TransactionEditFragment";
@@ -167,7 +167,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Transaction>> result = await ApiClient().delete(widget.base!.uuid);
+    final ApiResponse<List<Transaction>> result = await ApiClient().delete(Transaction.endpoint, widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -186,10 +186,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     late ApiResponse<List<Transaction>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(editing.map);
+      result = await ApiClient().update(Transaction.endpoint, editing.map);
       Log.v(_tag, "Update: ${editing.map}");
     } else {
-      result = await ApiClient().create(editing.map);
+      result = await ApiClient().create(Transaction.endpoint, editing.map);
       Log.v(_tag, "Create: ${editing.map}");
     }
     // Check

@@ -136,7 +136,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Payment>> result = await ApiClient().delete(widget.base!.uuid);
+    final ApiResponse<List<Payment>> result = await ApiClient().delete(Payment.endpoint, widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -151,9 +151,9 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     late ApiResponse<List<Payment>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(editing.map);
+      result = await ApiClient().update(Payment.endpoint, editing.map);
     } else {
-      result = await ApiClient().create(editing.map);
+      result = await ApiClient().create(Payment.endpoint, editing.map);
     }
     // Check
     if (result.result != ApiResultCode.success || result.data.length != 1) {

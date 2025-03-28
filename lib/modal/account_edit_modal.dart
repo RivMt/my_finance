@@ -136,7 +136,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Account>> result = await ApiClient().delete(widget.base!.uuid);
+    final ApiResponse<List<Account>> result = await ApiClient().delete(Account.endpoint, widget.base!.uuid);
     // Check failed
     if (result.result != ApiResultCode.success && result.data.length != 1) {
       return false;
@@ -151,9 +151,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     late ApiResponse<List<Account>> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(editing.map);
+      result = await ApiClient().update(Account.endpoint, editing.map);
     } else {
-      result = await ApiClient().create(editing.map);
+      result = await ApiClient().create(Account.endpoint, editing.map);
     }
     // Check
     if (result.result != ApiResultCode.success || result.data.length != 1) {

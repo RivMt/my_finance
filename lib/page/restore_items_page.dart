@@ -31,7 +31,7 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+  return ModelState<String>(ref, "", ModelKeys.keyLastUsed);
 });
 
 class RestoreItemsPage extends ConsumerStatefulWidget {
@@ -61,7 +61,8 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   /// Restore [item]
   Future<ApiResponse<T>> restoreItem<T extends WalletItem>(T item) async {
     item.deleted = false;
-    return await ApiClient().update<T>(item.map);
+    final endpoint = (T == Account) ? Account.endpoint : Payment.endpoint;
+    return await ApiClient().update<T>(endpoint, item.map);
   }
 
   /// Change index of [pageController] by index of [tabController]

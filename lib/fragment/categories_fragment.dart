@@ -25,7 +25,7 @@ class CategoriesFragment extends ConsumerWidget {
 
   Future<ApiResponse> restoreItem(Category item) async {
     item.deleted = false;
-    return await ApiClient().update<Category>(item.map);
+    return await ApiClient().update<Category>(Category.endpoint, item.map);
   }
 
   void onCategoryTapped(Category category, BuildContext context, WidgetRef ref) {

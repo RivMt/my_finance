@@ -17,15 +17,15 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 const String _tag = "ReadCsvFragment";
 
 final _accounts = StateNotifierProvider<ModelsState<Account>, List<Account>>((ref) {
-  return ModelsState<Account>(ref);
+  return ModelsState<Account>(ref, Account.endpoint);
 });
 
 final _payments = StateNotifierProvider<ModelsState<Payment>, List<Payment>>((ref) {
-  return ModelsState<Payment>(ref);
+  return ModelsState<Payment>(ref, Payment.endpoint);
 });
 
 final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref);
+  return ModelsState<Category>(ref, Category.endpoint);
 });
 
 typedef OnGeneration = void Function(BuildContext context, List<Transaction> list);
