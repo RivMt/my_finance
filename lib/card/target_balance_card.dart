@@ -7,24 +7,25 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
+import 'package:my_api/core/model/preference_element.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 typedef _DataType = SplayTreeMap<DateTime, List<Decimal>>;
-typedef _TargetType = Map<dynamic, dynamic>;
+typedef _TargetType = PreferenceElement;
 
 final _target = Provider<_TargetType?>((ref) {
-  final targets = provider.getPreference(ref, PreferenceKeys.targetBalance);
-  final currency = provider.getDefaultCurrency(ref);
-  if (targets == null ||
-      !targets.containsKey(currency.uuid) ||
-      !targets[currency.uuid]!.containsKey(ModelKeys.keyDate) ||
-      !targets[currency.uuid]!.containsKey(ModelKeys.keyAmount)
+  final root = ref.watch(provider.financePreference);
+  final targets = root.get(PreferenceKeys.targetBalance, null);
+  final currency = ref.watch(provider.defaultCurrency);
+  if (!targets.containsKey(currency.uuid) ||
+      !targets.get(currency.uuid, null).containsKey(ModelKeys.keyDate) ||
+      !targets.get(currency.uuid, null).containsKey(ModelKeys.keyAmount)
   ) {
     return null;
   }
-  return targets[currency.uuid];
+  return targets.get(currency.uuid, null);
 });
 
 final _dateNow = DateTime.now();
@@ -36,11 +37,11 @@ final _dateEnd = Provider<DateTime>((ref) {
   if (target == null) {
     return DateTime(_dateNow.year, _dateNow.month + 1, 0);
   }
-  return target[ModelKeys.keyDate];
+  return target.get<DateTime>(ModelKeys.keyDate, DateTime.now()).value;
 });
 
 final _transactions = Provider<List<Transaction>>((ref) {
-  final currency = provider.getDefaultCurrency(ref);
+  final currency = ref.watch(provider.defaultCurrency);
   return ref.watch(provider.transactions).where((item) {
     return !item.deleted
         && item.calculatedDate.compareTo(_dateBegin) >= 0
@@ -68,7 +69,7 @@ final _max = Provider<List<double>>((ref) {
 
 final _balance = Provider<Decimal>((ref) {
   final accounts = ref.watch(provider.accounts);
-  final currency = provider.getDefaultCurrency(ref);
+  final currency = ref.watch(provider.defaultCurrency);
   return accounts.fold(Decimal.zero, (prev, item) {
     if (item.currencyId == currency.uuid && !item.deleted) {
       return prev + item.balance;
@@ -80,7 +81,7 @@ final _balance = Provider<Decimal>((ref) {
 final _data = Provider<StatefulData<_DataType>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
   // Get default currency
-  final currency = provider.getDefaultCurrency(ref);
+  final currency = ref.watch(provider.defaultCurrency);
   if (currency == Currency.unknown) {
     state = StatefulDataState.error(LocaleKeys.msgUnknownDefaultCurrency.tr());
   }
@@ -198,11 +199,12 @@ class TargetBalanceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Provider
-    final data = ref.watch(_data).data;
-    final state = ref.watch(_data).state;
+    final raw = ref.watch(_data);
+    final data = raw.data;
+    final state = raw.state;
     final dateEnd = ref.watch(_dateEnd);
     final balance = data[dateEnd]![4];
-    final currency = provider.getDefaultCurrency(ref);
+    final currency = ref.watch(provider.defaultCurrency);
     final target = ref.watch(_target);
     // Value scaling
     final maxes = ref.watch(_max);
@@ -212,7 +214,7 @@ class TargetBalanceCard extends ConsumerWidget {
       title: LocaleKeys.targetBalance.tr(),
       subtitle: target == null ? "" : getSubtitle(
         currency: currency,
-        target: target[ModelKeys.keyAmount],
+        target: target.get<Decimal>(ModelKeys.keyAmount, Decimal.zero).value,
         balance: balance,
       ),
       state: state,

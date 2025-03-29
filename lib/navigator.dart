@@ -73,7 +73,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       return const CategoriesPage();
     } else if (currentConfiguration.path == FinanceRoutePath.preferences.path) {
       // Preference
-      return const PreferencePage();
+      return null;//const PreferencePage();
     }
     return null;
   }

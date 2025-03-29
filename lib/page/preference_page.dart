@@ -9,7 +9,7 @@ import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/modal/budget_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/modal/target_balance_edit_modal.dart';
-
+/*
 class PreferencePage extends ConsumerStatefulWidget {
 
   static const String route = "/preferences";
@@ -302,3 +302,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 }
+
+
+
+ */

@@ -128,7 +128,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     provider.refreshAccounts(ref);
     provider.refreshPayments(ref);
     provider.refreshCategories(ref);
-    provider.syncPreferences(ref, provider.initFinancePreference);
+    provider.refreshCurrencies(ref);
+    //provider.syncPreferences(ref, provider.initFinancePreference);
     // Fetch transactions
     fetch();
   }

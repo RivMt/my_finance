@@ -8,12 +8,12 @@ import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
 
-final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
+/*final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
   return SearchState<FinanceSearchResult>(ref);
-});
+});*/
 
 final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref);
+  return ModelsState<Category>(ref, Category.endpoint);
 });
 
 class SearchFragment extends ConsumerStatefulWidget {
@@ -57,7 +57,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
   void request() async {
     // Search
-    ref.read(_search.notifier).request(widget.query);
+    //ref.read(_search.notifier).request(widget.query);
   }
 
   @override
@@ -75,7 +75,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final List<FinanceSearchResult> results = ref.watch(_search);
+    final List<FinanceSearchResult> results = [];//ref.watch(_search);
     final List<Category> categories = ref.watch(_categories);
     return ListView.builder(
       itemCount: results.length,
