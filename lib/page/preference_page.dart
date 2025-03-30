@@ -6,10 +6,37 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/currency_select_dialog.dart';
-import 'package:my_finance/modal/budget_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/modal/target_balance_edit_modal.dart';
-/*
+
+const String _tag = "PreferencePage";
+
+final _pieChartMaxEntries = Provider<int>((ref) {
+  final root = ref.watch(provider.financePreference);
+  return root.get<int>(PreferenceKeys.pieChartMaxEntries, 5).value;
+});
+
+final _targetBalances = Provider<List<Map<String, dynamic>>>((ref) {
+  final root = ref.watch(provider.financePreference);
+  final targetBalances = <Map<String, dynamic>>[];
+  root.get(PreferenceKeys.targetBalance, null).map.forEach((String uuid, map) {
+    if (map is Map<String, dynamic>) {
+      map.forEach((String date, amount) {
+        try {
+          targetBalances.add({
+            ModelKeys.keyDate: DateTime.parse(date),
+            ModelKeys.keyCurrencyId: uuid,
+            ModelKeys.keyAmount: amount,
+          });
+        } on FormatException {
+          Log.e(_tag, "Unable to parse target balance item: $date, $uuid, $amount");
+        }
+      });
+    }
+  });
+  return targetBalances;
+});
+
 class PreferencePage extends ConsumerStatefulWidget {
 
   static const String route = "/preferences";
@@ -36,22 +63,6 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setState(() {});
   }
 
-  /// Set [value] as [key] to [provider.preferences]
-  Future set(String key, dynamic value) async {
-    progressing = true;
-    await provider.setPreference(ref, key, value);
-    progressing = false;
-    return;
-  }
-
-  /// Delete [key] from server
-  Future delete(String key) async {
-    progressing = true;
-    await ref.read(provider.preferences.notifier).delete(key);
-    progressing = false;
-    return;
-  }
-
   /// Show currency selection dialog
   Future<Currency?> showCurrencySelectionDialog(BuildContext context) async {
     return await showDialog(
@@ -73,7 +84,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           children: [
             ValueEditModal(
               title: LocaleKeys.preferencePieChartMaxEntries.tr(),
-              value: (provider.getPreference<int>(ref, PreferenceKeys.pieChartMaxEntries) ?? 5).toDouble(),
+              value: ref.watch(_pieChartMaxEntries).toDouble(),
               tick: 1.0,
               isDecimal: true,
               positiveButtonTitle: LocaleKeys.confirm.tr(),
@@ -85,6 +96,30 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
+  void setPieChartMaxEntries(int value) {
+    final root = ref.watch(provider.financePreference);
+    root.set<int>(PreferenceKeys.pieChartMaxEntries, value);
+    setPreference(ref, provider.financePreference, root);
+  }
+
+  void setTargetBalance(DateTime date, Currency currency, Decimal amount) {
+    final root = ref.watch(provider.financePreference);
+    final target = root.get(PreferenceKeys.targetBalance, null).get(currency.uuid, null);
+    target.set<Decimal>(date.toIso8601String(), amount);
+    setPreference(ref, provider.financePreference, root);
+  }
+
+  void removeTargetBalance(DateTime date, Currency currency) {
+    final root = ref.watch(provider.financePreference);
+    final targets = root.get(PreferenceKeys.targetBalance, null).get(currency.uuid, null);
+    final result = targets.remove(date.toIso8601String());
+    if (result == null) {
+      Log.w(_tag, "No target balance about '${date.toIso8601String()}' -> '${currency.uuid}'");
+      return;
+    }
+    setPreference(ref, provider.financePreference, root);
+  }
+
   /// Show modal
   void showModal({required Widget child}) {
     showModalBottomSheet(
@@ -94,9 +129,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
         maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) => child,
-    ).then((value) {
-      provider.syncPreferences(ref);
-    });
+    );
   }
 
   /// Triggers on default currency preference pressed
@@ -105,7 +138,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     if (currency == null) {
       return;
     }
-    await set(PreferenceKeys.defaultCurrency, currency.uuid);
+    provider.setDefaultCurrency(ref, currency);
   }
 
   /// Triggers on default currency preference pressed
@@ -114,85 +147,30 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     if (value == null) {
       return;
     }
-    await set(PreferenceKeys.pieChartMaxEntries, value.toInt());
-  }
-
-  /// Triggers on budget add pressed
-  void addOrEditBudget(BuildContext context, String key, [
-    String currencyId = Currency.unknownUuid,
-    Decimal? amount,
-  ]) async {
-    // Show modal
-    showModal(
-      child: BudgetEditModal(
-        value: amount,
-        currencyId: currencyId,
-        onConfirmButtonPressed: (uuid, value) {
-          final pref = ref.watch(provider.preferences)[key];
-          // Update
-          if (pref != null) {
-            final Map map = pref.value;
-            // Remove old
-            if (currencyId != Currency.unknownUuid) {
-              map.remove(currencyId);
-              set(key, map);
-            }
-            map[uuid] = value;
-            set(key, map);
-          }
-          Navigator.pop(context);
-        },
-        onNegativeButtonPressed: () {
-          final pref = ref.watch(provider.preferences)[key];
-          // Check edit mode
-          if (pref != null && amount != null) {
-            final map = pref.value as Map;
-            map.remove(currencyId);
-            set(key, map);
-          }
-          Navigator.pop(context);
-        },
-      ),
-    );
+    setPieChartMaxEntries(value.toInt());
   }
 
   /// Triggers on target balance add pressed
-  void addOrEditTargetBalance(BuildContext context, String key, [
+  void addOrEditTargetBalance({
+    required BuildContext context,
     DateTime? date,
-    String currencyId = Currency.unknownUuid,
+    Currency? currency,
     Decimal? amount,
-  ]) async {
+  }) async {
     // Show modal
     showModal(
       child: TargetBalanceEditModal(
         date: date,
-        currencyId: currencyId,
-        value: amount,
-        onConfirmButtonPressed: (date, uuid, value) {
-          final pref = ref.watch(provider.preferences)[key];
-          // Update
-          if (pref != null) {
-            final Map map = pref.value;
-            // Remove old
-            if (currencyId != Currency.unknownUuid) {
-              map.remove(currencyId);
-              set(key, map);
-            }
-            map[uuid] = {
-              ModelKeys.keyDate: date,
-              ModelKeys.keyAmount: value,
-            };
-            set(key, map);
-          }
+        currency: currency,
+        amount: amount,
+        onConfirmButtonPressed: (date, currency, amount) {
+          setTargetBalance(date, currency, amount);
           Navigator.pop(context);
         },
         onNegativeButtonPressed: () {
-          final pref = ref.watch(provider.preferences)[key];
           // Check edit mode
-          if (pref != null && amount != null) {
-            final map = pref.value as Map;
-            map.remove(currencyId);
-            set(key, map);
+          if (date != null && currency != null) {
+            removeTargetBalance(date, currency);
           }
           Navigator.pop(context);
         },
@@ -203,9 +181,9 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
   @override
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
-    final budgets = provider.getPreference(ref, PreferenceKeys.budgets);
-    final targetBalances = provider.getPreference(ref, PreferenceKeys.targetBalance);
-    final pieChartMaxEntries = provider.getPreference(ref, PreferenceKeys.pieChartMaxEntries);
+    final defaultCurrency = ref.watch(provider.defaultCurrency);
+    final targetBalances = ref.watch(_targetBalances);
+    final pieChartMaxEntries = ref.watch(_pieChartMaxEntries);
     return Scaffold(
       appBar: AppBar(
         title: Text(LocaleKeys.settings.tr()),
@@ -233,7 +211,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                   ),
                   PreferenceTile(
                     title: LocaleKeys.preferenceDefaultCurrency.tr(),
-                    subtitle: provider.getDefaultCurrency(ref).key.tr(),
+                    subtitle: defaultCurrency.key.tr(),
                     onTap: () => onDefaultCurrencyPressed(context),
                   ),
                   PreferenceTile(
@@ -241,55 +219,38 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     subtitle: pieChartMaxEntries.toString(),
                     onTap: () => onPieChartMaxEntriesPressed(context),
                   ),
-                  // Budgets
-                  PreferenceHeader(
-                    title: LocaleKeys.budget.plural(1),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.add_circle_outline_outlined),
-                      color: Theme.of(context).primaryColor,
-                      onPressed: () => addOrEditBudget(context, PreferenceKeys.budgets),
-                    ),
-                  ),
-                  ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: budgets.keys.length,
-                    itemBuilder: (context, index) {
-                      final uuid = budgets.keys.toList(growable: false)[index];
-                      final value = budgets[uuid];
-                      final currency = provider.getCurrency(ref, uuid);
-                      return PreferenceTile(
-                        title: currency.key.tr(),
-                        subtitle: currency.format(value ?? Decimal.zero),
-                        onTap: () => addOrEditBudget(context, PreferenceKeys.budgets, uuid, value),
-                      );
-                    },
-                  ),
                   // Target balance
-                  // Budgets
                   PreferenceHeader(
                     title: LocaleKeys.targetBalance.tr(),
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance),
+                      onPressed: () => addOrEditTargetBalance(context: context),
                     ),
                   ),
                   ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: targetBalances.keys.length,
+                    itemCount: targetBalances.length,
                     itemBuilder: (context, index) {
-                      final uuid = targetBalances.keys.toList(growable: false)[index];
-                      final target = targetBalances[uuid] ?? {};
-                      final date = target[ModelKeys.keyDate] ?? DateTime.now();
-                      final value = target[ModelKeys.keyAmount];
+                      final target = targetBalances[index];
+                      final date = target[ModelKeys.keyDate];
+                      final amount = target[ModelKeys.keyAmount];
+                      final uuid = target[ModelKeys.keyCurrencyId];
+                      if (date == null || amount == null || uuid == null) {
+                        return const SizedBox();
+                      }
                       final currency = provider.getCurrency(ref, uuid);
                       return PreferenceTile(
                         title: currency.key.tr(),
-                        subtitle: currency.format(value ?? Decimal.zero),
+                        subtitle: currency.format(amount ?? Decimal.zero),
                         trailing: Text(LocaleKeys.nToDate.tr(args: [DateFormat.yMd().format(date)])),
-                        onTap: () => addOrEditTargetBalance(context, PreferenceKeys.targetBalance, date, uuid, value),
+                        onTap: () => addOrEditTargetBalance(
+                          context: context,
+                          date: date,
+                          currency: currency,
+                          amount: amount,
+                        ),
                       );
                     },
                   ),
@@ -302,7 +263,3 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 }
-
-
-
- */

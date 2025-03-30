@@ -10,14 +10,14 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 class AmountField extends ConsumerStatefulWidget {
   const AmountField({
     super.key,
-    this.currencyId = Currency.unknownUuid,
+    this.currency,
     this.label = "",
     required this.amount,
     required this.onCurrencyChanged,
     required this.onAmountChanged,
   });
 
-  final String currencyId;
+  final Currency? currency;
 
   final Decimal amount;
 
@@ -38,7 +38,7 @@ class _AmountFieldState extends ConsumerState<AmountField> {
   final controller = TextEditingController();
 
   /// Currency
-  Currency get currency => provider.getCurrency(ref, widget.currencyId);
+  Currency get currency => provider.getCurrency(ref, widget.currency?.uuid);
 
   /// [RegExp] for verify amount
   RegExp get regex => WalletItem.getAmountRegex(currency);

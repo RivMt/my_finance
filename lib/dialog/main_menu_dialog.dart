@@ -101,14 +101,14 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(LocaleKeys.settings.tr()),
-              onTap: () => {}/*openPage(
+              onTap: () => openPage(
                 const PreferencePage(),
                 (item) {
                   if (widget.onRefreshPressed != null) {
                     widget.onRefreshPressed!();
                   }
                 },
-              ),*/
+              ),
             ),
           ],
         ),

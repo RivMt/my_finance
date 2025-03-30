@@ -11,21 +11,21 @@ class TargetBalanceEditModal extends ConsumerStatefulWidget {
   const TargetBalanceEditModal({
     super.key,
     this.date,
-    this.currencyId = Currency.unknownUuid,
-    this.value,
+    this.currency,
+    this.amount,
     required this.onConfirmButtonPressed,
     required this.onNegativeButtonPressed,
   });
 
   final DateTime? date;
 
-  final String currencyId;
+  final Currency? currency;
 
-  final Decimal? value;
+  final Decimal? amount;
 
   final Function() onNegativeButtonPressed;
 
-  final Function(DateTime, String, Decimal) onConfirmButtonPressed;
+  final Function(DateTime, Currency, Decimal) onConfirmButtonPressed;
 
   @override
   ConsumerState createState() => _TargetBalanceEditModalState();
@@ -36,13 +36,13 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
   /// Is this fragment editing [Preference]
   ///
   /// This returns `true` when [widget.value] is not `null`
-  bool get isEdit => widget.value != null;
+  bool get isEdit => widget.amount != null;
 
   /// Expired [DateTime] of target balance
   late DateTime date;
 
   /// UUID of selected [Currency]
-  String currencyId = Currency.unknownUuid;
+  Currency currency = Currency.unknown;
 
   /// [Decimal] which is now editing
   Decimal amount = Decimal.zero;
@@ -57,7 +57,7 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
   /// Triggers on currency changed
   void onCurrencyChanged(Currency currency) {
     setState(() {
-      currencyId = currency.uuid;
+      this.currency = currency;
     });
   }
 
@@ -70,7 +70,7 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
 
   /// Triggers on positive button pressed
   Future<bool> onPos() async {
-    widget.onConfirmButtonPressed(date, currencyId, amount);
+    widget.onConfirmButtonPressed(date, currency, amount);
     return true;
   }
 
@@ -88,8 +88,8 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
       DateTime.now().month+1,
       0,
     );
-    currencyId = widget.currencyId;
-    amount = widget.value ?? Decimal.zero;
+    currency = widget.currency ?? Currency.unknown;
+    amount = widget.amount ?? Decimal.zero;
   }
 
   @override
@@ -136,7 +136,7 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
           // Limitation
           AmountField(
             label: LocaleKeys.amount.tr(),
-            currencyId: currencyId,
+            currency: currency,
             amount: amount,
             onCurrencyChanged: onCurrencyChanged,
             onAmountChanged: onAmountChanged,
