@@ -49,15 +49,15 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
 });
 
 final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, "", 0);
+  return ModelState<int>(ref, 0);
 });
 
 final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, "", 1000);
+  return ModelState<int>(ref, 1000);
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, "", ModelKeys.keyUuid);
+  return ModelState<String>(ref, ModelKeys.keyUuid);
 });
 
 class HomePage extends ConsumerStatefulWidget {

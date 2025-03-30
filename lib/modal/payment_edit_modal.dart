@@ -136,32 +136,32 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Payment>> result = await ApiClient().delete(Payment.endpoint, widget.base!.uuid);
+    final ApiResponse<Payment> result = await ApiClient().delete<Payment>(widget.base!.uuid);
     // Check failed
-    if (result.result != ApiResultCode.success && result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<List<Payment>> result;
+    late ApiResponse<Payment> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(Payment.endpoint, editing.map);
+      result = await ApiClient().update<Payment>(editing.map);
     } else {
-      result = await ApiClient().create(Payment.endpoint, editing.map);
+      result = await ApiClient().create<Payment>(editing.map);
     }
     // Check
-    if (result.result != ApiResultCode.success || result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       // Failed
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 

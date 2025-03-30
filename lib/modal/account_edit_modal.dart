@@ -136,32 +136,32 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Account>> result = await ApiClient().delete(Account.endpoint, widget.base!.uuid);
+    final ApiResponse<Account> result = await ApiClient().delete<Account>(widget.base!.uuid);
     // Check failed
-    if (result.result != ApiResultCode.success && result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<List<Account>> result;
+    late ApiResponse<Account> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(Account.endpoint, editing.map);
+      result = await ApiClient().update<Account>(editing.map);
     } else {
-      result = await ApiClient().create(Account.endpoint, editing.map);
+      result = await ApiClient().create<Account>(editing.map);
     }
     // Check
-    if (result.result != ApiResultCode.success || result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       // Failed
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 

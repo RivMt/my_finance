@@ -45,15 +45,15 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
 });
 
 final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, "", 0);
+  return ModelState<int>(ref, 0);
 });
 
 final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, "", 1000);
+  return ModelState<int>(ref, 1000);
 });
 
 final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, "", ModelKeys.keyLastUsed);
+  return ModelState<String>(ref, ModelKeys.keyLastUsed);
 });
 
 const String _tag = "TransactionEditFragment";
@@ -167,13 +167,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Transaction>> result = await ApiClient().delete(Transaction.endpoint, widget.base!.uuid);
+    final ApiResponse<Transaction> result = await ApiClient().delete<Transaction>(widget.base!.uuid);
     // Check failed
-    if (result.result != ApiResultCode.success && result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 
@@ -183,22 +183,22 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     if (!editing.isValid) {
       return false;
     }
-    late ApiResponse<List<Transaction>> result;
+    late ApiResponse<Transaction> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(Transaction.endpoint, editing.map);
+      result = await ApiClient().update<Transaction>(editing.map);
       Log.v(_tag, "Update: ${editing.map}");
     } else {
-      result = await ApiClient().create(Transaction.endpoint, editing.map);
+      result = await ApiClient().create<Transaction>(editing.map);
       Log.v(_tag, "Create: ${editing.map}");
     }
     // Check
-    if (result.result != ApiResultCode.success || result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       // Failed
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 

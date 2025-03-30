@@ -79,32 +79,32 @@ class _CategoryEditModalState extends State<CategoryEditModal> {
     if (!isEdit) {
       widget.onFinish(null);
     }
-    final ApiResponse<List<Category>> result = await ApiClient().delete(Category.endpoint, widget.base!.uuid);
+    final ApiResponse<Category> result = await ApiClient().delete<Category>(widget.base!.uuid);
     // Check failed
-    if (result.result != ApiResultCode.success && result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<List<Category>> result;
+    late ApiResponse<Category> result;
     // Send
     if (isEdit) {
-      result = await ApiClient().update(Category.endpoint, editing.map);
+      result = await ApiClient().update<Category>(editing.map);
     } else {
-      result = await ApiClient().create(Category.endpoint, editing.map);
+      result = await ApiClient().create<Category>(editing.map);
     }
     // Check
-    if (result.result != ApiResultCode.success || result.data.length != 1) {
+    if (result.result != ApiResultCode.success) {
       // Failed
       return false;
     }
     // Complete
-    widget.onFinish(result.data[0]);
+    widget.onFinish(result.data);
     return true;
   }
 

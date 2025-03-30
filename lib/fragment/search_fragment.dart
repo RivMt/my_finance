@@ -13,7 +13,7 @@ import 'package:my_finance/local_provider.dart' as local_provider;
 });*/
 
 final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref, Category.endpoint);
+  return ModelsState<Category>(ref);
 });
 
 class SearchFragment extends ConsumerStatefulWidget {

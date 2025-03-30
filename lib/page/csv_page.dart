@@ -12,7 +12,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 const String _tag = "CsvPage";
 
 final _transactions = StateNotifierProvider<ModelsState<RawTransaction>, List<RawTransaction>>((ref) {
-  return ModelsState<RawTransaction>(ref, "");
+  return ModelsState<RawTransaction>(ref);
 });
 
 class CsvPage extends ConsumerStatefulWidget {
