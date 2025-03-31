@@ -110,7 +110,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
                   return const SizedBox();
                 }
                 return CurrencyCard(
-                  data: currency,
+                  currency: currency,
                   amount: sum,
                 );
               },

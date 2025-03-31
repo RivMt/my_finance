@@ -7,6 +7,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/color_picker_dialog.dart';
+import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountEditModal extends ConsumerStatefulWidget {
@@ -207,11 +208,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Triggers on [Currency] button pressed
   void onCurrencyButtonPressed() async {
-    final currencies = ref.watch(provider.currencies);
-    final currency = await showSelectDialog<Currency>(
-      context,
-      LocaleKeys.icon.tr(),
-      currencies,
+    final currency = await showDialog(
+      context: context,
+      builder: (context) => const CurrencySelectDialog(),
     );
     if (currency != null) {
       setState(() {

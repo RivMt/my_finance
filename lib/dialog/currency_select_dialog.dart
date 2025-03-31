@@ -14,9 +14,8 @@ class CurrencySelectDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currencies = ref.watch(provider.currencies);
     return AlertDialog(
-      title: Text(LocaleKeys.object_action.tr(namedArgs: {
+      title: Text(LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
         "object": LocaleKeys.currency.plural(1),
-        "action": LocaleKeys.select.tr(),
       })),
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
@@ -24,7 +23,7 @@ class CurrencySelectDialog extends ConsumerWidget {
           itemCount: currencies.length,
           itemBuilder: (context, index) {
             return CurrencyCard(
-              data: currencies[index],
+              currency: currencies[index],
               useIconBackground: false,
               onTap: () => Navigator.pop(context, currencies[index]),
             );
