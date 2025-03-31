@@ -20,7 +20,7 @@ final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((re
         && item.calculatedDate.compareTo(_dateEnd) == -1;
   }).toList();
   if (list.isEmpty) {
-    state = StatefulDataState.loading;
+    state = StatefulDataState.error(LocaleKeys.msgNoTransactions.tr());
   }
   final payments = ref.watch(provider.payments);
   if (payments.isEmpty) {

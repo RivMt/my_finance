@@ -12,17 +12,16 @@ import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-typedef _DataType = SplayTreeMap<DateTime, List<Decimal>>;
-typedef _TargetType = PreferenceElement;
+const String _tag = "TargetBalanceCard";
 
-final _target = Provider<_TargetType?>((ref) {
+typedef _DataType = SplayTreeMap<DateTime, List<Decimal>>;
+
+final _target = Provider<PreferenceElement?>((ref) {
   final root = ref.watch(provider.financePreference);
-  final targets = root.get(PreferenceKeys.targetBalance, null);
   final currency = ref.watch(provider.defaultCurrency);
-  if (!targets.containsKey(currency.uuid) ||
-      !targets.get(currency.uuid, null).containsKey(ModelKeys.keyDate) ||
-      !targets.get(currency.uuid, null).containsKey(ModelKeys.keyAmount)
-  ) {
+  final targets = root.get(PreferenceKeys.targetBalance, null);
+  if (!targets.containsKey(currency.uuid)) {
+    Log.i(_tag, "No target balances for default currency: $currency");
     return null;
   }
   return targets.get(currency.uuid, null);
@@ -33,11 +32,28 @@ final _dateNow = DateTime.now();
 final _dateBegin = DateTime(_dateNow.year, _dateNow.month, _dateNow.day-7);
 
 final _dateEnd = Provider<DateTime>((ref) {
+  final defaultDate = DateTime(_dateNow.year, _dateNow.month + 1, 0);
   final target = ref.watch(_target);
   if (target == null) {
-    return DateTime(_dateNow.year, _dateNow.month + 1, 0);
+    return defaultDate;
   }
-  return target.get<DateTime>(ModelKeys.keyDate, DateTime.now()).value;
+  final dates = <DateTime>[];
+  for(PreferenceElement element in target.children) {
+    try {
+      final date = DateTime.parse(element.key);
+      if (date.isBefore(DateTime.now())) {
+        continue;
+      }
+      dates.add(date);
+    } on FormatException {
+      Log.e(_tag, "Unable to parse target balance key: ${element.key}");
+    }
+  }
+  if (dates.isEmpty) {
+    return defaultDate;
+  }
+  dates.sort();
+  return dates[0];
 });
 
 final _transactions = Provider<List<Transaction>>((ref) {
@@ -80,6 +96,11 @@ final _balance = Provider<Decimal>((ref) {
 
 final _data = Provider<StatefulData<_DataType>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
+  // Check logged in
+  final user = ref.watch(provider.currentUser);
+  if (!user.isValid) {
+    state = StatefulDataState.loading;
+  }
   // Get default currency
   final currency = ref.watch(provider.defaultCurrency);
   if (currency == Currency.unknown) {
@@ -88,7 +109,7 @@ final _data = Provider<StatefulData<_DataType>>((ref) {
   // Filter transactions
   final List<Transaction> list = ref.watch(_transactions);
   if (list.isEmpty) {
-    state = StatefulDataState.loading;
+    state = StatefulDataState.error(LocaleKeys.msgNoTransactions.tr());
   }
   // Generate chart data
   final _DataType data = SplayTreeMap();
@@ -205,7 +226,8 @@ class TargetBalanceCard extends ConsumerWidget {
     final dateEnd = ref.watch(_dateEnd);
     final balance = data[dateEnd]![4];
     final currency = ref.watch(provider.defaultCurrency);
-    final target = ref.watch(_target);
+    final targets = ref.watch(_target);
+    final target = targets?.get(dateEnd.toIso8601String(), null);
     // Value scaling
     final maxes = ref.watch(_max);
     final deltaMax = math.max(maxes[0], maxes[1]);
@@ -214,7 +236,7 @@ class TargetBalanceCard extends ConsumerWidget {
       title: LocaleKeys.targetBalance.tr(),
       subtitle: target == null ? "" : getSubtitle(
         currency: currency,
-        target: target.get<Decimal>(ModelKeys.keyAmount, Decimal.zero).value,
+        target: target.value,
         balance: balance,
       ),
       state: state,

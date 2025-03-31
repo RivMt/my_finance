@@ -7,44 +7,40 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_api/provider.dart' as provider;
 
-final _expenseTransactions = Provider<StatefulData<Map<String, Map<Category, Decimal>>>>((ref) {
+final _expenseTransactions = Provider<StatefulData<Map<Category, Decimal>>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
-  final currencies = ref.watch(provider.currencies);
-  final Map<String, Map<Category, Decimal>> result = {};
-  for(Currency currency in currencies) {
-    final date = ref.watch(_dateFilter);
-    final begin = DateTime(date.year, date.month, 1);
-    final end = DateTime(date.year, date.month + 1, 1);
-    final List<Transaction> list = ref.watch(provider.transactions)
-        .where((item) {
-      return !item.deleted
-          && item.type == TransactionType.expense
-          && item.isIncluded
-          && item.currencyId == currency.uuid
-          && item.paidDate.compareTo(begin) >= 0
-          && item.paidDate.compareTo(end) == -1;
-    }).toList();
-    if (list.isEmpty) {
-      state = StatefulDataState.loading;
-    }
-    final List<Category> categories = ref.watch(provider.categories);
-    if (categories.isEmpty) {
-      state = StatefulDataState.error(LocaleKeys.msgNoCategory.tr());
-    }
-    Map<Category, Decimal> map = {};
-    for (Transaction item in list) {
-      final Category category = categories.firstWhere((element) =>
-      element.uuid == item.categoryId, orElse: () => Category.unknown);
-      if (map[category] == null) {
-        map[category] = Decimal.zero;
-      }
-      map[category] = map[category]! + item.amount;
-    }
-    final entries = map.entries.toList();
-    entries.sort((e1, e2) => e1.value.compareTo(e2.value) * -1);
-    result[currency.uuid] = Map.fromEntries(entries);
+  final currency = ref.watch(provider.defaultCurrency);
+  final date = ref.watch(_dateFilter);
+  final begin = DateTime(date.year, date.month, 1);
+  final end = DateTime(date.year, date.month + 1, 1);
+  final List<Transaction> list = ref.watch(provider.transactions)
+      .where((item) {
+    return !item.deleted
+        && item.type == TransactionType.expense
+        && item.isIncluded
+        && item.currencyId == currency.uuid
+        && item.paidDate.compareTo(begin) >= 0
+        && item.paidDate.compareTo(end) == -1;
+  }).toList();
+  if (list.isEmpty) {
+    state = StatefulDataState.error(LocaleKeys.msgNoTransactions.tr());
   }
-  return StatefulData(result, state);
+  final List<Category> categories = ref.watch(provider.categories);
+  if (categories.isEmpty) {
+    state = StatefulDataState.error(LocaleKeys.msgNoCategory.tr());
+  }
+  final Map<Category, Decimal> map = {};
+  for (Transaction item in list) {
+    final Category category = categories.firstWhere((element) =>
+    element.uuid == item.categoryId, orElse: () => Category.unknown);
+    if (map[category] == null) {
+      map[category] = Decimal.zero;
+    }
+    map[category] = map[category]! + item.amount;
+  }
+  final entries = map.entries.toList();
+  entries.sort((e1, e2) => e1.value.compareTo(e2.value) * -1);
+  return StatefulData(Map.fromEntries(entries), state);
 });
 
 final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
@@ -68,8 +64,8 @@ class _ExpenseChartFragmentCard extends ConsumerState<ExpenseChartCard> {
   Widget build(BuildContext context) {
     final currency = ref.watch(provider.defaultCurrency);
     final expenseTransactions = ref.watch(_expenseTransactions);
-    final map = expenseTransactions.data[currency.uuid] ?? {};
-    final state = map.isEmpty ? StatefulDataState.error(LocaleKeys.msgError.tr()) : expenseTransactions.state;
+    final map = expenseTransactions.data;
+    final state = expenseTransactions.state;
     final total = map.values.toList(growable: false).fold(Decimal.zero, (prev, element) => prev + element);
     final root = ref.watch(provider.financePreference);
     final entries = root.get<int>(PreferenceKeys.pieChartMaxEntries, maxEntries).value;

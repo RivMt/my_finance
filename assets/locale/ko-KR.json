@@ -132,6 +132,7 @@
   "msgTaskComplete": "작업이 성공적으로 완료되었습니다",
   "msgNoCategory": "카테고리가 존재하지 않습니다",
   "msgNoPayment": "결제 수단이 존재하지 않습니다",
+  "msgNoTransactions": "거래 내역이 존재하지 않습니다",
   "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
   "msgTargetBalance": "{target}까지 {residual} {judge}",
 

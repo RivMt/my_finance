@@ -136,6 +136,7 @@
   "msgTaskComplete": "Task has been successfully completed",
   "msgNoCategory": "No category found",
   "msgNoPayment": "No payment found",
+  "msgNoTransactions": "No transactions found",
   "msgUnknownDefaultCurrency": "Default currency is unknown",
   "msgTargetBalance": "{residual} {judge}ed to {target}",
 
