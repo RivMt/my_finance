@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:my_api/core.dart';
 import 'package:my_finance/my_app.dart';
 
 void main() async {
@@ -13,6 +14,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   usePathUrlStrategy();
   final Map<String, dynamic> preferences = jsonDecode(await rootBundle.loadString("assets/key/server.json"));
+  await ApiClient().init(preferences);
 
   // Run
   runApp(ProviderScope(
@@ -23,7 +25,7 @@ void main() async {
       ],
       path: 'assets/locale',
       fallbackLocale: const Locale('en', 'US'),
-      child: MyApp(preferences: preferences),
+      child: const MyApp(),
     ),
   ));
 }

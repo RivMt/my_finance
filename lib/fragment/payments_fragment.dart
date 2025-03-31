@@ -4,11 +4,10 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
-import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class PaymentsFragment extends ConsumerStatefulWidget {
+class PaymentsFragment extends ConsumerWidget {
   const PaymentsFragment({
     super.key,
     required this.payments,
@@ -16,7 +15,6 @@ class PaymentsFragment extends ConsumerStatefulWidget {
     this.selected,
     this.hideCreateButton = false,
     this.onItemTap,
-    this.onEditFinish,
     this.paymentsConditions,
     this.amountConditions,
   });
@@ -31,21 +29,12 @@ class PaymentsFragment extends ConsumerStatefulWidget {
 
   final Function(Payment)? onItemTap;
 
-  final Function(Payment)? onEditFinish;
-
   final List<Map<String, dynamic>>? paymentsConditions;
 
   final List<Map<String, dynamic>>? amountConditions;
 
-  @override
-  ConsumerState createState() => _PaymentsFragmentState();
-}
-
-class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
-
   /// Show payment editing modal
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
-    Payment? editing = payment;
     showModalBottomSheet<Payment>(
       context: context,
       isScrollControlled: true,
@@ -55,21 +44,11 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            PaymentEditModal(
-              base: editing,
-              onFinish: (payment) {
-                Navigator.pop(context, payment);
-              },
-            ),
+            PaymentEditModal(payment),
           ],
         );
       },
-    ).then((payment) {
-      provider.refreshPayments(ref);
-      if (widget.onEditFinish != null && payment != null) {
-        widget.onEditFinish!(payment);
-      }
-    });
+    );
   }
 
   /// Triggers on payment add button pressed
@@ -78,7 +57,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: MasonryGridView.count(
@@ -90,7 +69,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
           // Tailing button
           if (index == PaymentSymbol.values.length) {
             return Visibility(
-              visible: !widget.hideCreateButton,
+              visible: !hideCreateButton,
               child: ListTailButton(
                 icon: Icons.add,
                 title: LocaleKeys.add.tr(),
@@ -99,7 +78,7 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
             );
           }
           final icon = PaymentSymbol.values[index];
-          final sublist = widget.payments.where((element) => (element.icon == icon)).toList(growable: false);
+          final sublist = payments.where((element) => (element.icon == icon)).toList(growable: false);
           // Hide when sublist is empty
           if (sublist.isEmpty) {
             return const SizedBox();
@@ -112,13 +91,13 @@ class _PaymentsFragmentState extends ConsumerState<PaymentsFragment> {
               final payment = sublist[index];
               return PaymentCard(
                 data: payment,
-                selected: widget.selected == payment,
+                selected: selected == payment,
                 ignoreDeleted: true,
                 onTap: () {
-                  if (widget.onItemTap == null) {
+                  if (onItemTap == null) {
                     return;
                   }
-                  widget.onItemTap!(payment);
+                  onItemTap!(payment);
                 },
                 onLongPress: () {
                   showPaymentEditingModal(context, payment);

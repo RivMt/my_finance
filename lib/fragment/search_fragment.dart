@@ -52,7 +52,7 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
   void getCategories() async {
     // Get categories
-    await ref.read(_categories.notifier).request({});
+    await ref.read(_categories.notifier).fetch({});
   }
 
   void request() async {

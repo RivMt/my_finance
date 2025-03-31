@@ -11,15 +11,9 @@ import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class PaymentEditModal extends ConsumerStatefulWidget {
-  const PaymentEditModal({
-    super.key,
-    required this.onFinish,
-    this.base,
-  });
+  const PaymentEditModal(this.base, {super.key});
 
   final Payment? base;
-
-  final Function(Payment?) onFinish;
 
   @override
   ConsumerState createState() => _PaymentEditModalState();
@@ -71,13 +65,17 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     return colors.toSet().toList();
   }
 
-  /// Show [T] item selection dialog
-  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  /// Show [PaymentSymbol] selection dialog
+  Future<PaymentSymbol?> showSymbolSelectDialog(BuildContext context) async {
+    const list = PaymentSymbol.values;
     return await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(title),
+          title: Text(LocaleKeys.object_action.tr(namedArgs: {
+            "object": LocaleKeys.icon.tr(),
+            "action": LocaleKeys.select.tr(),
+          })),
           content: SizedBox(
             width: ScreenPlanner(context).dialogWidth,
             height: MediaQuery.of(context).size.height * 0.7,
@@ -85,24 +83,9 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               itemCount: list.length,
               itemBuilder: (context, index) {
                 final item = list[index];
-                late String title;
-                late Widget icon;
-                switch(T) {
-                  case Currency:
-                    title = (item as Currency).key.tr();
-                    icon = CurrencyIcon(item);
-                    break;
-                  case PaymentSymbol:
-                    title = (item as PaymentSymbol).key.tr();
-                    icon = Icon(item.icon);
-                    break;
-                  default:
-                    title = "Unknown";
-                    icon = const Text('?');
-                }
                 return ListTile(
-                  title: Text(title),
-                  leading: icon,
+                  title: Text(item.key.tr()),
+                  leading: Icon(item.icon),
                   onTap: () => Navigator.pop(context, item),
                 );
               },
@@ -133,37 +116,18 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
 
   /// Triggers on negative button pressed
   Future<bool> onNegativeButtonPressed() async {
-    // Escape on creating mode
     if (!isEdit) {
-      widget.onFinish(null);
+      return true;
     }
-    final ApiResponse<Payment> result = await ApiClient().delete<Payment>(widget.base!.uuid);
-    // Check failed
-    if (result.result != ApiResultCode.success) {
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.deletePayment(ref, editing);
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<Payment> result;
-    // Send
     if (isEdit) {
-      result = await ApiClient().update<Payment>(editing.map);
-    } else {
-      result = await ApiClient().create<Payment>(editing.map);
+      return await provider.updatePayment(ref, editing);
     }
-    // Check
-    if (result.result != ApiResultCode.success) {
-      // Failed
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.createPayment(ref, editing);
   }
 
   /// Triggers on description changed
@@ -194,11 +158,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
 
   /// Triggers on [PaymentIcon] button pressed
   void onPaymentIconButtonPressed() async {
-    final icon = await showSelectDialog<PaymentSymbol>(
-      context,
-      LocaleKeys.icon.tr(),
-      PaymentSymbol.values,
-    );
+    final icon = await showSymbolSelectDialog(context);
     if (icon != null) {
       setState(() {
         editing.icon = icon;

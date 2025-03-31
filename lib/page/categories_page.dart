@@ -36,15 +36,10 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
       ),
       builder: (context) => Wrap(
         children: [
-          CategoryEditModal(
-            base: category,
-            onFinish: (item) => Navigator.pop(context, item),
-          ),
+          CategoryEditModal(category),
         ],
       ),
-    ).then((value) {
-      provider.refreshCategories(ref);
-    });
+    );
   }
 
   /// On tab page changed

@@ -8,6 +8,12 @@ import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
 
+final _account = Provider<Account>((ref) {
+  final accounts = ref.watch(provider.accounts);
+  final uuid = ref.watch(local_provider.selectedAccount);
+  return accounts.firstWhere((element) => element.uuid == uuid);
+});
+
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final date = ref.watch(_dateFilter);
   final begin = DateTime(date.year, date.month, 1);
@@ -58,9 +64,8 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     ref.read(_dateFilter.notifier).set(value);
   }
 
-  Future<void> refresh() async {
+  Future<void> fetchTransactions() async {
     final account = ref.watch(local_provider.selectedAccount);
-    provider.refreshAccounts(ref);
     provider.fetchTransactions(ref, {
       ModelKeys.keyAccountId: account,
     });
@@ -68,12 +73,11 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   void onMonthChanged(DateTime value) {
     month = value;
-    refresh();
+    fetchTransactions();
   }
 
   /// Show account editing modal
   void showAccountEditingModal(BuildContext context, [Account? account]) async {
-    Account? editing = account;
     showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
@@ -83,29 +87,22 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
       builder: (context) {
         return Wrap(
           children: [
-            AccountEditModal(
-              base: editing,
-              onFinish: (account) {
-                Navigator.pop(context, account);
-              },
-            ),
+            AccountEditModal(account),
           ],
         );
       },
-    ).then((item) {
-      refresh();
-    });
+    );
   }
 
   void onSortButtonPressed() {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
-  Future<void> onRefreshButtonPressed() => refresh();
+  Future<void> onRefreshButtonPressed() => fetchTransactions();
 
   @override
   Widget build(BuildContext context) {
-    final account = ref.watch(provider.accounts).firstWhere((element) => element.uuid == ref.watch(local_provider.selectedAccount));
+    final account = ref.watch(_account);
     return Scaffold(
       appBar: AppBar(
         title: Text(account.descriptions),
@@ -126,11 +123,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,
-        onTransactionEdit: (item) => refresh(),
       ),
       floatingActionButton: TransactionAddButton(
         account: account,
-        onFinish: (item) => refresh(),
       ),
     );
   }

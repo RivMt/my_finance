@@ -59,9 +59,13 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   }];
 
   /// Restore [item]
-  Future<ApiResponse<T>> restoreItem<T extends WalletItem>(T item) async {
+  Future<bool> restoreItem<T extends WalletItem>(T item) async {
     item.deleted = false;
-    return await ApiClient().update<T>(item.map);
+    switch(T) {
+      case Account: return await provider.updateAccount(ref, item as Account);
+      case Payment: return await provider.updatePayment(ref, item as Payment);
+      default: throw UnimplementedError();
+    }
   }
 
   /// Change index of [pageController] by index of [tabController]
@@ -72,19 +76,8 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   }
 
   /// Restore [item] when opened [SnackBar] closed successfully
-  void onItemTap<T extends WalletItem>(BuildContext context, T item) {
-    restoreItem<T>(item).then((value) {
-      // Escape if restore failed
-      if (value.result != ApiResultCode.success) {
-        return;
-      }
-      provider.refreshAccounts(ref);
-      provider.refreshPayments(ref);
-      final snackBar = SnackBar(
-        content: Text(LocaleKeys.msgItemRestored.tr(args: [item.descriptions])),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    });
+  void onItemTap<T extends WalletItem>(T item) {
+    restoreItem<T>(item);
   }
 
   @override
@@ -124,14 +117,14 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
                 accounts: ref.watch(_filteredAccounts).reversed.toList(),
                 hideCreateButton: true,
                 hideHeader: true,
-                onItemTap: (item) => onItemTap<Account>(context, item),
+                onItemTap: (item) => onItemTap<Account>(item),
               ),
               // 1: Payments
               PaymentsFragment(
                 payments: ref.watch(_filteredPayments).reversed.toList(),
                 hideCreateButton: true,
                 paymentsConditions: conditions,
-                onItemTap: (item) => onItemTap<Payment>(context, item),
+                onItemTap: (item) => onItemTap<Payment>(item),
               ),
             ],
           ),

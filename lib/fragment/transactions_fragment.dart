@@ -9,21 +9,18 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/modal/transaction_edit_modal.dart';
 
-class TransactionsFragment extends ConsumerStatefulWidget {
+class TransactionsFragment extends ConsumerWidget {
   const TransactionsFragment({
     super.key,
     required this.items,
     this.shrinkWrap = false,
     this.useSliver = false,
-    this.onEditFinish,
     this.isReverse = false,
     this.useCalculatedDate = false,
     this.groupSeparator,
   });
 
   final List<Transaction> items;
-
-  final Function(Transaction)? onEditFinish;
 
   final bool shrinkWrap;
 
@@ -34,12 +31,6 @@ class TransactionsFragment extends ConsumerStatefulWidget {
   final bool useCalculatedDate;
 
   final String Function(DateTime)? groupSeparator;
-
-  @override
-  ConsumerState createState() => _TransactionsFragmentState();
-}
-
-class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
 
   /// Show transaction details dialog
   void showTransactionDetailsDialog(BuildContext context, Transaction data) {
@@ -63,36 +54,26 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            TransactionEditModal(
-              base: editing,
-              isEdit: true,
-              onFinish: (account) {
-                Navigator.pop(context, account);
-              },
-            ),
+            TransactionEditModal(base: editing),
           ],
         );
       },
-    ).then((transaction) {
-      if (widget.onEditFinish != null && transaction != null) {
-        widget.onEditFinish!(transaction);
-      }
-    });
+    );
   }
 
   DateTime groupBy(Transaction data) {
-    final date = widget.useCalculatedDate ? data.calculatedDate : data.paidDate;
+    final date = useCalculatedDate ? data.calculatedDate : data.paidDate;
     return DateTime(date.year, date.month, date.day);
   }
 
-  Widget groupSeparatorBuilder(DateTime date) => Text(
-    widget.groupSeparator == null
+  Widget groupSeparatorBuilder(BuildContext context, DateTime date) => Text(
+    groupSeparator == null
         ? DateFormat.yMd().format(date.toLocal())
-        : widget.groupSeparator!(date.toLocal()),
+        : groupSeparator!(date.toLocal()),
     style: Theme.of(context).textTheme.titleSmall,
   );
 
-  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate) * (widget.isReverse ? -1 : 1);
+  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate) * (isReverse ? -1 : 1);
 
   Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) {
     return TransactionCard(
@@ -107,26 +88,26 @@ class _TransactionsFragmentState extends ConsumerState<TransactionsFragment> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(provider.categories);
     // Return sliver grouped list view
-    if (widget.useSliver) {
+    if (useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(
-        elements: widget.items,
+        elements: items,
         groupBy: groupBy,
-        order: widget.isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
-        groupSeparatorBuilder: groupSeparatorBuilder,
+        order: isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
+        groupSeparatorBuilder: (date) => groupSeparatorBuilder(context, date),
         itemComparator: itemComparator,
         itemBuilder: (context, data) => itemBuilder(context, data, categories),
       );
     }
     return GroupedListView<Transaction, DateTime>(
       physics: const BouncingScrollPhysics(),
-      shrinkWrap: widget.shrinkWrap,
-      elements: widget.items,
+      shrinkWrap: shrinkWrap,
+      elements: items,
       groupBy: groupBy,
-      order: widget.isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
-      groupSeparatorBuilder: groupSeparatorBuilder,
+      order: isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
+      groupSeparatorBuilder: (date) => groupSeparatorBuilder(context, date),
       itemComparator: itemComparator,
       itemBuilder: (context, data) => itemBuilder(context, data, categories),
     );

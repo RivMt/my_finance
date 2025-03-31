@@ -59,21 +59,19 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     ref.read(_dateFilter.notifier).set(value);
   }
 
-  Future<void> refresh() async {
+  Future<void> fetchTransactions() async {
     provider.fetchTransactions(ref, {
       ModelKeys.keyPaymentId: ref.watch(local_provider.selectedPayment),
     });
-    provider.refreshPayments(ref);
   }
 
   void onMonthChanged(DateTime value) {
     month = value;
-    refresh();
+    fetchTransactions();
   }
 
   /// Show payment editing modal
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
-    Payment? editing = payment;
     showModalBottomSheet<Payment>(
       context: context,
       isScrollControlled: true,
@@ -83,17 +81,12 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
       builder: (context) {
         return Wrap(
           children: [
-            PaymentEditModal(
-              base: editing,
-              onFinish: (payment) {
-                Navigator.pop(context, payment);
-              },
-            ),
+            PaymentEditModal(payment),
           ],
         );
       },
     ).then((item) {
-      refresh();
+      fetchTransactions();
     });
   }
 
@@ -101,7 +94,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
-  Future<void> onRefreshButtonPressed() => refresh();
+  Future<void> onRefreshButtonPressed() => fetchTransactions();
 
   @override
   Widget build(BuildContext context) {
@@ -137,11 +130,9 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
         onMonthChanged: onMonthChanged,
         onSortButtonPressed: onSortButtonPressed,
         onRefreshButtonPressed: onRefreshButtonPressed,
-        onTransactionEdit: (item) => refresh(),
       ),
       floatingActionButton: TransactionAddButton(
         payment: payment,
-        onFinish: (item) => refresh(),
       ),
     );
   }

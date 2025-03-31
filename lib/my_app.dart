@@ -11,14 +11,10 @@ import 'package:my_finance/navigator.dart';
 class MyApp extends ConsumerWidget {
   const MyApp({
     super.key,
-    required this.preferences,
   });
-
-  final Map<String, dynamic> preferences;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ApiClient().init(preferences);
     final brightness = Theme.of(context).brightness;
     AppTheme.isDarkMode = brightness == Brightness.dark;
     return MaterialApp.router(

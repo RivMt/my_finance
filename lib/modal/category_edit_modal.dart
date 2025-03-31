@@ -1,25 +1,21 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class CategoryEditModal extends StatefulWidget {
-  const CategoryEditModal({
-    super.key,
-    this.base,
-    required this.onFinish,
-  });
+class CategoryEditModal extends ConsumerStatefulWidget {
+  const CategoryEditModal(this.base, {super.key});
   
   final Category? base;
 
-  final Function(Category?) onFinish;
-
   @override
-  State createState() => _CategoryEditModalState();
+  ConsumerState createState() => _CategoryEditModalState();
 }
 
-class _CategoryEditModalState extends State<CategoryEditModal> {
+class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
 
   final TextEditingController nameController = TextEditingController();
 
@@ -75,37 +71,18 @@ class _CategoryEditModalState extends State<CategoryEditModal> {
 
   /// Triggers on negative button pressed
   Future<bool> onNegativeButtonPressed() async {
-    // Escape on creating mode
     if (!isEdit) {
-      widget.onFinish(null);
+      return true;
     }
-    final ApiResponse<Category> result = await ApiClient().delete<Category>(widget.base!.uuid);
-    // Check failed
-    if (result.result != ApiResultCode.success) {
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.deleteCategory(ref, editing);
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<Category> result;
-    // Send
     if (isEdit) {
-      result = await ApiClient().update<Category>(editing.map);
-    } else {
-      result = await ApiClient().create<Category>(editing.map);
+      return await provider.updateCategory(ref, editing);
     }
-    // Check
-    if (result.result != ApiResultCode.success) {
-      // Failed
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.createCategory(ref, editing);
   }
 
   /// Trigger on type chips selected

@@ -77,8 +77,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   static const String _tag = "HomePage";
 
-  final client = ApiClient();
-
   final List<_NavigationDestinations> railDestinations = [
     _NavigationDestinations(
       icon: const Icon(Icons.explore_outlined),
@@ -118,25 +116,31 @@ class _HomePageState extends ConsumerState<HomePage> {
     widget.router.setNewRoutePath(path).then(onPageFinished ?? (value) {});
   }
 
-  /// Refresh all data
-  void refresh() async {
-    // Check user is valid or not
+  /// Login
+  Future<void> tryLogin() async {
     if (!ref.watch(provider.currentUser).isValid) {
-      await client.login(ref);
+      await provider.login(ref, load);
     }
-    // Refresh providers
-    provider.refreshAccounts(ref);
-    provider.refreshPayments(ref);
-    provider.refreshCategories(ref);
+  }
+
+  /// Load init data
+  void load() async {
+    if (!mounted) {
+      Log.w(_tag, "Unable to load initial date due to state disposed");
+      return;
+    }
+    Log.i(_tag, "Request initial user data");
+    provider.fetchAccounts(ref);
+    provider.fetchPayments(ref);
+    provider.fetchCategories(ref);
     provider.fetchCurrencies(ref);
     fetchPreferences(ref, provider.corePreferences);
     fetchPreferences(ref, provider.financePreference);
-    // Fetch transactions
-    fetch();
+    fetchTransaction();
   }
 
-  /// Refresh transaction data
-  void fetch() async {
+  /// Fetch transaction data
+  void fetchTransaction() async {
     // Request
     final now = DateTime.now();
     provider.fetchTransactions(ref, {
@@ -145,7 +149,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         ApiQuery.keyQueryRangeEnd: DateTime(now.year, now.month + 2, 0).toIso8601String(),
       }
     });
-    provider.refreshAccounts(ref);
   }
 
   /// Convert [NavigationRail] index to [BottomNavigationBar] index
@@ -171,16 +174,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       context: context,
       builder: (context) => MainMenuDialog(
         router: widget.router,
-        onRefreshPressed: refresh,
+        onRefreshPressed: load,
       ),
     );
-  }
-
-  /// Triggers on transaction created
-  void onTransactionCreated(Transaction? transaction) {
-    if (transaction != null) {
-      fetch();
-    }
   }
 
   /// Triggers on account item selected
@@ -208,11 +204,16 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await tryLogin();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isWide = ScreenPlanner(context).isSidePanelVisible;
+    final accounts = ref.watch(_filteredAccounts);
+    final payments = ref.watch(_filteredPayments);
     return Scaffold(
       appBar: AppBar(
         title: const Text("MyFinance"),
@@ -238,11 +239,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: [
             if (isWide)
               NavigationRail(
-                leading: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                  child: TransactionAddButton(
-                    onFinish: onTransactionCreated,
-                  ),
+                leading: const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 16),
+                  child: TransactionAddButton(),
                 ),
                 destinations: List.generate(railDestinations.length, (index) => NavigationRailDestination(
                   icon: railDestinations[index].icon,
@@ -260,11 +259,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                 children: [
                   const HomeFragment(),
                   AccountsFragment(
-                    accounts: ref.watch(_filteredAccounts),
+                    accounts: accounts,
                     onItemTap: onAccountPressed,
                   ),
                   PaymentsFragment(
-                    payments: ref.watch(_filteredPayments),
+                    payments: payments,
                     onItemTap: onPaymentPressed,
                   ),
                 ],
@@ -290,9 +289,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           )),
         ),
       ),
-      floatingActionButton: isWide ? null : TransactionAddButton(
-        onFinish: onTransactionCreated,
-      ),
+      floatingActionButton: isWide ? null : const TransactionAddButton(),
     );
   }
 }

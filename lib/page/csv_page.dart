@@ -47,7 +47,7 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     setState(() {
       progressing = true;
     });
-    ref.read(_transactions.notifier).request({
+    ref.read(_transactions.notifier).fetch({
       ApiQuery.keyQueryRangeBegin: minDate.toIso8601String(),
       ApiQuery.keyQueryRangeEnd: maxDate.toIso8601String(),
     });

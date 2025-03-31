@@ -1,10 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
-import 'package:my_finance/generated/locale_keys.g.dart';
 
 class CategoriesFragment extends ConsumerWidget {
   const CategoriesFragment({
@@ -23,25 +21,14 @@ class CategoriesFragment extends ConsumerWidget {
 
   final Function(Category)? onLongPress;
 
-  Future<ApiResponse> restoreItem(Category item) async {
-    item.deleted = false;
-    return await ApiClient().update<Category>(item.map);
+  Future<bool> restoreItem(WidgetRef ref, Category category) async {
+    category.deleted = false;
+    return await provider.updateCategory(ref, category);
   }
 
-  void onCategoryTapped(Category category, BuildContext context, WidgetRef ref) {
+  void onCategoryTapped(WidgetRef ref, Category category, ) {
     if (category.deleted && isRestoreAvailable) {
-      restoreItem(category).then((value) {
-        // Escape if restore failed
-        if (value.result != ApiResultCode.success) {
-          return;
-        }
-        provider.refreshAccounts(ref);
-        provider.refreshPayments(ref);
-        final snackBar = SnackBar(
-          content: Text(LocaleKeys.msgItemRestored.tr(args: [category.name])),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      });
+      restoreItem(ref, category);
       return;
     }
     if (onTap != null) {
@@ -71,7 +58,7 @@ class CategoriesFragment extends ConsumerWidget {
         final category = categories[index];
         return CategoryCard(
           category: category,
-          onTap: () => onCategoryTapped(category, context, ref),
+          onTap: () => onCategoryTapped(ref, category),
           onLongPress: () => onCategoryLongPressed(category),
         );
       },

@@ -9,7 +9,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/modal/account_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class AccountsFragment extends ConsumerStatefulWidget {
+class AccountsFragment extends ConsumerWidget {
   const AccountsFragment({
     super.key,
     required this.accounts,
@@ -17,14 +17,11 @@ class AccountsFragment extends ConsumerStatefulWidget {
     this.hideHeader = false,
     this.hideCreateButton = false,
     this.onItemTap,
-    this.onEditFinish,
   });
 
   final List<Account> accounts;
 
   final Function(Account)? onItemTap;
-
-  final Function(Account)? onEditFinish;
 
   final Account? selected;
 
@@ -32,15 +29,8 @@ class AccountsFragment extends ConsumerStatefulWidget {
 
   final bool hideCreateButton;
 
-  @override
-  ConsumerState createState() => _AccountsFragmentState();
-}
-
-class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
-
   /// Show account editing modal
   void showAccountEditingModal(BuildContext context, [Account? account]) async {
-    Account? editing = account;
     showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
@@ -50,21 +40,11 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
       builder: (context) {
         return Wrap(
           children: [
-            AccountEditModal(
-              base: editing,
-              onFinish: (account) {
-                Navigator.pop(context, account);
-              },
-            ),
+            AccountEditModal(account),
           ],
         );
       },
-    ).then((account) {
-      provider.refreshAccounts(ref);
-      if (widget.onEditFinish != null && account != null) {
-        widget.onEditFinish!(account);
-      }
-    });
+    );
   }
 
   /// Triggers on account add button pressed
@@ -73,12 +53,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currencies = ref.watch(provider.currencies);
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -90,7 +65,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
         itemBuilder: (context, index) {
           // Header
           if (index == 0) {
-            if (widget.hideHeader) {
+            if (hideHeader) {
               return const SizedBox();
             }
             return GroupCard(
@@ -99,7 +74,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
               build: (context, index) {
                 final currency = currencies[index];
                 bool exist = false;
-                final sum = widget.accounts.fold<Decimal>(Decimal.zero, (total, account) {
+                final sum = accounts.fold<Decimal>(Decimal.zero, (total, account) {
                   if (account.currencyId == currency.uuid) {
                     exist = true;
                     return total + account.balance;
@@ -119,7 +94,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           // Tailing button
           if (index == AccountSymbol.values.length + 1) {
             return Visibility(
-              visible: !widget.hideCreateButton,
+              visible: !hideCreateButton,
               child: ListTailButton(
                 icon: Icons.add,
                 title: LocaleKeys.add.tr(),
@@ -129,7 +104,7 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
           }
           // Accounts
           final icon = AccountSymbol.values[index-1];
-          final sublist = widget.accounts.where((element) => (element.icon == icon)).toList(growable: false);
+          final sublist = accounts.where((element) => (element.icon == icon)).toList(growable: false);
           // Hide when sublist is empty
           if (sublist.isEmpty) {
             return const SizedBox();
@@ -142,13 +117,13 @@ class _AccountsFragmentState extends ConsumerState<AccountsFragment> {
               final account = sublist[index];
               return AccountCard(
                 data: account,
-                selected: widget.selected == account,
+                selected: selected == account,
                 ignoreDeleted: true,
                 onTap: () {
-                  if (widget.onItemTap == null) {
+                  if (onItemTap == null) {
                     return;
                   }
-                  widget.onItemTap!(account);
+                  onItemTap!(account);
                 },
                 onLongPress: () {
                   showAccountEditingModal(context, account);

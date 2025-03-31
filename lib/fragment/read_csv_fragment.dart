@@ -324,7 +324,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   /// Request
   void request() async {
     // Account
-    await ref.read(_accounts.notifier).request({
+    await ref.read(_accounts.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
         ApiQuery.keyQueryRangeBegin: 0,
@@ -339,7 +339,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     final account = this.account;
     setAccount(account);
     // Payment
-    await ref.read(_payments.notifier).request({
+    await ref.read(_payments.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
         ApiQuery.keyQueryRangeBegin: 0,
@@ -354,7 +354,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     final payment = this.payment;
     setPayment(payment);
     // Category
-    await ref.read(_categories.notifier).request({
+    await ref.read(_categories.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ApiQuery.keySortField: [
         ModelKeys.keyUuid,

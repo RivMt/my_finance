@@ -8,7 +8,6 @@ class TransactionAddButton extends StatelessWidget {
     super.key,
     this.account,
     this.payment,
-    this.onFinish,
   });
 
   /// Selected [Account]
@@ -17,16 +16,7 @@ class TransactionAddButton extends StatelessWidget {
   /// Selected [Payment]
   final Payment? payment;
 
-  final Function(Transaction?)? onFinish;
-
   void showTransactionCreateModal(BuildContext context) {
-    final Transaction data = Transaction.init();
-    if (account != null && account != Account.unknown) {
-      data.setAccount(account!);
-    }
-    if (payment != null && payment != Payment.unknown) {
-      data.setPayment(payment!);
-    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -34,14 +24,10 @@ class TransactionAddButton extends StatelessWidget {
         maxWidth: ScreenPlanner(context).panelWidth,
       ),
       builder: (context) => TransactionEditModal(
-        base: data,
-        onFinish: (item) => Navigator.pop(context, item),
+        account: account,
+        payment: payment,
       ),
-    ).then((value) {
-      if (onFinish != null) {
-        onFinish!(value);
-      }
-    });
+    );
   }
 
   @override

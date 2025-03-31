@@ -56,22 +56,19 @@ final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
   return ModelState<String>(ref, ModelKeys.keyLastUsed);
 });
 
-const String _tag = "TransactionEditFragment";
-
 class TransactionEditModal extends ConsumerStatefulWidget {
   const TransactionEditModal({
     super.key,
-    required this.onFinish,
-    this.isEdit = false,
     this.base,
+    this.account,
+    this.payment,
   });
 
   final Transaction? base;
 
-  /// Value of this fragment is editing [Transaction]
-  final bool isEdit;
+  final Account? account;
 
-  final Function(Transaction?) onFinish;
+  final Payment? payment;
 
   @override
   ConsumerState createState() => _TransactionEditModalState();
@@ -90,7 +87,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   /// Is this fragment editing [Transaction]
   ///
   /// This returns `true` when [widget.base] is not `null`
-  bool get isEdit => widget.isEdit;
+  bool get isEdit => widget.base != null;
 
   /// [Transaction] which is now editing
   Transaction editing = Transaction({});
@@ -163,43 +160,18 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Triggers on negative button pressed
   Future<bool> onNegativeButtonPressed() async {
-    // Escape on creating mode
     if (!isEdit) {
-      widget.onFinish(null);
+      return true;
     }
-    final ApiResponse<Transaction> result = await ApiClient().delete<Transaction>(widget.base!.uuid);
-    // Check failed
-    if (result.result != ApiResultCode.success) {
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.deleteTransaction(ref, editing);
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    // Check transaction is valid
-    if (!editing.isValid) {
-      return false;
-    }
-    late ApiResponse<Transaction> result;
-    // Send
     if (isEdit) {
-      result = await ApiClient().update<Transaction>(editing.map);
-      Log.v(_tag, "Update: ${editing.map}");
-    } else {
-      result = await ApiClient().create<Transaction>(editing.map);
-      Log.v(_tag, "Create: ${editing.map}");
+      return await provider.updateTransaction(ref, editing);
     }
-    // Check
-    if (result.result != ApiResultCode.success) {
-      // Failed
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.createTransaction(ref, editing);
   }
 
   /// Set [editing.paidDate]
@@ -367,20 +339,18 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Apply [editing] data to UI
-  void apply() {
+  @override
+  void initState() {
+    super.initState();
+    editing = widget.base ?? Transaction.init();
     descriptionController.text = editing.descriptions;
     amountController.text = editing.amount.toString();
     altAmountController.text = (editing.altAmount ?? Decimal.zero).toString();
     utilityDaysController.text = editing.utilityDays.toString();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    assert((widget.isEdit && widget.base != null) || !widget.isEdit);
-    editing = widget.base ?? Transaction.init();
-    apply();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.account != null) setAccount(widget.account!);
+      if (widget.payment != null) setPayment(widget.payment!);
+    });
   }
 
   @override

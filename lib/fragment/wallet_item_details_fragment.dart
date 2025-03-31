@@ -8,7 +8,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerStatefulWidget {
+class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
   const WalletItemDetailsFragment({
     super.key,
     required this.item,
@@ -18,7 +18,6 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerStatefulWi
     required this.onMonthChanged,
     required this.onSortButtonPressed,
     required this.onRefreshButtonPressed,
-    required this.onTransactionEdit,
     this.isReverse = false,
     this.sortByCalculatedDate = false,
   });
@@ -33,8 +32,6 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerStatefulWi
 
   final Future<void> Function() onRefreshButtonPressed;
 
-  final void Function(Transaction) onTransactionEdit;
-
   final List<Transaction> transactions;
 
   final DateTime month;
@@ -43,28 +40,22 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerStatefulWi
 
   final bool sortByCalculatedDate;
 
-  @override
-  ConsumerState createState() => _WalletItemDetailsFragmentState<T>();
-}
-
-class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerState<WalletItemDetailsFragment<T>> {
-
   /// Build group separator by given [date]
   String buildGroupSeparator(DateTime date) {
-    if (widget.month.year != date.year) {
+    if (month.year != date.year) {
       return DateFormat.yMd().format(date);
-    } else if (widget.month.month != date.month) {
+    } else if (month.month != date.month) {
       return DateFormat.Md().format(date);
     }
     return DateFormat.d().format(date);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final currency = provider.getCurrency(ref, widget.item.currencyId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currency = provider.getCurrency(ref, item.currencyId);
     const height = 100.0;
     return RefreshIndicator(
-      onRefresh: widget.onRefreshButtonPressed,
+      onRefresh: onRefreshButtonPressed,
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -82,13 +73,13 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerStat
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SelectableText(
-                      widget.item.serialNumber,
+                      item.serialNumber,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppTheme.swatches.contentSecondary,
                       ),
                     ),
                     Text(
-                      currency.format(widget.content),
+                      currency.format(content),
                       style: Theme.of(context).textTheme.displayLarge,
                     )
                   ],
@@ -103,12 +94,12 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerStat
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton.icon(
-                    icon: Icon(widget.isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
-                    onPressed: widget.onSortButtonPressed,
+                    icon: Icon(isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
+                    onPressed: onSortButtonPressed,
                     label: Text(LocaleKeys.sort.tr()),
                   ),
                   MonthPicker(
-                    date: widget.month,
+                    date: month,
                     displayText: (date) {
                       final now = DateTime.now();
                       if (date.year == now.year) {
@@ -116,11 +107,11 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerStat
                       }
                       return DateFormat.yMMM().format(date);
                     },
-                    onDateChanged: widget.onMonthChanged,
+                    onDateChanged: onMonthChanged,
                   ),
                   TextButton.icon(
                     icon: const Icon(Icons.refresh),
-                    onPressed: widget.onRefreshButtonPressed,
+                    onPressed: onRefreshButtonPressed,
                     label: Text(LocaleKeys.refresh.tr()),
                   ),
                 ],
@@ -131,11 +122,10 @@ class _WalletItemDetailsFragmentState<T extends WalletItem> extends ConsumerStat
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
             sliver: TransactionsFragment(
               useSliver: true,
-              items: widget.transactions,
-              isReverse: widget.isReverse,
-              useCalculatedDate: widget.sortByCalculatedDate,
+              items: transactions,
+              isReverse: isReverse,
+              useCalculatedDate: sortByCalculatedDate,
               groupSeparator: buildGroupSeparator,
-              onEditFinish: widget.onTransactionEdit,
             ),
           ),
         ],

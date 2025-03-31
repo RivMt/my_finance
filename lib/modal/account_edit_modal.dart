@@ -11,15 +11,9 @@ import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 class AccountEditModal extends ConsumerStatefulWidget {
-  const AccountEditModal({
-    super.key,
-    required this.onFinish,
-    this.base,
-  });
+  const AccountEditModal(this.base, {super.key});
 
   final Account? base;
-
-  final Function(Account?) onFinish;
 
   @override
   ConsumerState createState() => _AccountEditModalState();
@@ -72,12 +66,17 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
   }
 
   /// Show [T] item selection dialog
-  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  /// Show [AccountSymbol] selection dialog
+  Future<AccountSymbol?> showSymbolSelectDialog(BuildContext context) async {
+    const list = AccountSymbol.values;
     return await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(title),
+          title: Text(LocaleKeys.object_action.tr(namedArgs: {
+            "object": LocaleKeys.icon.tr(),
+            "action": LocaleKeys.select.tr(),
+          })),
           content: SizedBox(
             width: ScreenPlanner(context).dialogWidth,
             height: MediaQuery.of(context).size.height * 0.7,
@@ -85,24 +84,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
               itemCount: list.length,
               itemBuilder: (context, index) {
                 final item = list[index];
-                late String title;
-                late Widget icon;
-                switch(T) {
-                  case Currency:
-                    title = (item as Currency).key.tr();
-                    icon = CurrencyIcon(item);
-                    break;
-                  case AccountSymbol:
-                    title = (item as AccountSymbol).key.tr();
-                    icon = Icon(item.icon);
-                    break;
-                  default:
-                    title = "Unknown";
-                    icon = const Text('?');
-                }
                 return ListTile(
-                  title: Text(title),
-                  leading: icon,
+                  title: Text(item.key.tr()),
+                  leading: Icon(item.icon),
                   onTap: () => Navigator.pop(context, item),
                 );
               },
@@ -133,37 +117,18 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Triggers on negative button pressed
   Future<bool> onNegativeButtonPressed() async {
-    // Escape on creating mode
     if (!isEdit) {
-      widget.onFinish(null);
+      return true;
     }
-    final ApiResponse<Account> result = await ApiClient().delete<Account>(widget.base!.uuid);
-    // Check failed
-    if (result.result != ApiResultCode.success) {
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.deleteAccount(ref, editing);
   }
 
   /// Triggers on confirm button pressed
   Future<bool> onConfirmButtonPressed() async {
-    late ApiResponse<Account> result;
-    // Send
     if (isEdit) {
-      result = await ApiClient().update<Account>(editing.map);
-    } else {
-      result = await ApiClient().create<Account>(editing.map);
+      return await provider.updateAccount(ref, editing);
     }
-    // Check
-    if (result.result != ApiResultCode.success) {
-      // Failed
-      return false;
-    }
-    // Complete
-    widget.onFinish(result.data);
-    return true;
+    return await provider.createAccount(ref, editing);
   }
 
   /// Triggers on description changed
@@ -194,11 +159,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Triggers on [AccountIcon] button pressed
   void onAccountIconButtonPressed() async {
-    final icon = await showSelectDialog<AccountSymbol>(
-      context,
-      LocaleKeys.icon.tr(),
-      AccountSymbol.values,
-    );
+    final icon = await showSymbolSelectDialog(context);
     if (icon != null) {
       setState(() {
         editing.icon = icon;
