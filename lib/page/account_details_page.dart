@@ -19,13 +19,13 @@ final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final begin = DateTime(date.year, date.month, 1);
   final end = DateTime(date.year, date.month + 1, 1);
   final sort = ref.watch(_sortFilter);
-  final account = ref.watch(local_provider.selectedAccount);
+  final account = ref.watch(_account);
   List<Transaction> list = ref.watch(provider.transactions);
   list = list.where((item) {
     return !item.deleted
         && item.calculatedDate.compareTo(begin) >= 0
         && item.calculatedDate.compareTo(end) == -1
-        && item.accountId == account;
+        && item.accountId == account.uuid;
   }).toList();
   if (sort) {
     list = list.reversed.toList();
@@ -54,8 +54,6 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
 
 class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
-  List<Transaction> get transactions => ref.watch(_filteredTransactions);
-
   bool get isReverse => ref.watch(_sortFilter);
 
   DateTime get month => ref.watch(_dateFilter);
@@ -69,11 +67,6 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     provider.fetchTransactions(ref, {
       ModelKeys.keyAccountId: account,
     });
-  }
-
-  void onMonthChanged(DateTime value) {
-    month = value;
-    fetchTransactions();
   }
 
   /// Show account editing modal
@@ -94,6 +87,11 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     );
   }
 
+  void onMonthChanged(DateTime value) {
+    month = value;
+    fetchTransactions();
+  }
+
   void onSortButtonPressed() {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
@@ -103,6 +101,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final account = ref.watch(_account);
+    final transactions = ref.watch(_filteredTransactions);
     return Scaffold(
       appBar: AppBar(
         title: Text(account.descriptions),
