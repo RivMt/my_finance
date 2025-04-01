@@ -121,6 +121,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     return ref.watch(provider.categories).firstWhere((item) => item.uuid == editing.categoryId, orElse: () => Category.unknown);
   }
 
+  /// Transactions has payment or not
+  bool get hasPayment => editing.paymentId != Payment.noneUuid;
+
   /// Show [T] item selection dialog
   Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
@@ -446,45 +449,52 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           ),
           const SizedBox(height: 8,),
           // Payment
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                LocaleKeys.payment.plural(1),
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-              InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () => onNoPaymentCheckboxChanged(payment != Payment.none),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Checkbox(
-                        value: payment == Payment.none,
-                        tristate: false,
-                        onChanged: null,
-                      ),
-                      Text(
-                        LocaleKeys.noPayment.plural(1),
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
           Visibility(
-            visible: payment != Payment.none,
-            child: PaymentCard(
-              data: payment,
-              unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-                "object": LocaleKeys.payment.plural(1),
-              }),
-              onTap: () => onPaymentCardTapped(ref.watch(_filteredPayments)),
+            visible: editing.type == TransactionType.expense,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      LocaleKeys.payment.plural(1),
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => onNoPaymentCheckboxChanged(hasPayment),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: !hasPayment,
+                              tristate: false,
+                              onChanged: null,
+                            ),
+                            Text(
+                              LocaleKeys.noPayment.plural(1),
+                              style: Theme.of(context).textTheme.labelSmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Visibility(
+                  visible: hasPayment,
+                  child: PaymentCard(
+                    data: payment,
+                    unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                      "object": LocaleKeys.payment.plural(1),
+                    }),
+                    onTap: () => onPaymentCardTapped(ref.watch(_filteredPayments)),
+                  ),
+                )
+              ],
             ),
           ),
           const SizedBox(height: 8,),
