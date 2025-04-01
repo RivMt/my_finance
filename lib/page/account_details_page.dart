@@ -129,10 +129,4 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    month = DateTime.now();
-    super.dispose();
-  }
 }
