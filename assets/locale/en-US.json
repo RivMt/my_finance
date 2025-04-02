@@ -139,6 +139,7 @@
   "msgNoTransactions": "No transactions found",
   "msgUnknownDefaultCurrency": "Default currency is unknown",
   "msgTargetBalance": "{residual} {judge}ed to {target}",
+  "msgInputSearchQuery": "Input words to search",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",

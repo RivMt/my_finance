@@ -1,19 +1,17 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
-import 'package:my_finance/dialog/transaction_details_dialog.dart';
+import 'package:my_finance/fragment/transactions_fragment.dart';
+import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
 import 'package:my_finance/local_provider.dart' as local_provider;
 
-/*final _search = StateNotifierProvider<SearchState<FinanceSearchResult>, List<FinanceSearchResult>>((ref) {
-  return SearchState<FinanceSearchResult>(ref);
-});*/
-
-final _categories = StateNotifierProvider<ModelsState<Category>, List<Category>>((ref) {
-  return ModelsState<Category>(ref);
+final _search = StateNotifierProvider<ModelStreamNotifier<Transaction>, Set<Transaction>>((ref) {
+  return ModelStreamNotifier<Transaction>(ref);
 });
 
 class SearchFragment extends ConsumerStatefulWidget {
@@ -50,71 +48,33 @@ class _SearchFragmentState extends ConsumerState<SearchFragment> {
     ));
   }
 
-  void getCategories() async {
-    // Get categories
-    await ref.read(_categories.notifier).fetch({});
-  }
-
-  void request() async {
-    // Search
-    //ref.read(_search.notifier).request(widget.query);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getCategories();
-    request();
+  void search() async {
+    ref.read(_search.notifier).search(widget.query);
   }
 
   @override
   void didUpdateWidget(SearchFragment oldWidget) {
     super.didUpdateWidget(oldWidget);
-    request();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      search();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<FinanceSearchResult> results = [];//ref.watch(_search);
-    final List<Category> categories = ref.watch(_categories);
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) {
-        final item = results[index];
-        switch(item.table) {
-          case FinanceModelType.account:
-            final data = Account(item.map);
-            return AccountCard(
-              data: data,
-              onTap: () => openAccountPage(data),
-            );
-          case FinanceModelType.payment:
-            final data = Payment(item.map);
-            return PaymentCard(
-              data: data,
-              onTap: () => openPaymentPage(data),
-            );
-          case FinanceModelType.transaction:
-            final data = Transaction(item.map);
-            return TransactionCard(
-              data: data,
-              category: categories.firstWhere((item) => item.uuid == data.categoryId, orElse: () => Category.unknown),
-              onTap: () => showDialog(
-                context: context,
-                builder: (context) => TransactionDetailsDialog(
-                  data: data,
-                ),
-              ),
-            );
-          case FinanceModelType.category:
-            final data = Category(item.map);
-            return CategoryCard(
-              category: data,
-              onTap: () => openCategoryPage(),
-            );
-        }
-        return const SizedBox();
-      },
-    );
+    if (widget.query.length < 3) {
+      return MessageBox(
+        icon: Icons.info_outline,
+        message: LocaleKeys.msgInputSearchQuery.tr(),
+      );
+    }
+    final List<Transaction> results = ref.watch(_search).toList(growable: false);
+    if (results.isEmpty) {
+      return MessageBox(
+        icon: Icons.warning_amber_outlined,
+        message: LocaleKeys.msgNoTransactions.tr(),
+      );
+    }
+    return TransactionsFragment(items: results);
   }
 }

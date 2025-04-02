@@ -23,24 +23,20 @@ class SearchPage extends SearchDelegate {
   }
 
   @override
-  Widget buildSuggestions(BuildContext context) {
-    if (query.length < 2) {
-      return const MessageBox(
-        icon: Icons.warning_amber_outlined,
-        message: "",
-      );
-    }
-    return buildResults(context);
-  }
+  Widget buildSuggestions(BuildContext context) => build(context);
 
   @override
-  Widget buildResults(BuildContext context) {
+  Widget buildResults(BuildContext context) => build(context);
+
+  Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final number = ScreenPlanner(context).panelNumber;
     return Align(
       alignment: number == 1 ? Alignment.topLeft : Alignment.topCenter,
-      child: SizedBox(
+      child: Container(
         width: width,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: SearchFragment(
           query: query,
         ),

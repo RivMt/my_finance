@@ -11,9 +11,26 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "CsvPage";
 
-final _transactions = StateNotifierProvider<ModelsState<RawTransaction>, List<RawTransaction>>((ref) {
-  return ModelsState<RawTransaction>(ref);
+final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
+  return ModelsState<Transaction>(ref);
 });
+
+final _columns = [
+  ModelKeys.keyUuid,
+  ModelKeys.keyType,
+  ModelKeys.keyCategoryName,
+  ModelKeys.keyAccountName,
+  ModelKeys.keyPaymentName,
+  ModelKeys.keyCurrencyId,
+  ModelKeys.keyAmount,
+  ModelKeys.keyAltCurrencyId,
+  ModelKeys.keyAltAmount,
+  ModelKeys.keyPaidDate,
+  ModelKeys.keyCalculatedDate,
+  ModelKeys.keyUtilityEnd,
+  ModelKeys.keyDescription,
+  ModelKeys.keyIncluded,
+];
 
 class CsvPage extends ConsumerStatefulWidget {
 
@@ -56,6 +73,42 @@ class _CsvPageState extends ConsumerState<CsvPage> {
     });
   }
 
+  /// Generate data row
+  DataRow getDataRow(Transaction item) {
+    final accounts = ref.watch(provider.accounts);
+    final payments = ref.watch(provider.payments);
+    final categories = ref.watch(provider.categories);
+    final account = accounts.firstWhere((element) => element.uuid == item.accountId, orElse: () => Account.unknown);
+    final payment = payments.firstWhere((element) => element.uuid == item.paymentId, orElse: () => Payment.unknown);
+    final category = categories.firstWhere((element) => element.uuid == item.categoryId, orElse: () => Category.unknown);
+    final currency = provider.getCurrency(ref, item.currencyId);
+    final altCurrency = provider.getCurrency(ref, item.altCurrencyId);
+    return DataRow(
+      cells: [
+        DataCell(Text(item.uuid.toString())),
+        DataCell(Text(item.type.key.tr())),
+        DataCell(Text(category.name)),
+        DataCell(Text(account.name)),
+        DataCell(Text(payment.name)),
+        DataCell(Text(item.currencyId)),
+        DataCell(Text(currency.format(item.amount))),
+        DataCell(Text(item.altCurrencyId == null
+            ? ""
+            : item.altCurrencyId!)
+        ),
+        DataCell(Text(item.altAmount == null || item.altCurrencyId == null
+            ? ""
+            : altCurrency.format(item.altAmount!))
+        ),
+        DataCell(Text(DateFormat.yMd().format(item.paidDate))),
+        DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),
+        DataCell(Text(DateFormat.yMd().format(item.utilityEnd))),
+        DataCell(Text(item.descriptions)),
+        DataCell(Text(item.isIncluded.toString())),
+      ],
+    );
+  }
+
   /// Triggers on download button pressed
   void onDownloadButtonPressed() async {
     String? path = await FilePicker.platform.saveFile(
@@ -67,8 +120,8 @@ class _CsvPageState extends ConsumerState<CsvPage> {
       return;
     }
     // Create raw csv
-    final DataFrame<RawTransaction> df = DataFrame(
-      columns: RawTransaction.columns,
+    final DataFrame<Transaction> df = DataFrame(
+      columns: _columns,
       data: ref.watch(_transactions),
       conversions: {
         ModelKeys.keyType: (type) {
@@ -189,41 +242,15 @@ class _CsvPageState extends ConsumerState<CsvPage> {
                   scrollDirection: Axis.horizontal,
                   controller: controller,
                   child: DataTable(
-                    columns: List.generate(RawTransaction.columns.length, (index) {
-                      final String name = RawTransaction.columns[index];
+                    columns: List.generate(_columns.length, (index) {
+                      final String name = _columns[index];
                       return DataColumn(
                         label: Text(name),
                         tooltip: name,
                       );
                     }),
                     rows: List.generate(transactions.length, (index) {
-                      final item = transactions[index];
-                      final currency = provider.getCurrency(ref, item.currencyId);
-                      final altCurrency = provider.getCurrency(ref, item.altCurrencyId);
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(item.uuid.toString())),
-                          DataCell(Text(item.type.key.tr())),
-                          DataCell(Text(item.categoryName)),
-                          DataCell(Text(item.accountName)),
-                          DataCell(Text(item.paymentName)),
-                          DataCell(Text(item.currencyId)),
-                          DataCell(Text(currency.format(item.amount))),
-                          DataCell(Text(item.altCurrencyId == null
-                              ? ""
-                              : item.altCurrencyId!)
-                          ),
-                          DataCell(Text(item.altAmount == null || item.altCurrencyId == null
-                              ? ""
-                              : altCurrency.format(item.altAmount!))
-                          ),
-                          DataCell(Text(DateFormat.yMd().format(item.paidDate))),
-                          DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),
-                          DataCell(Text(DateFormat.yMd().format(item.utilityEnd))),
-                          DataCell(Text(item.descriptions)),
-                          DataCell(Text(item.isIncluded.toString())),
-                        ],
-                      );
+                      return getDataRow(transactions[index]);
                     }),
                   ),
                 ),

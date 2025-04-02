@@ -135,6 +135,7 @@
   "msgNoTransactions": "거래 내역이 존재하지 않습니다",
   "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
   "msgTargetBalance": "{target}까지 {residual} {judge}",
+  "msgInputSearchQuery": "검색어를 입력해주세요",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
