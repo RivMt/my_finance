@@ -56,7 +56,7 @@ jobs:
       - name: Clone my_api
         run: |
           mkdir ../my_api
-          git clone https://${{ secrets.MYAPI_GIT }} ../my_api
+          git clone https://${{ vars.GIT_MYAPI }} ../my_api
 
       # Install flutter
       - name: Install Flutter
