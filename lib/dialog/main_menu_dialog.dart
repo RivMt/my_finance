@@ -47,6 +47,7 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(provider.currentUser);
     return AlertDialog(
       content: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -56,7 +57,7 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
           children: [
             // User
             UserCard(
-              user: ref.watch(provider.currentUser),
+              user: user,
               onTap: widget.onAccountButtonPressed,
             ),
             const Divider(),

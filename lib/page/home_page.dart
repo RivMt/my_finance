@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
@@ -214,11 +216,28 @@ class _HomePageState extends ConsumerState<HomePage> {
     final bool isWide = ScreenPlanner(context).isSidePanelVisible;
     final accounts = ref.watch(_filteredAccounts);
     final payments = ref.watch(_filteredPayments);
+    final iconName = ApiClient().isDevelop ? 'assets/icon/icon-dev.png' : 'assets/icon/icon-full.png';
+    final user = ref.watch(provider.currentUser);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MyFinance"),
+        title: Row(
+          children: [
+            Visibility(
+              visible: isWide,
+              child: Container(
+                alignment: Alignment.center,
+                child: Image.asset(iconName,
+                  width: 32,
+                  height: 32,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text("MyFinance"),
+          ],
+        ),
         centerTitle: !isWide,
-        leading: IconButton(
+        leading: isWide ? null : IconButton(
           icon: const Icon(Icons.menu),
           onPressed: onMenuButtonPressed,
         ),
@@ -248,6 +267,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                   selectedIcon: railDestinations[index].selectedIcon,
                   label: Text(railDestinations[index].label),
                 )),
+                trailing: Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: IconButton(
+                        icon: UserIcon(user),
+                        onPressed: onMenuButtonPressed,
+                      ),
+                    ),
+                  ),
+                ),
                 selectedIndex: navigationRailIndex,
                 onDestinationSelected: onNavigationIndexChanged,
                 labelType: NavigationRailLabelType.all,
