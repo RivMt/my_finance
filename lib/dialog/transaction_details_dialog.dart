@@ -49,7 +49,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
     final category = ref.watch(provider.categories).where((item) => item.uuid == widget.data.categoryId).first;
     final account = ref.watch(provider.accounts).where((item) => item.uuid == widget.data.accountId).first;
     final payments = ref.watch(provider.payments).where((item) => item.uuid == widget.data.paymentId);
-    final hasAlt = widget.data.altAmount != null;
+    final hasAlt = widget.data.hasAlt;
     final primaryCurrency = provider.getCurrency(ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
     final secondaryCurrency = provider.getCurrency(ref, widget.data.currencyId);
     return AlertDialog(
@@ -95,13 +95,19 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   title: Text(widget.data.descriptions),
                 ),
               ),
+              // UUID
+              ListTile(
+                leading: const Icon(Icons.numbers_outlined),
+                title: SelectableText(widget.data.uuid),
+              ),
               // Details
               const Divider(),
               Tooltip(
-                message: account.serialNumber,
+                message: account.descriptions,
                 child: ListTile(
                   leading: Icon(account.icon.icon),
-                  title: Text(account.descriptions),
+                  title: Text(account.name),
+                  subtitle: Text(account.serialNumber),
                   onTap: () => openAccountPage(account),
                 ),
               ),
@@ -110,10 +116,11 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   visible: widget.data.paymentId != Payment.unknown.uuid
                       && widget.data.paymentId != Payment.none.uuid,
                   child: Tooltip(
-                    message: payments.first.serialNumber,
+                    message: payments.first.descriptions,
                     child: ListTile(
                       leading: Icon(payments.first.icon.icon),
-                      title: Text(payments.first.descriptions),
+                      title: Text(payments.first.name),
+                      subtitle: Text(payments.first.serialNumber),
                       onTap: () => openPaymentPage(payments.first),
                     ),
                   ),
