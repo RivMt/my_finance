@@ -21,11 +21,13 @@ class AccountEditModal extends ConsumerStatefulWidget {
 
 class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
-  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
 
   final TextEditingController serialNumberController = TextEditingController();
   
   final TextEditingController limitationController = TextEditingController();
+
+  final TextEditingController descriptionController = TextEditingController();
 
   /// Is this fragment editing [Account]
   ///
@@ -131,10 +133,10 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     return await provider.createAccount(ref, editing);
   }
 
-  /// Triggers on description changed
-  void onDescriptionChanged(String desc) {
+  /// Triggers on name changed
+  void onNameChanged(String text) {
     setState(() {
-      editing.descriptions = desc;
+      editing.name = text;
     });
   }
 
@@ -154,6 +156,13 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
           editing.limitation = Decimal.parse(value);
         }
       }
+    });
+  }
+
+  /// Triggers on description changed
+  void onDescriptionChanged(String text) {
+    setState(() {
+      editing.descriptions = text;
     });
   }
 
@@ -207,9 +216,10 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
   void initState() {
     super.initState();
     editing = widget.base ?? Account({});
-    descriptionController.text = editing.descriptions;
+    nameController.text = editing.name;
     serialNumberController.text = editing.serialNumber;
     limitationController.text = editing.limitation.toString();
+    descriptionController.text = editing.descriptions;
   }
 
   @override
@@ -235,9 +245,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Name
           TextField(
-            controller: descriptionController,
+            controller: nameController,
             decoration: InputDecoration(
               labelText: LocaleKeys.name.tr(),
               prefixIcon: IconButton(
@@ -245,7 +255,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
                 onPressed: () => onAccountIconButtonPressed(),
               ),
             ),
-            onChanged: onDescriptionChanged,
+            maxLength: BaseModel.maxTextLength,
+            onChanged: onNameChanged,
           ),
           const SizedBox(height: 8,),
           // Serial Number
@@ -278,6 +289,18 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
               FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),
             ],
             onChanged: onLimitationChanged,
+          ),
+          const SizedBox(height: 8,),
+          // Description
+          TextField(
+            controller: descriptionController,
+            decoration: InputDecoration(
+              labelText: LocaleKeys.description.tr(),
+              prefixIcon: const Icon(Icons.notes),
+            ),
+            maxLines: null,
+            maxLength: BaseModel.maxTextLength,
+            onChanged: onDescriptionChanged,
           ),
           // Is cash checkbox
           Padding(

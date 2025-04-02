@@ -78,10 +78,17 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
                         color: AppTheme.swatches.contentSecondary,
                       ),
                     ),
-                    Text(
+                    SelectableText(
                       currency.format(content),
                       style: Theme.of(context).textTheme.displayLarge,
-                    )
+                    ),
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      item.descriptions,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.swatches.contentSecondary,
+                      ),
+                    ),
                   ],
                 ),
               ),

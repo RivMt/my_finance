@@ -104,7 +104,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     final transactions = ref.watch(_filteredTransactions);
     return Scaffold(
       appBar: AppBar(
-        title: Text(account.descriptions),
+        title: Text(account.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),

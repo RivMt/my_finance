@@ -514,7 +514,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.paidAmount.tr(),
-                prefixIcon: CurrencyIcon(altCurrency),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: CurrencyIcon(altCurrency),
+                ),
                 errorText: Transaction.getAmountRegex(altCurrency).hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput,
@@ -534,7 +537,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ),
             decoration: InputDecoration(
               labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
-              prefixIcon: CurrencyIcon(currency),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(4),
+                child: CurrencyIcon(currency),
+              ),
               errorText: Transaction.getAmountRegex(currency).hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput,
@@ -552,6 +558,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               labelText: LocaleKeys.description.tr(),
               prefixIcon: const Icon(Icons.notes),
             ),
+            maxLines: null,
+            maxLength: BaseModel.maxTextLength,
             onChanged: onDescriptionChanged,
           ),
           const SizedBox(height: 8,),

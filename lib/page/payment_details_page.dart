@@ -113,7 +113,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     });
     return Scaffold(
       appBar: AppBar(
-        title: Text(payment.descriptions),
+        title: Text(payment.name),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
