@@ -220,21 +220,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     final user = ref.watch(provider.currentUser);
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Visibility(
-              visible: isWide,
-              child: Container(
-                alignment: Alignment.center,
-                child: Image.asset(iconName,
-                  width: 32,
-                  height: 32,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Text("MyFinance"),
-          ],
+        title: AppLogo(
+          iconName: iconName,
+          isWide: isWide,
+          title: "MyFinance",
         ),
         centerTitle: !isWide,
         leading: isWide ? null : IconButton(
