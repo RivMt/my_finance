@@ -4,7 +4,6 @@ import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/home_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
-import 'package:my_finance/page/preference_page.dart';
 
 List<RoutePath> _d1 = [
   FinanceRoutePath.accounts,
