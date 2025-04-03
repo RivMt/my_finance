@@ -1,4 +1,5 @@
 import 'package:decimal/decimal.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -84,7 +85,7 @@ class _AmountFieldState extends ConsumerState<AmountField> {
         ),
         errorText: regex.hasMatch(controller.text)
             ? null
-            : LocaleKeys.msgInvalidInput,
+            : LocaleKeys.msgInvalidInput.tr(),
       ),
       inputFormatters: [
         FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),

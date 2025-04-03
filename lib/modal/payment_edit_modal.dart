@@ -311,7 +311,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               ),
               errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)
                   ? null
-                  : LocaleKeys.msgInvalidInput,
+                  : LocaleKeys.msgInvalidInput.tr(),
             ),
             inputFormatters: [
               FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),

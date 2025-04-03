@@ -543,7 +543,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ),
               errorText: Transaction.getAmountRegex(currency).hasMatch(amountController.text)
                   ? null
-                  : LocaleKeys.msgInvalidInput,
+                  : LocaleKeys.msgInvalidInput.tr(),
             ),
             inputFormatters: [
               FilteringTextInputFormatter(RegExp(r"[\d.]"), allow: true),
