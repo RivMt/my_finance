@@ -257,14 +257,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                   label: Text(railDestinations[index].label),
                 )),
                 trailing: Expanded(
-                  child: Align(
+                  child: Container(
                     alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: IconButton(
-                        icon: UserIcon(user),
-                        onPressed: onMenuButtonPressed,
-                      ),
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: IconButton(
+                      icon: UserIcon(user, size: 32),
+                      onPressed: onMenuButtonPressed,
                     ),
                   ),
                 ),
