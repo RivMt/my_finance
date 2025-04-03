@@ -59,7 +59,7 @@ class PaymentsFragment extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       child: MasonryGridView.count(
         itemCount: PaymentSymbol.values.length + 1,
         crossAxisCount: ScreenPlanner(context).panelNumber,

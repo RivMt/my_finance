@@ -56,7 +56,7 @@ class AccountsFragment extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currencies = ref.watch(provider.currencies);
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       child: MasonryGridView.count(
         itemCount: AccountSymbol.values.length + 2,
         crossAxisCount: ScreenPlanner(context).panelNumber,
