@@ -79,9 +79,9 @@ class _AmountFieldState extends ConsumerState<AmountField> {
       ),
       decoration: InputDecoration(
         labelText: widget.label,
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(4),
-          child: CurrencyIcon(currency),
+        prefixIcon: IconButton(
+          onPressed: () => onCurrencyPressed(context),
+          icon: CurrencyIcon(currency),
         ),
         errorText: regex.hasMatch(controller.text)
             ? null
