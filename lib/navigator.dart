@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
+import 'package:my_finance/page/advanced_query_page.dart';
 import 'package:my_finance/page/home_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
 import 'package:my_finance/page/preference_page.dart';
+import 'package:my_finance/page/read_csv_page.dart';
+import 'package:my_finance/page/restore_items_page.dart';
 
 const String _tag = "Navigator";
 
@@ -17,6 +20,12 @@ class FinanceRoutePath extends RoutePath {
   static final FinanceRoutePath payments = FinanceRoutePath("payments", index: 2);
 
   static final FinanceRoutePath categories = FinanceRoutePath("categories");
+
+  static final FinanceRoutePath restores = FinanceRoutePath("restores");
+
+  static final FinanceRoutePath advancedQuery = FinanceRoutePath("advanced_query");
+
+  static final FinanceRoutePath readCsv = FinanceRoutePath("read_csv");
 
   static final FinanceRoutePath preferences = FinanceRoutePath("preferences");
 
@@ -87,8 +96,13 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
     } else if (configuration.path == FinanceRoutePath.categories.path) {
       // Category
       return const CategoriesPage();
+    } else if (configuration.path == FinanceRoutePath.restores.path) {
+      return const RestoreItemsPage();
+    } else if (configuration.path == FinanceRoutePath.advancedQuery.path) {
+      return const AdvancedQueryPage();
+    } else if (configuration.path == FinanceRoutePath.readCsv.path) {
+      return const ReadCsvPage();
     } else if (configuration.path == FinanceRoutePath.preferences.path) {
-      // Preference
       return const PreferencePage();
     }
     _navigationRailIndex = configuration.index;

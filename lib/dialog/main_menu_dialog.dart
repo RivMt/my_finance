@@ -7,7 +7,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
-import 'package:my_finance/page/csv_page.dart';
+import 'package:my_finance/page/advanced_query_page.dart';
 import 'package:my_finance/page/read_csv_page.dart';
 import 'package:my_finance/page/restore_items_page.dart';
 import 'package:my_finance/page/preference_page.dart';
@@ -37,12 +37,8 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
   /// Open [page]
   ///
   /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
-  void openPage(Widget page, [Function(dynamic)? onPageFinished]) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => page)).then((value) {
-      if (onPageFinished != null) {
-        onPageFinished(value);
-      }
-    });
+  void openPage(RoutePath configuration) {
+    widget.router.setNewRoutePath(configuration);
   }
 
   @override
@@ -75,13 +71,13 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
                 "object": LocaleKeys.category.plural(2),
                 "action": LocaleKeys.edit.tr(),
               })),
-              onTap: () => openPage(const CategoriesPage()),
+              onTap: () => openPage(FinanceRoutePath.categories),
             ),
             // Trash can
             ListTile(
               leading: const Icon(Icons.delete_outline),
               title: Text(LocaleKeys.trashCan.tr()),
-              onTap: () => openPage(const RestoreItemsPage()),
+              onTap: () => openPage(FinanceRoutePath.restores),
             ),
             // CSV
             Visibility(
@@ -89,27 +85,20 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
               child: ListTile(
                 leading: const Icon(Icons.table_view_outlined),
                 title: Text(LocaleKeys.advancedQuery.tr()),
-                onTap: () => openPage(const CsvPage()),
+                onTap: () => openPage(FinanceRoutePath.advancedQuery),
               ),
             ),
             // Load CSV
             ListTile(
               leading: const Icon(Icons.file_open_outlined),
               title: Text(LocaleKeys.readCsv.tr()),
-              onTap: () => openPage(const ReadCsvPage()),
+              onTap: () => openPage(FinanceRoutePath.readCsv),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: Text(LocaleKeys.settings.tr()),
-              onTap: () => openPage(
-                const PreferencePage(),
-                (item) {
-                  if (widget.onRefreshPressed != null) {
-                    widget.onRefreshPressed!();
-                  }
-                },
-              ),
+              onTap: () => openPage(FinanceRoutePath.preferences),
             ),
           ],
         ),

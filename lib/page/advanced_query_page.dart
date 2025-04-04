@@ -32,17 +32,17 @@ final _columns = [
   ModelKeys.keyIncluded,
 ];
 
-class CsvPage extends ConsumerStatefulWidget {
+class AdvancedQueryPage extends ConsumerStatefulWidget {
 
   static const String route = "/csv";
 
-  const CsvPage({super.key});
+  const AdvancedQueryPage({super.key});
 
   @override
-  ConsumerState createState() => _CsvPageState();
+  ConsumerState createState() => _AdvancedQueryPageState();
 }
 
-class _CsvPageState extends ConsumerState<CsvPage> {
+class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
 
   /// Beginning [DateTime] of condition
   DateTime minDate = DateTime(DateTime.now().year, 1, 1);
@@ -184,7 +184,7 @@ class _CsvPageState extends ConsumerState<CsvPage> {
   }
 
   @override
-  void didUpdateWidget(CsvPage oldWidget) {
+  void didUpdateWidget(AdvancedQueryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     request();
   }
