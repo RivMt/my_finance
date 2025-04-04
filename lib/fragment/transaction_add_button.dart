@@ -4,6 +4,9 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/modal/transaction_edit_modal.dart';
 
 class TransactionAddButton extends StatelessWidget {
+
+  static const String _heroTag = "TransactionAddButton";
+
   const TransactionAddButton({
     super.key,
     this.account,
@@ -33,6 +36,7 @@ class TransactionAddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      heroTag: _heroTag,
       onPressed: () => showTransactionCreateModal(context),
       child: const Icon(Icons.add),
     );

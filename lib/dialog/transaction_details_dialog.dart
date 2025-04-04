@@ -5,10 +5,9 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/account_details_page.dart';
+import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
 
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({
@@ -31,17 +30,13 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
   }
 
   void openAccountPage(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const AccountDetailsPage(),
-    ));
+    final delegate = Router.of(context).routerDelegate;
+    delegate.setNewRoutePath(FinanceRoutePath.accounts.extend(uuid: account.uuid));
   }
 
   void openPaymentPage(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const PaymentDetailsPage(),
-    ));
+    final delegate = Router.of(context).routerDelegate;
+    delegate.setNewRoutePath(FinanceRoutePath.payments.extend(uuid: payment.uuid));
   }
 
   @override

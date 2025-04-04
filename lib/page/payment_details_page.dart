@@ -7,22 +7,31 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
 
 const _tag = "PaymentDetailsPage";
+
+final _uuid = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier(ref, Payment.unknown.uuid);
+});
+
+final _payment = Provider<Payment>((ref) {
+  final payments = ref.watch(provider.payments);
+  final uuid = ref.watch(_uuid);
+  return payments.firstWhere((element) => element.uuid == uuid, orElse: () => Payment.unknown);
+});
 
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
   final date = ref.watch(_dateFilter);
   final begin = DateTime(date.year, date.month, 1);
   final end = DateTime(date.year, date.month + 1, 1);
   final sort = ref.watch(_sortFilter);
-  final payment = ref.watch(local_provider.selectedPayment);
+  final uuid = ref.watch(_uuid);
   List<Transaction> list = ref.watch(provider.transactions);
   list = list.where((item) {
     return !item.deleted
         && item.paidDate.compareTo(begin) >= 0
         && item.paidDate.compareTo(end) == -1
-        && item.paymentId == payment;
+        && item.paymentId == uuid;
   }).toList();
   if (sort) {
     list = list.reversed.toList();
@@ -42,7 +51,10 @@ class PaymentDetailsPage extends ConsumerStatefulWidget {
 
   const PaymentDetailsPage({
     super.key,
+    required this.uuid,
   });
+
+  final String uuid;
 
   @override
   ConsumerState createState() => _PaymentDetailsPageState();
@@ -60,8 +72,9 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
   }
 
   Future<void> fetchTransactions() async {
+    final uuid = ref.watch(_uuid);
     provider.fetchTransactions(ref, {
-      ModelKeys.keyPaymentId: ref.watch(local_provider.selectedPayment),
+      ModelKeys.keyPaymentId: uuid,
     });
   }
 
@@ -96,9 +109,18 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
   Future<void> onRefreshButtonPressed() => fetchTransactions();
 
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      ref.read(_uuid.notifier).set(widget.uuid);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final payment = ref.watch(provider.payments).firstWhere((element) => element.uuid == ref.watch(local_provider.selectedPayment));
+    final payment = ref.watch(_payment);
     final transactions = ref.watch(_filteredTransactions);
     final total = transactions.fold(Decimal.zero, (previousValue, element) {
       if (payment.currencyId == element.currencyId) {

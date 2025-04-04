@@ -6,12 +6,15 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/modal/account_edit_modal.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
+
+final _uuid = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier(ref, Account.unknown.uuid);
+});
 
 final _account = Provider<Account>((ref) {
   final accounts = ref.watch(provider.accounts);
-  final uuid = ref.watch(local_provider.selectedAccount);
-  return accounts.firstWhere((element) => element.uuid == uuid);
+  final uuid = ref.watch(_uuid);
+  return accounts.firstWhere((element) => element.uuid == uuid, orElse: () => Account.unknown);
 });
 
 final _filteredTransactions = Provider<List<Transaction>>((ref) {
@@ -45,7 +48,10 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
 
   const AccountDetailsPage({
     super.key,
+    required this.uuid,
   });
+
+  final String uuid;
 
   @override
   ConsumerState createState() => _AccountDetailsPageState();
@@ -63,9 +69,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   }
 
   Future<void> fetchTransactions() async {
-    final account = ref.watch(local_provider.selectedAccount);
+    final uuid = ref.watch(_uuid);
     provider.fetchTransactions(ref, {
-      ModelKeys.keyAccountId: account,
+      ModelKeys.keyAccountId: uuid,
     });
   }
 
@@ -97,6 +103,15 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
   }
 
   Future<void> onRefreshButtonPressed() => fetchTransactions();
+
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      ref.read(_uuid.notifier).set(widget.uuid);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

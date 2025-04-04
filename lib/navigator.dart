@@ -13,8 +13,6 @@ const String _tag = "Navigator";
 
 class FinanceRoutePath extends RoutePath {
 
-  static final FinanceRoutePath search = FinanceRoutePath("search");
-
   static final FinanceRoutePath accounts = FinanceRoutePath("accounts", index: 1);
 
   static final FinanceRoutePath payments = FinanceRoutePath("payments", index: 2);
@@ -28,6 +26,8 @@ class FinanceRoutePath extends RoutePath {
   static final FinanceRoutePath readCsv = FinanceRoutePath("read_csv");
 
   static final FinanceRoutePath preferences = FinanceRoutePath("preferences");
+
+  static final FinanceRoutePath search = FinanceRoutePath("search");
 
   static const String keyMode = "mode";
 
@@ -81,7 +81,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       // Accounts
       final uuid = configuration.uuid;
       if (uuid != null) {
-        return const AccountDetailsPage();
+        return AccountDetailsPage(uuid: uuid);
       }
       _navigationRailIndex = configuration.index;
       return null;
@@ -89,7 +89,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       // Payments
       final uuid = configuration.uuid;
       if (uuid != null) {
-        return const PaymentDetailsPage();
+        return PaymentDetailsPage(uuid: uuid);
       }
       _navigationRailIndex = configuration.index;
       return null;

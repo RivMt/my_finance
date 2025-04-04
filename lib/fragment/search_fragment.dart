@@ -5,10 +5,6 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/page/account_details_page.dart';
-import 'package:my_finance/page/categories_page.dart';
-import 'package:my_finance/page/payment_details_page.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _search = StateNotifierProvider<ModelStreamNotifier<Transaction>, Set<Transaction>>((ref) {
   return ModelStreamNotifier<Transaction>(ref);
@@ -27,26 +23,6 @@ class SearchFragment extends ConsumerStatefulWidget {
 }
 
 class _SearchFragmentState extends ConsumerState<SearchFragment> {
-
-  void openCategoryPage() {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const CategoriesPage(),
-    ));
-  }
-
-  void openAccountPage(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const AccountDetailsPage(),
-    ));
-  }
-
-  void openPaymentPage(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const PaymentDetailsPage(),
-    ));
-  }
 
   void search() async {
     ref.read(_search.notifier).search(widget.query);

@@ -12,7 +12,6 @@ import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
-import 'package:my_finance/local_provider.dart' as local_provider;
 
 final _filteredAccounts = Provider<List<Account>>((ref) {
   final min = ref.watch(_minPriorityFilter);
@@ -192,13 +191,11 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Triggers on account item selected
   void onAccountPressed(Account account) {
-    ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
     setNewRoute(FinanceRoutePath(FinanceRoutePath.accounts.path, uuid: account.uuid));
   }
 
   /// Triggers on payment item selected
   void onPaymentPressed(Payment payment) {
-    ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
     setNewRoute(FinanceRoutePath(FinanceRoutePath.payments.path, uuid: payment.uuid));
   }
 
