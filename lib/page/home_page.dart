@@ -65,9 +65,15 @@ class HomePage extends ConsumerStatefulWidget {
   const HomePage({
     super.key,
     required this.router,
+    this.index = 0,
+    required this.onIndexChanged,
   });
 
   final FinanceRouterDelegate router;
+
+  final int index;
+
+  final ValueChanged<int> onIndexChanged;
 
   @override
   ConsumerState createState() => _HomePageState();
@@ -82,16 +88,19 @@ class _HomePageState extends ConsumerState<HomePage> {
       icon: const Icon(Icons.explore_outlined),
       selectedIcon: const Icon(Icons.explore),
       label: LocaleKeys.home.tr(),
+      route: RoutePath.home,
     ),
     _NavigationDestinations(
       icon: const Icon(Icons.folder_copy_outlined),
       selectedIcon: const Icon(Icons.folder_copy),
       label: LocaleKeys.account.plural(1),
+      route: FinanceRoutePath.accounts,
     ),
     _NavigationDestinations(
       icon: const Icon(Icons.payments_outlined),
       selectedIcon: const Icon(Icons.payments),
       label: LocaleKeys.payment.plural(1),
+      route: FinanceRoutePath.payments,
     ),
   ];
 
@@ -112,8 +121,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Open [page]
   ///
   /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
-  void openPage(RoutePath path, [Function(dynamic)? onPageFinished]) {
-    widget.router.setNewRoutePath(path).then(onPageFinished ?? (value) {});
+  void setNewRoute(RoutePath path) {
+    widget.router.setNewRoutePath(path);
   }
 
   /// Login
@@ -166,6 +175,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     setState(() {
       navigationRailIndex = index;
     });
+    setNewRoute(railDestinations[index].route);
+    widget.onIndexChanged(index);
   }
 
   /// Triggers on menu button pressed
@@ -182,13 +193,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   /// Triggers on account item selected
   void onAccountPressed(Account account) {
     ref.read(local_provider.selectedAccount.notifier).set(account.uuid);
-    openPage(FinanceRoutePath(FinanceRoutePath.accounts.path, account.uuid));
+    setNewRoute(FinanceRoutePath(FinanceRoutePath.accounts.path, uuid: account.uuid));
   }
 
   /// Triggers on payment item selected
   void onPaymentPressed(Payment payment) {
     ref.read(local_provider.selectedPayment.notifier).set(payment.uuid);
-    openPage(FinanceRoutePath(FinanceRoutePath.payments.path, payment.uuid));
+    setNewRoute(FinanceRoutePath(FinanceRoutePath.payments.path, uuid: payment.uuid));
   }
 
   /// Get [GridView] cross axis count
@@ -207,6 +218,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await tryLogin();
     });
+    navigationRailIndex = widget.index;
   }
 
   @override
@@ -297,8 +309,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           onTap: (index) {
             return onNavigationIndexChanged(convertNavigationIndex(index));
           },
-          items: List.generate(barDestinations.
-          length, (index) => BottomNavigationBarItem(
+          items: List.generate(barDestinations.length, (index) => BottomNavigationBarItem(
             icon: barDestinations[index].icon,
             activeIcon: barDestinations[index].selectedIcon,
             label: barDestinations[index].label,
@@ -318,9 +329,12 @@ class _NavigationDestinations {
 
   final String label;
 
+  final RoutePath route;
+
   _NavigationDestinations({
     required this.icon,
     required this.selectedIcon,
     required this.label,
+    required this.route,
   });
 }
