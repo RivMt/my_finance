@@ -15,6 +15,7 @@ void main() async {
   usePathUrlStrategy();
   final Map<String, dynamic> preferences = jsonDecode(await rootBundle.loadString("assets/key/config.json"));
   await ApiClient().init(preferences);
+  EasyLocalization.logger.printer = Log.easyLogger;
 
   // Run
   runApp(ProviderScope(
