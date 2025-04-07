@@ -87,6 +87,7 @@ class AccountsFragment extends ConsumerWidget {
                 return CurrencyCard(
                   currency: currency,
                   amount: sum,
+
                 );
               },
             );

@@ -280,6 +280,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               labelText: LocaleKeys.name.tr(),
               prefixIcon: IconButton(
                 icon: Icon(editing.icon.icon),
+                color: Theme.of(context).inputDecorationTheme.prefixIconColor,
                 onPressed: () => onPaymentIconButtonPressed(),
               ),
             ),

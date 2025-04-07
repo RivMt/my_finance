@@ -252,6 +252,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
               labelText: LocaleKeys.name.tr(),
               prefixIcon: IconButton(
                 icon: Icon(editing.icon.icon),
+                color: Theme.of(context).inputDecorationTheme.prefixIconColor,
                 onPressed: () => onAccountIconButtonPressed(),
               ),
             ),
