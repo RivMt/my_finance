@@ -126,8 +126,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Login
   Future<void> tryLogin() async {
-    if (!ref.watch(provider.currentUser).isValid) {
-      await provider.login(ref, load);
+    if (!ref.watch(provider.currentUser).user.isValid) {
+      provider.login(ref, load);
     }
   }
 
@@ -224,7 +224,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final accounts = ref.watch(_filteredAccounts);
     final payments = ref.watch(_filteredPayments);
     final iconName = ApiClient().isDevelop ? 'assets/icon/icon-dev.png' : 'assets/icon/icon-full.png';
-    final user = ref.watch(provider.currentUser);
+    final user = ref.watch(provider.currentUser).user;
     return Scaffold(
       appBar: AppBar(
         title: AppLogo(

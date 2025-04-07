@@ -43,7 +43,7 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(provider.currentUser);
+    final user = ref.watch(provider.currentUser).user;
     return AlertDialog(
       content: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

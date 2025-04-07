@@ -97,7 +97,7 @@ final _balance = Provider<Decimal>((ref) {
 final _data = Provider<StatefulData<_DataType>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
   // Check logged in
-  final user = ref.watch(provider.currentUser);
+  final user = ref.watch(provider.currentUser).user;
   if (!user.isValid) {
     state = StatefulDataState.loading;
   }
