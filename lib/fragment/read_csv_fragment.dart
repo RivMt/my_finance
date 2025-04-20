@@ -199,12 +199,11 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   }
 
   /// Show [Category] item selection dialog
-  Future<Category?> showCategorySelectDialog(BuildContext context, List<Category> list) async {
+  Future<Category?> showCategorySelectDialog(BuildContext context) async {
     return await showDialog(
       context: context,
       builder: (context) {
         return CategorySelectDialog(
-          list: list,
           onTap: (item) => Navigator.pop(context, item),
         );
       },
@@ -241,12 +240,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   void setPlusCategory(Category category) => plusCategory = category;
 
   /// Triggers on category card tapped
-  void onCategoryCardTapped(List<Category> categories, bool isPlus) async {
-    // Check categories has been loaded
-    if (categories.isEmpty) {
-      return;
-    }
-    final category = await showCategorySelectDialog(context, categories);
+  void onCategoryCardTapped(bool isPlus) async {
+    final category = await showCategorySelectDialog(context);
     if (category != null) {
       if (isPlus) {
         setPlusCategory(category);
@@ -432,7 +427,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
               "object": LocaleKeys.category.plural(1),
             }),
-            onTap: () => onCategoryCardTapped(ref.watch(_categories), false),
+            onTap: () => onCategoryCardTapped(false),
           ),
           // Category (Income)
           Text(
@@ -444,7 +439,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
               "object": LocaleKeys.category.plural(1),
             }),
-            onTap: () => onCategoryCardTapped(ref.watch(_categories), true),
+            onTap: () => onCategoryCardTapped(true),
           ),
           const SizedBox(height: 8,),
           // Target

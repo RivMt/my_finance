@@ -138,12 +138,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   }
 
   /// Show [Category] item selection dialog
-  Future<Category?> showCategorySelectDialog(BuildContext context, List<Category> list) async {
+  Future<Category?> showCategorySelectDialog(BuildContext context) async {
     return await showDialog(
       context: context,
       builder: (context) {
         return CategorySelectDialog(
-          list: list,
+          selectedType: editing.type,
+          showIncluded: editing.isIncluded,
           onTap: (item) => Navigator.pop(context, item),
         );
       },
@@ -230,12 +231,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   }
 
   /// Triggers on category card tapped
-  void onCategoryCardTapped(List<Category> categories) async {
-    // Check categories has been loaded
-    if (categories.isEmpty) {
-      return;
-    }
-    final category = await showCategorySelectDialog(context, categories);
+  void onCategoryCardTapped() async {
+    final category = await showCategorySelectDialog(context);
     if (category != null) {
       setState(() {
         setCategory(category);
@@ -431,7 +428,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
               "object": LocaleKeys.category.plural(1),
             }),
-            onTap: () => onCategoryCardTapped(ref.watch(provider.categories)),
+            onTap: onCategoryCardTapped,
           ),
           const SizedBox(height: 8,),
           // Account

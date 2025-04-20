@@ -1,73 +1,75 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:my_api/core/screen_planner.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
+import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
-class CategorySelectDialog extends StatefulWidget {
+final _type = StateNotifierProvider<ValueStateNotifier<TransactionType>, TransactionType>((ref) {
+  return ValueStateNotifier(ref, TransactionType.expense);
+});
+
+final _included = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) {
+  return ValueStateNotifier(ref, true);
+});
+
+final _categories = Provider((ref) {
+  final type = ref.watch(_type);
+  final included = ref.watch(_included);
+  final categories = ref.watch(provider.categories);
+  return categories.where((item) {
+    return item.type == type && item.isIncluded == included;
+  }).toList(growable: false);
+});
+
+class CategorySelectDialog extends ConsumerStatefulWidget {
   const CategorySelectDialog({
     super.key,
-    required this.list,
+    this.selectedType = TransactionType.expense,
+    this.showIncluded = true,
     this.onTap,
   });
 
-  /// List of **ALL** [Category]s
-  final List<Category> list;
+  /// Currently selected [TransactionType]
+  final TransactionType selectedType;
+
+  /// Value of including [Transaction.keyIncluded] is `true`
+  final bool showIncluded;
 
   /// Triggers on [CategoryCard] tapped
   final Function(Category)? onTap;
 
   @override
-  State createState() => _CategorySelectDialogState();
+  ConsumerState createState() => _CategorySelectDialogState();
 }
 
-class _CategorySelectDialogState extends State<CategorySelectDialog> {
-
-  List<Category> categories = [];
-
-  /// Currently selected [TransactionType]
-  TransactionType selectedType = TransactionType.expense;
-
-  /// Value of including [Transaction.keyIncluded] is `true`
-  bool include = true;
+class _CategorySelectDialogState extends ConsumerState<CategorySelectDialog> {
 
   /// Triggers on chip selection changed
   void onChipSelected(TransactionType type) {
-    selectedType = type;
-    refresh();
-    setState(() {});
+    ref.read(_type.notifier).set(type);
   }
 
   /// Triggers on included checkbox pressed
   void onIncludedPressed(bool value) {
-    include = value;
-    refresh();
-    setState(() {});
-  }
-
-  /// Refresh list of categories according to conditions
-  void refresh() {
-    categories = widget.list.where((item) {
-      return item.type == selectedType &&
-          item.isIncluded == include &&
-          !item.deleted;
-    }).toList(growable: false);
+    ref.read(_included.notifier).set(value);
   }
 
   @override
   void initState() {
     super.initState();
-    refresh();
-  }
-
-  @override
-  void didUpdateWidget(CategorySelectDialog oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    refresh();
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      onChipSelected(widget.selectedType);
+      onIncludedPressed(widget.showIncluded);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final selectedType = ref.watch(_type);
+    final showIncluded = ref.watch(_included);
+    final categories = ref.watch(_categories);
     return AlertDialog(
       title: Text(LocaleKeys.object_action.tr(namedArgs: {
         "object": LocaleKeys.category.plural(1),
@@ -101,14 +103,14 @@ class _CategorySelectDialogState extends State<CategorySelectDialog> {
                   padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () => onIncludedPressed(!include),
+                    onTap: () => onIncludedPressed(!showIncluded),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 0, 16, 0),
                       child: Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Checkbox(
-                            value: include,
+                            value: showIncluded,
                             onChanged: null,
                           ),
                           Text(
