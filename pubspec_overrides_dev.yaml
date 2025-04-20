@@ -1,0 +1,3 @@
+dependency_overrides:
+  my_api:
+    path: ../my_api

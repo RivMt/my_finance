@@ -52,20 +52,16 @@ jobs:
         with:
           cosign-release: 'v2.2.2'
 
-      # Clone my_api
-      - name: Clone my_api
-        run: |
-          mkdir ../my_api
-          git clone https://${{ vars.GIT_MYAPI }} ../my_api
-
       # Install flutter
       - name: Install Flutter
         uses: subosito/flutter-action@v2.16.0
 
-      # Install project's dependencies
-      - name: Install dependencies
+      # Clone my_api if ref is not master
+      - name: Clone my_api
+        if: github.ref_name != 'master'
         run: |
-          flutter pub get
+          mkdir ../my_api
+          git clone https://${{ vars.GIT_MYAPI }} ../my_api
 
       # Switch branch if DEV mode
       - name: Switch branch
@@ -75,13 +71,19 @@ jobs:
           git switch dev
           git show -q dev
           cd ../my_finance
+          mv pubspec_overrides_dev.yaml pubspec_overrides.yaml
+
+      # Install project's dependencies
+      - name: Install dependencies
+        run: |
+          flutter pub get
 
       # Generate locales
       - name: Generate locales
         run: |
           dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
 
-      # Generate icons if dev
+      # Generate icons if ref is dev
       - name: Generate DEV icons
         if: ${{ github.ref_name == 'dev' }}
         run: |
