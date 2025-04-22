@@ -19,7 +19,9 @@ final _categories = Provider((ref) {
   final included = ref.watch(_included);
   final categories = ref.watch(provider.categories);
   return categories.where((item) {
-    return item.type == type && item.isIncluded == included;
+    return item.type == type
+        && item.isIncluded == included
+        && item.deleted == false;
   }).toList(growable: false);
 });
 
