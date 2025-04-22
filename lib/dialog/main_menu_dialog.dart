@@ -6,11 +6,6 @@ import 'package:my_api/core.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
-import 'package:my_finance/page/categories_page.dart';
-import 'package:my_finance/page/advanced_query_page.dart';
-import 'package:my_finance/page/read_csv_page.dart';
-import 'package:my_finance/page/restore_items_page.dart';
-import 'package:my_finance/page/preference_page.dart';
 
 class MainMenuDialog extends ConsumerStatefulWidget {
   const MainMenuDialog({

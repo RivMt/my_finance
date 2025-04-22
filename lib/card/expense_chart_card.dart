@@ -43,8 +43,8 @@ final _expenseTransactions = Provider<StatefulData<Map<Category, Decimal>>>((ref
   return StatefulData(Map.fromEntries(entries), state);
 });
 
-final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
-  return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
+final _dateFilter = StateNotifierProvider<ValueStateNotifier<DateTime>, DateTime>((ref) {
+  return ValueStateNotifier<DateTime>(DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
 class ExpenseChartCard extends ConsumerStatefulWidget {

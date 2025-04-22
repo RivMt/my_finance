@@ -11,8 +11,8 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "CsvPage";
 
-final _transactions = StateNotifierProvider<ModelsState<Transaction>, List<Transaction>>((ref) {
-  return ModelsState<Transaction>(ref);
+final _transactions = StateNotifierProvider<ModelsStateNotifier<Transaction>, List<Transaction>>((ref) {
+  return ModelsStateNotifier<Transaction>();
 });
 
 final _columns = [

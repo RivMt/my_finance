@@ -11,7 +11,7 @@ import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 const _tag = "PaymentDetailsPage";
 
 final _uuid = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
-  return ValueStateNotifier(ref, Payment.unknown.uuid);
+  return ValueStateNotifier(Payment.unknown.uuid);
 });
 
 final _payment = Provider<Payment>((ref) {
@@ -39,12 +39,12 @@ final _filteredTransactions = Provider<List<Transaction>>((ref) {
   return list;
 });
 
-final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
-  return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
+final _dateFilter = StateNotifierProvider<ValueStateNotifier<DateTime>, DateTime>((ref) {
+  return ValueStateNotifier<DateTime>(DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
-final _sortFilter = StateNotifierProvider<ModelState<bool>, bool>((ref) {
-  return ModelState<bool>(ref, false);
+final _sortFilter = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) {
+  return ValueStateNotifier<bool>(false);
 });
 
 class PaymentDetailsPage extends ConsumerStatefulWidget {
@@ -73,7 +73,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
   Future<void> fetchTransactions() async {
     final uuid = ref.watch(_uuid);
-    provider.fetchTransactions(ref, {
+    provider.appendTransactions(ref, {
       ModelKeys.keyPaymentId: uuid,
     });
   }

@@ -8,7 +8,7 @@ import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 
 final _uuid = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
-  return ValueStateNotifier(ref, Account.unknown.uuid);
+  return ValueStateNotifier(Account.unknown.uuid);
 });
 
 final _account = Provider<Account>((ref) {
@@ -36,12 +36,12 @@ final _filteredTransactions = Provider<List<Transaction>>((ref) {
   return list;
 });
 
-final _dateFilter = StateNotifierProvider<ModelState<DateTime>, DateTime>((ref) {
-  return ModelState<DateTime>(ref, DateTime(DateTime.now().year, DateTime.now().month, 1));
+final _dateFilter = StateNotifierProvider<ValueStateNotifier<DateTime>, DateTime>((ref) {
+  return ValueStateNotifier<DateTime>(DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
-final _sortFilter = StateNotifierProvider<ModelState<bool>, bool>((ref) {
-  return ModelState<bool>(ref, false);
+final _sortFilter = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) {
+  return ValueStateNotifier<bool>(false);
 });
 
 class AccountDetailsPage extends ConsumerStatefulWidget {
@@ -68,9 +68,9 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     ref.read(_dateFilter.notifier).set(value);
   }
 
-  Future<void> fetchTransactions() async {
+  Future<void> appendTransactions() async {
     final uuid = ref.watch(_uuid);
-    provider.fetchTransactions(ref, {
+    provider.appendTransactions(ref, {
       ModelKeys.keyAccountId: uuid,
     });
   }
@@ -95,14 +95,14 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
   void onMonthChanged(DateTime value) {
     month = value;
-    fetchTransactions();
+    appendTransactions();
   }
 
   void onSortButtonPressed() {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
-  Future<void> onRefreshButtonPressed() => fetchTransactions();
+  Future<void> onRefreshButtonPressed() => appendTransactions();
 
 
   @override

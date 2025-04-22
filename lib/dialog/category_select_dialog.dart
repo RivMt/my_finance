@@ -7,11 +7,11 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 final _type = StateNotifierProvider<ValueStateNotifier<TransactionType>, TransactionType>((ref) {
-  return ValueStateNotifier(ref, TransactionType.expense);
+  return ValueStateNotifier(TransactionType.expense);
 });
 
 final _included = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) {
-  return ValueStateNotifier(ref, true);
+  return ValueStateNotifier(true);
 });
 
 final _categories = Provider((ref) {

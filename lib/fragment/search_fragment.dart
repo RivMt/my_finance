@@ -7,7 +7,7 @@ import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
 final _search = StateNotifierProvider<ModelStreamNotifier<Transaction>, Set<Transaction>>((ref) {
-  return ModelStreamNotifier<Transaction>(ref);
+  return ModelStreamNotifier<Transaction>();
 });
 
 class SearchFragment extends ConsumerStatefulWidget {

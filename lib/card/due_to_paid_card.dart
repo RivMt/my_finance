@@ -51,7 +51,7 @@ class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
   /// Fetch transaction data
   void fetch() async {
     // Request
-    provider.fetchTransactions(ref, {
+    provider.appendTransactions(ref, {
       ModelKeys.keyDeleted: false,
       ModelKeys.keyType: TransactionType.expense.code,
       ModelKeys.keyCalculatedDate: {

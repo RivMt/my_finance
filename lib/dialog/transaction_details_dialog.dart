@@ -7,7 +7,6 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
-import 'package:my_finance/page/payment_details_page.dart';
 
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({

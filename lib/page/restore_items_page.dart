@@ -30,8 +30,8 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   return result;
 });
 
-final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, ModelKeys.keyLastUsed);
+final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier<String>(ModelKeys.keyLastUsed);
 });
 
 class RestoreItemsPage extends ConsumerStatefulWidget {

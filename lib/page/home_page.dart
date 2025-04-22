@@ -47,16 +47,16 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   return result;
 });
 
-final _minPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, 0);
+final _minPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+  return ValueStateNotifier<int>(0);
 });
 
-final _maxPriorityFilter = StateNotifierProvider<ModelState<int>, int>((ref) {
-  return ModelState<int>(ref, 1000);
+final _maxPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+  return ValueStateNotifier<int>(1000);
 });
 
-final _sortFilter = StateNotifierProvider<ModelState<String>, String>((ref) {
-  return ModelState<String>(ref, ModelKeys.keyUuid);
+final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier<String>(ModelKeys.keyUuid);
 });
 
 class HomePage extends ConsumerStatefulWidget {
@@ -138,12 +138,12 @@ class _HomePageState extends ConsumerState<HomePage> {
       return;
     }
     Log.i(_tag, "Request initial user data");
-    provider.fetchAccounts(ref);
+    provider.appendAccounts(ref);
     provider.fetchPayments(ref);
     provider.fetchCategories(ref);
     provider.fetchCurrencies(ref);
-    fetchPreferences(ref, provider.corePreferences);
-    fetchPreferences(ref, provider.financePreference);
+    pullPreferences(ref, provider.corePreferences);
+    pullPreferences(ref, provider.financePreference);
     fetchTransaction();
   }
 
@@ -151,7 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   void fetchTransaction() async {
     // Request
     final now = DateTime.now();
-    provider.fetchTransactions(ref, {
+    provider.appendTransactions(ref, {
       ModelKeys.keyPaidDate: {
         ApiQuery.keyQueryRangeBegin: DateTime(now.year, now.month - 3, 1).toIso8601String(),
         ApiQuery.keyQueryRangeEnd: DateTime(now.year, now.month + 2, 0).toIso8601String(),
