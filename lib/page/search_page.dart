@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/fragment/search_fragment.dart';
 
+/// Provides transaction search through Flutter's search interface.
 class SearchPage extends SearchDelegate {
 
   @override
@@ -28,6 +29,7 @@ class SearchPage extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) => build(context);
 
+  /// Builds the shared suggestions and results content.
   Widget build(BuildContext context) {
     final width = ScreenPlanner(context).panelWidth;
     final number = ScreenPlanner(context).panelNumber;

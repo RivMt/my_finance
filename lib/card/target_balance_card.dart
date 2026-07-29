@@ -95,40 +95,41 @@ final _balance = Provider<Decimal>((ref) {
 
 final _data = Provider<StatefulData<_DataType>>((ref) {
   StatefulDataState state = StatefulDataState.ready;
-  // Check logged in
+  // Wait for an authenticated user.
   final user = ref.watch(provider.currentUser).user;
   if (!user.isValid) {
     state = StatefulDataState.loading;
   }
-  // Get default currency
+  // Require a configured default currency.
   final currency = ref.watch(provider.defaultCurrency);
   if (currency == Currency.unknown) {
     state = StatefulDataState.error(LocaleKeys.msgUnknownDefaultCurrency.tr());
   }
-  // Filter transactions
+  // Require transactions in the chart range.
   final List<Transaction> list = ref.watch(_transactions);
   if (list.isEmpty) {
     state = StatefulDataState.error(LocaleKeys.msgNoTransactions.tr());
   }
-  // Generate chart data
+  // Aggregate daily transaction amounts.
   final _DataType data = SplayTreeMap();
   for(Transaction item in list) {
     final key = DateTime(item.calculatedDate.year, item.calculatedDate.month, item.calculatedDate.day);
     if (!data.containsKey(key)) {
-      // Expense, Income, Withdraw, Deposit, Balance
+      // Included expense, included income, excluded expense, excluded income,
+      // and balance.
       data[key] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
     }
     final index = item.type.code + (item.isIncluded ? 0 : 1) * 2;
     data[key]![index] = data[key]![index] + item.amount;
   }
-  // Target Balance
+  // Seed the target date with the current balance.
   final DateTime end = ref.watch(_dateEnd);
   Decimal balance = ref.watch(_balance);
   if (!data.containsKey(end)) {
     data[end] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
   }
   data[end]![4] = balance;
-  // Balances
+  // Reconstruct historical and projected daily balances.
   final DateTime now = DateTime(_dateNow.year, _dateNow.month, _dateNow.day);
   if (!data.containsKey(now)) {
     data[now] = [Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero, Decimal.zero];
@@ -151,11 +152,12 @@ final _data = Provider<StatefulData<_DataType>>((ref) {
   return StatefulData(data, state);
 });
 
-/// Calculate delta of given [list]
+/// Returns the net balance change for an aggregated daily [list].
 Decimal _sum(List<Decimal> list) {
   return -list[0] + list[1] - list[2] + list[3];
 }
 
+/// Charts actual and projected balances against the next target balance.
 class TargetBalanceCard extends ConsumerWidget {
 
   const TargetBalanceCard({super.key});
@@ -164,25 +166,25 @@ class TargetBalanceCard extends ConsumerWidget {
 
   static const _colorIncome = Colors.greenAccent;
 
-  /// [BorderRadius] of upper direction chart bar
+  /// Border radius for upward bars.
   final _borderUp = const BorderRadius.vertical(
     top: Radius.circular(8),
     bottom: Radius.zero,
   );
 
-  /// [BorderRadius] of upper direction chart bar
+  /// Border radius for downward bars.
   final _borderDown = const BorderRadius.vertical(
     top: Radius.zero,
     bottom: Radius.circular(8),
   );
 
-  /// Height of bar chart
+  /// Height available on each side of the chart axis.
   final _height = 90.0;
 
-  /// Minimum size of bar height
+  /// Minimum visible height of a non-zero bar.
   final _minBarHeight = 10.0;
 
-  /// Generate subtitle from given [currency], [balance], and [target]
+  /// Describes the difference between [balance] and [target].
   String getSubtitle({
     required Currency currency,
     required Decimal balance,
@@ -196,7 +198,7 @@ class TargetBalanceCard extends ConsumerWidget {
     });
   }
 
-  /// Scaling chart value
+  /// Scales [value] into chart space while preserving its sign.
   double scaleValue({
     required double value,
     required double max,
@@ -209,16 +211,14 @@ class TargetBalanceCard extends ConsumerWidget {
     ) * value.sign;
   }
 
-  /// Factor of bar scale
-  ///
-  /// [local] is local maximum, [global] is global maximum.
+  /// Returns a scale factor from a series [local] maximum and [global] maximum.
   double scaleFactor(double local, double global) {
     return 0.5 + local/global * 0.5;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Provider
+    // Resolve chart data and the next target.
     final raw = ref.watch(_data);
     final data = raw.data;
     final state = raw.state;
@@ -227,7 +227,7 @@ class TargetBalanceCard extends ConsumerWidget {
     final currency = ref.watch(provider.defaultCurrency);
     final targets = ref.watch(_target);
     final target = targets?.get(dateEnd.toIso8601String(), null);
-    // Value scaling
+    // Normalize balance, income, and expense series together.
     final maxes = ref.watch(_max);
     final deltaMax = math.max(maxes[0], maxes[1]);
     final globalMax = math.max(deltaMax, maxes[4]);
@@ -288,7 +288,7 @@ class TargetBalanceCard extends ConsumerWidget {
                     ),
                     textAlign: TextAlign.start,
                     children: [
-                      // Balance
+                      // Balance.
                       TextSpan(
                         text: currency.format(data[key]![4]),
                         style: TextStyle(
@@ -298,7 +298,7 @@ class TargetBalanceCard extends ConsumerWidget {
                         ),
                       ),
                       const TextSpan(text: "\n"),
-                      // Expense
+                      // Expense.
                       TextSpan(
                         text: LocaleKeys.transactionTypeExpense.tr(),
                         style: const TextStyle(
@@ -308,7 +308,7 @@ class TargetBalanceCard extends ConsumerWidget {
                       const TextSpan(text: " "),
                       TextSpan(text: currency.format(data[key]![0])),
                       const TextSpan(text: "\n"),
-                      // Income
+                      // Income.
                       TextSpan(
                         text: LocaleKeys.transactionTypeIncome.tr(),
                         style: const TextStyle(
@@ -318,7 +318,7 @@ class TargetBalanceCard extends ConsumerWidget {
                       const TextSpan(text: " "),
                       TextSpan(text: currency.format(data[key]![1])),
                       const TextSpan(text: "\n"),
-                      // Delta
+                      // Excluded transaction delta.
                       TextSpan(
                         text: LocaleKeys.delta.tr(),
                         style: const TextStyle(
@@ -345,7 +345,7 @@ class TargetBalanceCard extends ConsumerWidget {
                 x: key.millisecondsSinceEpoch,
                 groupVertically: true,
                 barRods: [
-                  // Balance
+                  // Balance.
                   if (maxes[4] > 0)
                     BarChartRodData(
                       fromY: 0,
@@ -355,7 +355,7 @@ class TargetBalanceCard extends ConsumerWidget {
                           : Theme.of(context).colorScheme.primaryContainer,
                       borderRadius: bal > 0 ? _borderUp : _borderDown,
                     ),
-                  // Expense
+                  // Included expenses.
                   if (maxes[0] > 0)
                     BarChartRodData(
                       fromY: 0,
@@ -367,7 +367,7 @@ class TargetBalanceCard extends ConsumerWidget {
                       color: _colorExpense,
                       borderRadius: _borderDown,
                     ),
-                  // Income
+                  // Included income.
                   if (maxes[1] > 0)
                     BarChartRodData(
                       fromY: 0,

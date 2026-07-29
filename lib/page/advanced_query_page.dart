@@ -32,8 +32,10 @@ final _columns = [
   ModelKeys.keyIncluded,
 ];
 
+/// Queries transactions by date and exports the results as CSV.
 class AdvancedQueryPage extends ConsumerStatefulWidget {
 
+  /// Legacy route name for the advanced query page.
   static const String route = "/csv";
 
   const AdvancedQueryPage({super.key});
@@ -44,19 +46,19 @@ class AdvancedQueryPage extends ConsumerStatefulWidget {
 
 class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
 
-  /// Beginning [DateTime] of condition
+  /// Inclusive beginning of the query range.
   DateTime minDate = DateTime(DateTime.now().year, 1, 1);
 
-  /// End of [DateTime] of condition
+  /// End of the query range.
   DateTime maxDate = DateTime.now();
 
-  /// Value of request is progressing or not
+  /// Whether a query is in progress.
   bool progressing = false;
 
-  /// Horizontal scroll controller
+  /// Controls horizontal table scrolling.
   final ScrollController controller = ScrollController();
 
-  /// Request [RawTransaction]s
+  /// Requests transactions in the selected date range.
   void request() async {
     if (minDate.compareTo(maxDate) > 0) {
       return;
@@ -73,7 +75,7 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
     });
   }
 
-  /// Generate data row
+  /// Builds a table row for [item].
   DataRow getDataRow(Transaction item) {
     final accounts = ref.watch(provider.accounts);
     final payments = ref.watch(provider.payments);
@@ -109,7 +111,7 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
     );
   }
 
-  /// Triggers on download button pressed
+  /// Exports the queried transactions through [DataFrame].
   void onDownloadButtonPressed() async {
     String? path = await FilePicker.platform.saveFile(
       dialogTitle: LocaleKeys.msgExportCsv.tr(),
@@ -119,7 +121,7 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
     if (path == null) {
       return;
     }
-    // Create raw csv
+    // Convert model fields to localized CSV values.
     final DataFrame<Transaction> df = DataFrame(
       columns: _columns,
       data: ref.watch(_transactions),
@@ -160,7 +162,7 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
       newLine: "\r\n",
       escape: '"',
     );
-    // Save
+    // Save the CSV to the selected path.
     try {
       final file = File(path);
       file.writeAsString(raw);
@@ -169,14 +171,14 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
     }
   }
 
-  /// Triggers on [minDate] setting [DateButton] pressed
+  /// Updates the beginning of the query range.
   void onMinDateChanged(DateTime date) async {
     setState(() {
       minDate = date;
     });
   }
 
-  /// Triggers on [maxDate] setting [DateButton] pressed
+  /// Updates the end of the query range.
   void onMaxDateChanged(DateTime date) async {
     setState(() {
       maxDate = date;

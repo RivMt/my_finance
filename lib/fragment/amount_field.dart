@@ -8,6 +8,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Edits a currency-specific [Decimal] amount.
 class AmountField extends ConsumerStatefulWidget {
   const AmountField({
     super.key,
@@ -18,14 +19,19 @@ class AmountField extends ConsumerStatefulWidget {
     required this.onAmountChanged,
   });
 
+  /// Selected currency, or the configured default currency.
   final Currency? currency;
 
+  /// Current amount.
   final Decimal amount;
 
+  /// Input label.
   final String label;
 
+  /// Called when the selected currency changes.
   final Function(Currency) onCurrencyChanged;
 
+  /// Called when a valid amount is entered.
   final Function(Decimal) onAmountChanged;
 
   @override
@@ -35,16 +41,16 @@ class AmountField extends ConsumerStatefulWidget {
 
 class _AmountFieldState extends ConsumerState<AmountField> {
 
-  /// [TextEditingController] for budget amount
+  /// Controls the amount input.
   final controller = TextEditingController();
 
-  /// Currency
+  /// Resolved selected or default currency.
   Currency get currency => provider.getCurrency(ref, widget.currency?.uuid);
 
-  /// [RegExp] for verify amount
+  /// Currency-aware amount validation pattern from [WalletItem].
   RegExp get regex => WalletItem.getAmountRegex(currency);
 
-  /// Show currency selection dialog
+  /// Shows the currency selection dialog.
   void onCurrencyPressed(BuildContext context) async {
     final result = await showDialog(
       context: context,
@@ -53,7 +59,7 @@ class _AmountFieldState extends ConsumerState<AmountField> {
     widget.onCurrencyChanged(result);
   }
 
-  /// Triggers on [TextField] value changed
+  /// Validates and reports an amount input change.
   void onTextFieldChanged(String string) {
     Decimal value = Decimal.zero;
     if (regex.hasMatch(string)) {

@@ -6,6 +6,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Selects a color from a picker or a recent-color palette.
 class ColorPickerDialog extends StatefulWidget {
   const ColorPickerDialog({
     super.key,
@@ -15,12 +16,16 @@ class ColorPickerDialog extends StatefulWidget {
     this.paletteSize = 32,
   });
 
+  /// Initially selected color.
   final Color color;
 
+  /// Called whenever the selected color changes.
   final void Function(Color) onColorChanged;
 
+  /// Optional recent colors displayed below the picker.
   final List<Color> palettes;
 
+  /// Diameter of each palette button.
   final double paletteSize;
 
   @override
@@ -29,13 +34,13 @@ class ColorPickerDialog extends StatefulWidget {
 
 class _ColorPickerDialogState extends State<ColorPickerDialog> {
 
-  /// Number of palettes
+  /// Maximum number of recent colors shown.
   final maxPaletteNumber = 10;
 
-  /// Selected [Color] of widget
+  /// Currently selected color.
   Color selected = Colors.white;
 
-  /// Triggers on color picked
+  /// Updates and reports the selected color.
   void onColorChanged(Color value) {
     setState(() {
       selected = value;

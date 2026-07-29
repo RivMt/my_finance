@@ -6,6 +6,7 @@ import 'package:my_finance/card/due_to_paid_card.dart';
 import 'package:my_finance/card/expense_chart_card.dart';
 import 'package:my_finance/card/target_balance_card.dart';
 
+/// Displays the finance summary cards in a responsive grid.
 class HomeFragment extends ConsumerStatefulWidget {
 
   const HomeFragment({super.key});
@@ -24,7 +25,7 @@ class _HomePageState extends ConsumerState<HomeFragment> {
     const TargetBalanceCard(),
   ];
 
-  /// Triggers on scroll down
+  /// Refreshes summary data after a pull gesture.
   Future<void> refresh() {
     _dueToPaidKey.currentState?.fetch();
     return Future<void>.value();

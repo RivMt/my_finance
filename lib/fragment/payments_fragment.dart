@@ -7,6 +7,7 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Groups payments by [PaymentSymbol] and provides editing actions.
 class PaymentsFragment extends ConsumerWidget {
   const PaymentsFragment({
     super.key,
@@ -19,21 +20,28 @@ class PaymentsFragment extends ConsumerWidget {
     this.amountConditions,
   });
 
+  /// Payments to display.
   final List<Payment> payments;
 
+  /// Payment highlighted as selected.
   final Payment? selected;
 
+  /// Optional subtitle for payment content.
   final String subtitle;
 
+  /// Whether to hide the payment creation button.
   final bool hideCreateButton;
 
+  /// Called when a payment is tapped.
   final Function(Payment)? onItemTap;
 
+  /// Conditions used to query payments.
   final List<Map<String, dynamic>>? paymentsConditions;
 
+  /// Conditions used to calculate payment amounts.
   final List<Map<String, dynamic>>? amountConditions;
 
-  /// Show payment editing modal
+  /// Shows the payment creation or editing modal.
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
     showModalBottomSheet<Payment>(
       context: context,
@@ -51,7 +59,7 @@ class PaymentsFragment extends ConsumerWidget {
     );
   }
 
-  /// Triggers on payment add button pressed
+  /// Opens the payment creation modal.
   void onPaymentAddButtonPressed(BuildContext context) {
     showPaymentEditingModal(context);
   }
@@ -66,7 +74,7 @@ class PaymentsFragment extends ConsumerWidget {
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
-          // Tailing button
+          // Payment creation button.
           if (index == PaymentSymbol.values.length) {
             return Visibility(
               visible: !hideCreateButton,
@@ -79,11 +87,11 @@ class PaymentsFragment extends ConsumerWidget {
           }
           final icon = PaymentSymbol.values[index];
           final sublist = payments.where((element) => (element.icon == icon)).toList(growable: false);
-          // Hide when sublist is empty
+          // Omit empty symbol groups.
           if (sublist.isEmpty) {
             return const SizedBox();
           }
-          // Group
+          // Symbol group.
           return GroupCard(
             title: icon.key.tr(),
             count: sublist.length,

@@ -56,6 +56,7 @@ final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((r
   return ValueStateNotifier<String>(ModelKeys.keyLastUsed);
 });
 
+/// Creates, updates, or soft-deletes a [Transaction].
 class TransactionEditModal extends ConsumerStatefulWidget {
   const TransactionEditModal({
     super.key,
@@ -64,10 +65,13 @@ class TransactionEditModal extends ConsumerStatefulWidget {
     this.payment,
   });
 
+  /// Transaction to edit, or `null` when creating one.
   final Transaction? base;
 
+  /// Account selected before opening the modal.
   final Account? account;
 
+  /// Payment selected before opening the modal.
   final Payment? payment;
 
   @override
@@ -84,15 +88,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   final TextEditingController utilityDaysController = TextEditingController();
 
-  /// Is this fragment editing [Transaction]
-  ///
-  /// This returns `true` when [widget.base] is not `null`
+  /// Whether an existing transaction is being edited.
   bool get isEdit => widget.base != null;
 
-  /// [Transaction] which is now editing
+  /// Mutable transaction being edited.
   Transaction editing = Transaction({});
 
-  /// Value of [editing] is ready or not
+  /// Whether the transaction and text inputs are valid.
   bool get ready {
     return editing.isValid
         && (amountController.text == editing.amount.toString())
@@ -101,12 +103,12 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
         && (utilityDaysController.text == editing.utilityDays.toString());
   }
 
-  /// Currently selected [Account]
+  /// Currently selected account, or [Account.unknown].
   Account get selectedAccount {
     return ref.watch(_filteredAccounts).firstWhere((item) => item.uuid == editing.accountId, orElse: () => Account.unknown);
   }
 
-  /// Currently selected [Payment]
+  /// Currently selected payment, including [Payment.none].
   Payment get selectedPayment {
     return ref.watch(_filteredPayments).firstWhere((item) => item.uuid == editing.paymentId, orElse: () {
       if (editing.paymentId == Payment.none.uuid) {
@@ -116,15 +118,15 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Currently selected [Category]
+  /// Currently selected category, or [Category.unknown].
   Category get selectedCategory {
     return ref.watch(provider.categories).firstWhere((item) => item.uuid == editing.categoryId, orElse: () => Category.unknown);
   }
 
-  /// Transactions has payment or not
+  /// Whether the transaction uses a payment handler.
   bool get hasPayment => editing.paymentId != Payment.noneUuid;
 
-  /// Show [T] item selection dialog
+  /// Shows a selection dialog for [list].
   Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
@@ -137,7 +139,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     );
   }
 
-  /// Show [Category] item selection dialog
+  /// Shows a category dialog matching the transaction settings.
   Future<Category?> showCategorySelectDialog(BuildContext context) async {
     return await showDialog(
       context: context,
@@ -151,7 +153,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     );
   }
   
-  /// Show date picker
+  /// Shows a date picker initialized with [base].
   Future<DateTime> showDatePickDialog(BuildContext context, DateTime base) async {
     final DateTime? result = await showDatePicker(
       context: context,
@@ -162,7 +164,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     return result ?? base;
   }
 
-  /// Triggers on negative button pressed
+  /// Deletes the transaction in edit mode or cancels creation.
   Future<bool> onNegativeButtonPressed() async {
     if (!isEdit) {
       return true;
@@ -170,7 +172,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     return await provider.deleteTransaction(ref, editing);
   }
 
-  /// Triggers on confirm button pressed
+  /// Persists the transaction being edited.
   Future<bool> onConfirmButtonPressed() async {
     if (isEdit) {
       return await provider.updateTransaction(ref, editing);
@@ -178,7 +180,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     return await provider.createTransaction(ref, editing);
   }
 
-  /// Set [editing.paidDate]
+  /// Sets the paid date and recalculates the withdrawal date.
   void setPaidDate(DateTime date) {
     setState(() {
       editing.paidDate = date;
@@ -186,13 +188,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Set [editing.calculatedDate]
-  ///
-  /// If [date] is not `null`, set [editing.calculatedDate] to [date]. And
-  /// [date] is `null` and [editing.calculatedDate] is equal to
-  /// [Transaction.defaultCalculatedDate], set it from [editing.paidDate].
-  ///
-  /// Make [override] `true` to override [editing.calculatedDate] whether its value.
+  /// Sets the withdrawal date directly or derives it from the payment.
   void setCalculatedDate([DateTime? date]) {
     setState(() {
       if (date != null) {
@@ -204,15 +200,14 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Set [editing.accountId] and [editing.currency]
+  /// Sets the transaction account and account currency.
   void setAccount(Account account) {
     setState(() {
       editing.setAccount(account);
     });
   }
 
-  /// Set [editing.paymentId], [editing.altCurrency], [editing.altAmount] and
-  /// [editing.calculatedDate].
+  /// Sets payment fields and recalculates the withdrawal date.
   void setPayment(Payment payment) {
     setState(() {
       editing.setPayment(payment);
@@ -220,7 +215,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Set [editing.minusCategory] and [editing.type]
+  /// Applies the category type and statistics-inclusion setting.
   void setCategory(Category category) {
     editing.categoryId = category.uuid;
     editing.type = category.type;
@@ -230,7 +225,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     }
   }
 
-  /// Triggers on category card tapped
+  /// Selects a category.
   void onCategoryCardTapped() async {
     final category = await showCategorySelectDialog(context);
     if (category != null) {
@@ -240,7 +235,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     }
   }
   
-  /// Triggers on account card tapped
+  /// Selects an account and reconciles payment currencies.
   void onAccountCardTapped(List<Account> accounts) async {
     final account = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
       "object": LocaleKeys.account.plural(1),
@@ -253,13 +248,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     setState(() {});
   }
 
-  /// Triggers on no payment checkbox changed
+  /// Selects [Payment.none] when no payment handler is requested.
   void onNoPaymentCheckboxChanged(bool value) {
     setPayment(value ? Payment.none : Payment.unknown);
     setState(() {});
   }
 
-  /// Triggers on payment card tapped
+  /// Selects a payment and reconciles account currencies.
   void onPaymentCardTapped(List<Payment> payments) async {
     final payment = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
       "object": LocaleKeys.payment.plural(1),
@@ -272,7 +267,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     setState(() {});
   }
 
-  /// Triggers on alt amount changed
+  /// Updates the alternate amount when [value] is valid.
   void onAltAmountChanged(String value) {
     final currency = provider.getCurrency(ref, editing.altCurrencyId);
     setState(() {
@@ -284,7 +279,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Triggers on amount changed
+  /// Updates the account-currency amount when [value] is valid.
   void onAmountChanged(String value) {
     final currency = provider.getCurrency(ref, editing.currencyId);
     setState(() {
@@ -296,21 +291,21 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the transaction description.
   void onDescriptionChanged(String desc) {
     setState(() {
       editing.descriptions = desc;
     });
   }
 
-  /// Triggers on cash checkboxes value changed
+  /// Updates whether the transaction is included in statistics.
   void onIncludedValueChanged(bool value) {
     setState(() {
       editing.isIncluded = value;
     });
   }
 
-  /// Triggers on utility days calculate button pressed
+  /// Calculates utility days from a selected inclusive date range.
   void onUtilityDaysCalculateButtonPressed(BuildContext context) async {
     final DateTimeRange? range = await showDateRangePicker(
       context: context,
@@ -330,7 +325,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     });
   }
 
-  /// Triggers on utility days value changed
+  /// Updates the number of utility days.
   void onUtilityDaysValueChanged(String value) {
     setState(() {
       if (value != "") {
@@ -378,7 +373,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date
+          // Paid and calculated dates.
           Text(
             LocaleKeys.date.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -418,7 +413,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ),
           ),
           const SizedBox(height: 8,),
-          // Category
+          // Transaction category.
           Text(
             LocaleKeys.category.plural(1),
             style: Theme.of(context).textTheme.labelSmall,
@@ -431,7 +426,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             onTap: onCategoryCardTapped,
           ),
           const SizedBox(height: 8,),
-          // Account
+          // Source account.
           Text(
             LocaleKeys.account.plural(1),
             style: Theme.of(context).textTheme.labelSmall,
@@ -445,7 +440,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             onTap: () => onAccountCardTapped(ref.watch(_filteredAccounts)),
           ),
           const SizedBox(height: 8,),
-          // Payment
+          // Payment handler.
           Visibility(
             visible: editing.type == TransactionType.expense,
             child: Column(
@@ -495,13 +490,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ),
           ),
           const SizedBox(height: 8,),
-          // Basic information
+          // Amount and description.
           Text(
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Alt amount
+          // Alternate payment-currency amount.
           Visibility(
             visible: useAlt,
             child: TextField(
@@ -526,7 +521,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ),
           ),
           const SizedBox(height: 8,),
-          // Amount
+          // Account-currency amount.
           TextField(
             controller: amountController,
             keyboardType: TextInputType.numberWithOptions(
@@ -548,7 +543,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             onChanged: onAmountChanged,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Description.
           TextField(
             controller: descriptionController,
             decoration: InputDecoration(
@@ -560,7 +555,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             onChanged: onDescriptionChanged,
           ),
           const SizedBox(height: 8,),
-          // Efficient days
+          // Effective date range.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -599,7 +594,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ],
           ),
           const SizedBox(height: 8,),
-          // Included checkbox
+          // Statistics-inclusion flag.
           Padding(
             padding: const EdgeInsets.all(8),
             child: InkWell(

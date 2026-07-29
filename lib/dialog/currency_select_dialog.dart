@@ -6,6 +6,7 @@ import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Selects a [Currency] from the currencies provided by `my_api`.
 class CurrencySelectDialog extends ConsumerWidget {
 
   const CurrencySelectDialog({super.key});

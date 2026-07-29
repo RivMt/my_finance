@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 
+/// Selects an [Account] or [Payment] from [list].
 class SelectDialog<T> extends StatelessWidget {
 
+  /// Dialog title.
   final String title;
 
+  /// Items available for selection.
   final List<T> list;
 
   const SelectDialog({

@@ -44,6 +44,7 @@ final _sortFilter = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) 
   return ValueStateNotifier<bool>(false);
 });
 
+/// Displays an account balance and its monthly transactions.
 class AccountDetailsPage extends ConsumerStatefulWidget {
 
   const AccountDetailsPage({
@@ -51,6 +52,7 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
     required this.uuid,
   });
 
+  /// UUID of the account to display.
   final String uuid;
 
   @override
@@ -60,14 +62,17 @@ class AccountDetailsPage extends ConsumerStatefulWidget {
 
 class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
 
+  /// Whether transactions are shown in reverse order.
   bool get isReverse => ref.watch(_sortFilter);
 
+  /// Month currently displayed.
   DateTime get month => ref.watch(_dateFilter);
 
   set month(DateTime value) {
     ref.read(_dateFilter.notifier).set(value);
   }
 
+  /// Appends transactions for the current account.
   Future<void> appendTransactions() async {
     final uuid = ref.watch(_uuid);
     provider.appendTransactions(ref, {
@@ -75,7 +80,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     });
   }
 
-  /// Show account editing modal
+  /// Shows the account editing modal.
   void showAccountEditingModal(BuildContext context, [Account? account]) async {
     showModalBottomSheet<Account>(
       context: context,
@@ -93,15 +98,18 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     );
   }
 
+  /// Changes the month and requests account transactions.
   void onMonthChanged(DateTime value) {
     month = value;
     appendTransactions();
   }
 
+  /// Toggles transaction ordering.
   void onSortButtonPressed() {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
+  /// Refreshes account transactions.
   Future<void> onRefreshButtonPressed() => appendTransactions();
 
 

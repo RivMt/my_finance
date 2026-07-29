@@ -6,9 +6,11 @@ import 'package:my_api/finance.dart';
 import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Creates, updates, or soft-deletes a [Category].
 class CategoryEditModal extends ConsumerStatefulWidget {
   const CategoryEditModal(this.base, {super.key});
   
+  /// Category to edit, or `null` when creating one.
   final Category? base;
 
   @override
@@ -21,18 +23,16 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
 
   final TextEditingController descriptionController = TextEditingController();
 
-  /// Is this fragment editing [Category]
-  ///
-  /// This returns `true` when [widget.base] is not `null`
+  /// Whether an existing category is being edited.
   bool get isEdit => widget.base != null;
 
-  /// [Category] which is now editing
+  /// Mutable category being edited.
   Category editing = Category({});
 
-  /// Value is [editing] is ready or not
+  /// Whether the category is valid.
   bool get ready => editing.isValid;
 
-  /// Show [CategoryIcon] item selection dialog
+  /// Shows a [CategorySymbol] selection dialog.
   Future<CategorySymbol?> showSelectDialog(BuildContext context, String title, List<CategorySymbol> list) async {
     return await showDialog(
       context: context,
@@ -69,7 +69,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
     );
   }
 
-  /// Triggers on negative button pressed
+  /// Deletes the category in edit mode or cancels creation.
   Future<bool> onNegativeButtonPressed() async {
     if (!isEdit) {
       return true;
@@ -77,7 +77,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
     return await provider.deleteCategory(ref, editing);
   }
 
-  /// Triggers on confirm button pressed
+  /// Persists the category being edited.
   Future<bool> onConfirmButtonPressed() async {
     if (isEdit) {
       return await provider.updateCategory(ref, editing);
@@ -85,7 +85,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
     return await provider.createCategory(ref, editing);
   }
 
-  /// Trigger on type chips selected
+  /// Updates the category transaction type.
   void onTypeChanged(TransactionType type, bool value) {
     setState(() {
       if (value) {
@@ -94,21 +94,21 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
     });
   }
 
-  /// Triggers on name changed
+  /// Updates the category name.
   void onNameChanged(String name) {
     setState(() {
       editing.name = name;
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the category description.
   void onDescriptionsChanged(String desc) {
     setState(() {
       editing.descriptions = desc;
     });
   }
 
-  /// Triggers on [CategoryIcon] button pressed
+  /// Selects the category symbol.
   void onCategoryIconButtonPressed() async {
     final icon = await showSelectDialog(
       context,
@@ -122,7 +122,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
     }
   }
 
-  /// Triggers on cash checkboxes value changed
+  /// Updates whether related transactions are included in statistics.
   void onIncludeValueChanged(bool value) {
     setState(() {
       editing.isIncluded = value;
@@ -152,13 +152,13 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Basic information
+          // Basic information.
           Text(
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Type
+          // Transaction type.
           Padding(
             padding: const EdgeInsets.all(4),
             child: Row(
@@ -186,7 +186,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
             ),
           ),
           const SizedBox(height: 8,),
-          // Name
+          // Name and symbol.
           TextField(
             controller: nameController,
             decoration: InputDecoration(
@@ -199,7 +199,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
             onChanged: onNameChanged,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Description.
           TextField(
             controller: descriptionController,
             decoration: InputDecoration(
@@ -209,7 +209,7 @@ class _CategoryEditModalState extends ConsumerState<CategoryEditModal> {
             onChanged: onDescriptionsChanged,
           ),
           const SizedBox(height: 8,),
-          // Included checkbox
+          // Statistics-inclusion flag.
           Padding(
             padding: const EdgeInsets.all(8),
             child: InkWell(

@@ -9,6 +9,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/modal/account_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Groups accounts by [AccountSymbol] and displays their balances.
 class AccountsFragment extends ConsumerWidget {
   const AccountsFragment({
     super.key,
@@ -19,17 +20,22 @@ class AccountsFragment extends ConsumerWidget {
     this.onItemTap,
   });
 
+  /// Accounts to display.
   final List<Account> accounts;
 
+  /// Called when an account is tapped.
   final Function(Account)? onItemTap;
 
+  /// Account highlighted as selected.
   final Account? selected;
 
+  /// Whether to hide the total-balance header.
   final bool hideHeader;
 
+  /// Whether to hide the account creation button.
   final bool hideCreateButton;
 
-  /// Show account editing modal
+  /// Shows the account creation or editing modal.
   void showAccountEditingModal(BuildContext context, [Account? account]) async {
     showModalBottomSheet<Account>(
       context: context,
@@ -47,7 +53,7 @@ class AccountsFragment extends ConsumerWidget {
     );
   }
 
-  /// Triggers on account add button pressed
+  /// Opens the account creation modal.
   void onAccountAddButtonPressed(BuildContext context) {
     showAccountEditingModal(context);
   }
@@ -63,7 +69,7 @@ class AccountsFragment extends ConsumerWidget {
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
         itemBuilder: (context, index) {
-          // Header
+          // Balances grouped by currency.
           if (index == 0) {
             if (hideHeader) {
               return const SizedBox();
@@ -92,7 +98,7 @@ class AccountsFragment extends ConsumerWidget {
               },
             );
           }
-          // Tailing button
+          // Account creation button.
           if (index == AccountSymbol.values.length + 1) {
             return Visibility(
               visible: !hideCreateButton,
@@ -103,14 +109,14 @@ class AccountsFragment extends ConsumerWidget {
               ),
             );
           }
-          // Accounts
+          // Accounts for this symbol.
           final icon = AccountSymbol.values[index-1];
           final sublist = accounts.where((element) => (element.icon == icon)).toList(growable: false);
-          // Hide when sublist is empty
+          // Omit empty symbol groups.
           if (sublist.isEmpty) {
             return const SizedBox();
           }
-          // Group
+          // Symbol group.
           return GroupCard(
             title: icon.key.tr(),
             count: sublist.length,

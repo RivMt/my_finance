@@ -34,8 +34,10 @@ final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((r
   return ValueStateNotifier<String>(ModelKeys.keyLastUsed);
 });
 
+/// Lists and restores soft-deleted accounts and payments.
 class RestoreItemsPage extends ConsumerStatefulWidget {
 
+  /// Legacy route name for deleted items.
   static const String routeTrash = "/trash";
 
   const RestoreItemsPage({
@@ -58,7 +60,7 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
     ModelKeys.keyDeleted: true,
   }];
 
-  /// Restore [item]
+  /// Restores a soft-deleted wallet [item].
   Future<bool> restoreItem<T extends WalletItem>(T item) async {
     item.deleted = false;
     switch(T) {
@@ -68,14 +70,14 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
     }
   }
 
-  /// Change index of [pageController] by index of [tabController]
+  /// Synchronizes the page view with the selected tab.
   void onTabChanged(int index) {
     setState(() {
       pageController.jumpToPage(index);
     });
   }
 
-  /// Restore [item] when opened [SnackBar] closed successfully
+  /// Restores [item] when it is tapped.
   void onItemTap<T extends WalletItem>(T item) {
     restoreItem<T>(item);
   }
@@ -83,7 +85,7 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
   @override
   void initState() {
     super.initState();
-    // Tab controller
+    // Keep the tab bar and page view in sync.
     tabController = TabController(
       length: 2,
       vsync: this,
@@ -112,14 +114,14 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
             controller: pageController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              // 0: Accounts
+              // Deleted accounts.
               AccountsFragment(
                 accounts: ref.watch(_filteredAccounts).reversed.toList(),
                 hideCreateButton: true,
                 hideHeader: true,
                 onItemTap: (item) => onItemTap<Account>(item),
               ),
-              // 1: Payments
+              // Deleted payments.
               PaymentsFragment(
                 payments: ref.watch(_filteredPayments).reversed.toList(),
                 hideCreateButton: true,

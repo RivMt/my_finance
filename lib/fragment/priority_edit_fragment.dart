@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 
+/// Edits the pin or hidden priority state of a [WalletItem].
 class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
   const PriorityEditFragment({
     super.key,
@@ -9,8 +10,10 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
     required this.onPressed,
   });
 
+  /// Wallet item whose priority is being edited.
   final T data;
 
+  /// Called with `1`, `0`, or `-1` for pinned, normal, or hidden.
   final Function(int) onPressed;
 
   @override
@@ -19,7 +22,7 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Pin
+        // Pin or unpin visible items.
         Visibility(
           visible: data.priority >= 0,
           child: IconButton(
@@ -33,7 +36,7 @@ class PriorityEditFragment<T extends WalletItem> extends StatelessWidget {
             onPressed: () => onPressed(data.priority > 0 ? 0 : 1),
           ),
         ),
-        // Hide
+        // Hide or reveal unpinned items.
         Visibility(
           visible: data.priority <= 0,
           child: IconButton(

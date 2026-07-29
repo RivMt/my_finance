@@ -10,12 +10,14 @@ final _search = StateNotifierProvider<ModelStreamNotifier<Transaction>, Set<Tran
   return ModelStreamNotifier<Transaction>();
 });
 
+/// Searches transactions for [query] and displays matching results.
 class SearchFragment extends ConsumerStatefulWidget {
   const SearchFragment({
     super.key,
     required this.query,
   });
 
+  /// Search text sent to the transaction stream endpoint.
   final String query;
 
   @override
@@ -24,6 +26,7 @@ class SearchFragment extends ConsumerStatefulWidget {
 
 class _SearchFragmentState extends ConsumerState<SearchFragment> {
 
+  /// Runs the current transaction search.
   void search() async {
     ref.read(_search.notifier).search(widget.query);
   }

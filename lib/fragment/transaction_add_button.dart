@@ -3,6 +3,7 @@ import 'package:my_api/core.dart';
 import 'package:my_api/finance.dart';
 import 'package:my_finance/modal/transaction_edit_modal.dart';
 
+/// Opens a transaction modal with an optional account or payment preset.
 class TransactionAddButton extends StatelessWidget {
 
   static const String _heroTag = "TransactionAddButton";
@@ -13,12 +14,13 @@ class TransactionAddButton extends StatelessWidget {
     this.payment,
   });
 
-  /// Selected [Account]
+  /// Account selected before creating the transaction.
   final Account? account;
 
-  /// Selected [Payment]
+  /// Payment selected before creating the transaction.
   final Payment? payment;
 
+  /// Opens the transaction creation modal.
   void showTransactionCreateModal(BuildContext context) {
     showModalBottomSheet(
       context: context,

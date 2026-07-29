@@ -8,6 +8,7 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "ReadCsvPage";
 
+/// Previews and creates transactions parsed from a CSV file.
 class ReadCsvPage extends StatefulWidget {
   const ReadCsvPage({
     super.key,
@@ -19,10 +20,13 @@ class ReadCsvPage extends StatefulWidget {
 
 class _ReadCsvPageState extends State<ReadCsvPage> {
 
+  /// Transactions generated from the current CSV mapping.
   List<Transaction> transactions = [];
 
+  /// Whether transaction creation is in progress.
   bool progressing = false;
 
+  /// Shows generated transactions in a bottom-sheet preview.
   void showPreviewModel(BuildContext context) {
     setState(() {});
     showModalBottomSheet<void>(
@@ -42,6 +46,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
     );
   }
 
+  /// Shows a result message.
   void showToast(String message) {
     final snackBar = SnackBar(
       content: Text(message),
@@ -49,6 +54,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  /// Validates and creates each generated transaction through the API.
   void create() async {
     setState(() {
       progressing = true;
@@ -87,6 +93,7 @@ class _ReadCsvPageState extends State<ReadCsvPage> {
     }
   }
 
+  /// Starts transaction creation.
   void onSavePressed() => create();
 
   @override

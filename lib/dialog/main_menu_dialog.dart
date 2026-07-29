@@ -7,6 +7,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 
+/// Provides user actions and navigation to finance management pages.
 class MainMenuDialog extends ConsumerStatefulWidget {
   const MainMenuDialog({
     super.key,
@@ -15,10 +16,13 @@ class MainMenuDialog extends ConsumerStatefulWidget {
     this.onRefreshPressed,
   });
 
+  /// Router used to open menu destinations.
   final FinanceRouterDelegate router;
 
+  /// Called when the user card is tapped.
   final Function()? onAccountButtonPressed;
 
+  /// Called when refresh is requested.
   final Function()? onRefreshPressed;
 
   @override
@@ -27,11 +31,7 @@ class MainMenuDialog extends ConsumerStatefulWidget {
 
 class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
 
-  /// Check host platform is desktop or not
-
-  /// Open [page]
-  ///
-  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  /// Opens the page represented by [configuration].
   void openPage(RoutePath configuration) {
     widget.router.setNewRoutePath(configuration);
   }
@@ -46,20 +46,20 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // User
+            // Current user.
             UserCard(
               user: user,
               onTap: widget.onAccountButtonPressed,
             ),
             const Divider(),
-            // Refresh
+            // Data refresh.
             ListTile(
               leading: const Icon(Icons.refresh_outlined),
               title: Text(LocaleKeys.refresh.tr()),
               onTap: widget.onRefreshPressed,
             ),
             const Divider(),
-            // Settings
+            // Category settings.
             ListTile(
               leading: const Icon(Icons.category_outlined),
               title: Text(LocaleKeys.object_action.tr(namedArgs: {
@@ -68,13 +68,13 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
               })),
               onTap: () => openPage(FinanceRoutePath.categories),
             ),
-            // Trash can
+            // Deleted items.
             ListTile(
               leading: const Icon(Icons.delete_outline),
               title: Text(LocaleKeys.trashCan.tr()),
               onTap: () => openPage(FinanceRoutePath.restores),
             ),
-            // CSV
+            // Advanced CSV export.
             Visibility(
               visible: ScreenPlanner(context).isDesktop || kDebugMode,
               child: ListTile(
@@ -83,7 +83,7 @@ class _MainMenuDialogState extends ConsumerState<MainMenuDialog> {
                 onTap: () => openPage(FinanceRoutePath.advancedQuery),
               ),
             ),
-            // Load CSV
+            // CSV import.
             ListTile(
               leading: const Icon(Icons.file_open_outlined),
               title: Text(LocaleKeys.readCsv.tr()),

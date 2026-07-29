@@ -47,6 +47,7 @@ final _dateFilter = StateNotifierProvider<ValueStateNotifier<DateTime>, DateTime
   return ValueStateNotifier<DateTime>(DateTime(DateTime.now().year, DateTime.now().month, 1));
 });
 
+/// Charts the current month's included expenses by category.
 class ExpenseChartCard extends ConsumerStatefulWidget {
   const ExpenseChartCard({
     super.key,

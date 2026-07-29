@@ -37,8 +37,10 @@ final _targetBalances = Provider<List<Map<String, dynamic>>>((ref) {
   return targetBalances;
 });
 
+/// Edits finance preferences and target balances.
 class PreferencePage extends ConsumerStatefulWidget {
 
+  /// Legacy route name for finance preferences.
   static const String route = "/preferences";
 
   const PreferencePage({super.key});
@@ -49,13 +51,10 @@ class PreferencePage extends ConsumerStatefulWidget {
 
 class _PreferencePageState extends ConsumerState<PreferencePage> {
 
-  /// Value updating preferences are progressing or not
+  /// Whether a preference update is in progress.
   bool _progressing = false;
 
-  /// Value updating preferences are progressing or not
-  ///
-  /// This is wrapper of [_progressing]. When setting this, [setState] called
-  /// automatically
+  /// Whether a preference update is in progress.
   bool get progressing => _progressing;
 
   set progressing(bool value) {
@@ -63,7 +62,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setState(() {});
   }
 
-  /// Show currency selection dialog
+  /// Shows the currency selection dialog.
   Future<Currency?> showCurrencySelectionDialog(BuildContext context) async {
     return await showDialog(
         context: context,
@@ -71,7 +70,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
-  /// Show currency selection dialog
+  /// Shows the pie-chart entry limit editor.
   Future<double?> showPieChartMaxEntriesInputModal(BuildContext context) async {
     return await showModalBottomSheet(
       context: context,
@@ -96,12 +95,14 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
+  /// Updates the maximum number of pie-chart entries.
   void setPieChartMaxEntries(int value) {
     final root = ref.watch(provider.financePreference);
     root.set<int>(PreferenceKeys.pieChartMaxEntries, value);
     setPreference(ref, provider.financePreference, root);
   }
 
+  /// Stores a target balance for [date] and [currency].
   void setTargetBalance(DateTime date, Currency currency, Decimal amount) {
     final root = ref.watch(provider.financePreference);
     final target = root.get(PreferenceKeys.targetBalance, null).get(currency.uuid, null);
@@ -109,6 +110,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setPreference(ref, provider.financePreference, root);
   }
 
+  /// Removes the target balance for [date] and [currency].
   void removeTargetBalance(DateTime date, Currency currency) {
     final root = ref.watch(provider.financePreference);
     final targets = root.get(PreferenceKeys.targetBalance, null).get(currency.uuid, null);
@@ -120,7 +122,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setPreference(ref, provider.financePreference, root);
   }
 
-  /// Show modal
+  /// Shows a constrained bottom-sheet [child].
   void showModal({required Widget child}) {
     showModalBottomSheet(
       context: context,
@@ -132,7 +134,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     );
   }
 
-  /// Triggers on default currency preference pressed
+  /// Selects the default currency.
   void onDefaultCurrencyPressed(BuildContext context) async {
     final Currency? currency = await showCurrencySelectionDialog(context);
     if (currency == null) {
@@ -141,7 +143,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     provider.setDefaultCurrency(ref, currency);
   }
 
-  /// Triggers on default currency preference pressed
+  /// Edits the pie-chart entry limit.
   void onPieChartMaxEntriesPressed(BuildContext context) async {
     final double? value = await showPieChartMaxEntriesInputModal(context);
     if (value == null) {
@@ -150,14 +152,14 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     setPieChartMaxEntries(value.toInt());
   }
 
-  /// Triggers on target balance add pressed
+  /// Opens the target-balance creation or editing modal.
   void addOrEditTargetBalance({
     required BuildContext context,
     DateTime? date,
     Currency? currency,
     Decimal? amount,
   }) async {
-    // Show modal
+    // Configure callbacks for create, update, and remove actions.
     showModal(
       child: TargetBalanceEditModal(
         date: date,
@@ -168,7 +170,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           Navigator.pop(context);
         },
         onNegativeButtonPressed: () {
-          // Check edit mode
+          // Only existing targets can be removed.
           if (date != null && currency != null) {
             removeTargetBalance(date, currency);
           }
@@ -205,7 +207,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // General
+                  // General finance preferences.
                   PreferenceHeader(
                     title: LocaleKeys.preferenceGeneral.tr(),
                   ),
@@ -219,7 +221,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     subtitle: pieChartMaxEntries.toString(),
                     onTap: () => onPieChartMaxEntriesPressed(context),
                   ),
-                  // Target balance
+                  // Target balances by date and currency.
                   PreferenceHeader(
                     title: LocaleKeys.targetBalance.tr(),
                     trailing: IconButton(

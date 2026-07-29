@@ -8,6 +8,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/fragment/transactions_fragment.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Displays a wallet item summary and its monthly transactions.
 class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
   const WalletItemDetailsFragment({
     super.key,
@@ -22,25 +23,34 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
     this.sortByCalculatedDate = false,
   });
 
+  /// Account or payment being displayed.
   final T item;
 
+  /// Balance or aggregate amount shown in the header.
   final Decimal content;
 
+  /// Called when the displayed month changes.
   final void Function(DateTime) onMonthChanged;
 
+  /// Called when transaction ordering is toggled.
   final void Function() onSortButtonPressed;
 
+  /// Called when a data refresh is requested.
   final Future<void> Function() onRefreshButtonPressed;
 
+  /// Transactions for the selected wallet item and month.
   final List<Transaction> transactions;
 
+  /// Month currently displayed.
   final DateTime month;
 
+  /// Whether transaction ordering is reversed.
   final bool isReverse;
 
+  /// Whether transactions are grouped by calculated date.
   final bool sortByCalculatedDate;
 
-  /// Build group separator by given [date]
+  /// Formats a group label for [date] relative to [month].
   String buildGroupSeparator(DateTime date) {
     if (month.year != date.year) {
       return DateFormat.yMd().format(date);

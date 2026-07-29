@@ -9,6 +9,7 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/modal/transaction_edit_modal.dart';
 
+/// Displays transactions grouped by paid or calculated date.
 class TransactionsFragment extends ConsumerWidget {
   const TransactionsFragment({
     super.key,
@@ -20,19 +21,25 @@ class TransactionsFragment extends ConsumerWidget {
     this.groupSeparator,
   });
 
+  /// Transactions to display.
   final List<Transaction> items;
 
+  /// Whether the non-sliver list wraps its contents.
   final bool shrinkWrap;
 
+  /// Whether to build a sliver list.
   final bool useSliver;
 
+  /// Whether to reverse transaction ordering.
   final bool isReverse;
 
+  /// Whether to group by calculated date instead of paid date.
   final bool useCalculatedDate;
 
+  /// Optional label builder for each date group.
   final String Function(DateTime)? groupSeparator;
 
-  /// Show transaction details dialog
+  /// Shows details for [data].
   void showTransactionDetailsDialog(BuildContext context, Transaction data) {
     showDialog(
       context: context,
@@ -42,7 +49,7 @@ class TransactionsFragment extends ConsumerWidget {
     );
   }
 
-  /// Show transaction editing modal
+  /// Shows the transaction creation or editing modal.
   void showTransactionEditingModal(BuildContext context, [Transaction? transaction]) async {
     Transaction? editing = transaction;
     showModalBottomSheet<Transaction>(
@@ -61,11 +68,13 @@ class TransactionsFragment extends ConsumerWidget {
     );
   }
 
+  /// Returns the normalized date used to group [data].
   DateTime groupBy(Transaction data) {
     final date = useCalculatedDate ? data.calculatedDate : data.paidDate;
     return DateTime(date.year, date.month, date.day);
   }
 
+  /// Builds the label for a transaction date group.
   Widget groupSeparatorBuilder(BuildContext context, DateTime date) => Text(
     groupSeparator == null
         ? DateFormat.yMd().format(date.toLocal())
@@ -73,8 +82,10 @@ class TransactionsFragment extends ConsumerWidget {
     style: Theme.of(context).textTheme.titleSmall,
   );
 
+  /// Compares transaction paid dates using the selected order.
   int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate) * (isReverse ? -1 : 1);
 
+  /// Builds a transaction card with its matching category.
   Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) {
     return TransactionCard(
       data: data,
@@ -90,7 +101,7 @@ class TransactionsFragment extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(provider.categories);
-    // Return sliver grouped list view
+    // Use a sliver list when embedded in a custom scroll view.
     if (useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(
         elements: items,

@@ -37,6 +37,7 @@ final _expenseTransactions = Provider<StatefulData<Map<_DataType, Decimal>>>((re
   return StatefulData(Map.fromEntries(entries), state);
 });
 
+/// Summarizes upcoming expense withdrawals by date and payment.
 class DueToPaidCard extends ConsumerStatefulWidget {
   const DueToPaidCard({
     super.key,
@@ -46,11 +47,12 @@ class DueToPaidCard extends ConsumerStatefulWidget {
   ConsumerState createState() => DueToPaidCardState();
 }
 
+/// State for [DueToPaidCard] with an externally callable refresh method.
 class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
 
-  /// Fetch transaction data
+  /// Appends upcoming expense transactions to the shared provider.
   void fetch() async {
-    // Request
+    // Query by calculated withdrawal date.
     provider.appendTransactions(ref, {
       ModelKeys.keyDeleted: false,
       ModelKeys.keyType: TransactionType.expense.code,
@@ -101,14 +103,18 @@ class DueToPaidCardState extends ConsumerState<DueToPaidCard> {
   }
 }
 
+/// Groups an upcoming amount by withdrawal date and payment.
 class _DataType {
 
   _DataType(this.date, this.payment);
 
+  /// Calculated withdrawal date.
   final DateTime date;
 
+  /// Payment handler for the grouped transactions.
   final Payment payment;
 
+  /// Orders groups by withdrawal date.
   int compareTo(_DataType other) {
     return (date.compareTo(other.date));
   }

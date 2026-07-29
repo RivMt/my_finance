@@ -10,9 +10,11 @@ import 'package:my_finance/dialog/color_picker_dialog.dart';
 import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Creates, updates, or soft-deletes a [Payment].
 class PaymentEditModal extends ConsumerStatefulWidget {
   const PaymentEditModal(this.base, {super.key});
 
+  /// Payment to edit, or `null` when creating one.
   final Payment? base;
 
   @override
@@ -29,24 +31,22 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
 
   final TextEditingController descriptionController = TextEditingController();
 
-  /// Is this fragment editing [Payment]
-  ///
-  /// This returns `true` when [widget.base] is not `null`
+  /// Whether an existing payment is being edited.
   bool get isEdit => widget.base != null;
 
-  /// [Payment] which is now editing
+  /// Mutable payment being edited.
   Payment editing = Payment({});
 
-  /// Value of [editing] is ready or not
+  /// Whether the payment and limitation input are valid.
   bool get ready {
     return editing.isValid
         && (limitationController.text == editing.limitation.toString());
   }
 
-  /// Build list of colors
+  /// Builds a recent-color list from accounts and payments.
   List<Color> buildColorHistory() {
     List<Color> colors = [];
-    // Colors of accounts
+    // Account colors, newest first.
     final accounts = ref.watch(provider.accounts);
     accounts.sort((a, b) {
       return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
@@ -55,7 +55,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
       colors.add(account.foreground);
       colors.add(account.background);
     }
-    // Colors of payments
+    // Payment colors, newest first.
     final payments = ref.watch(provider.payments);
     payments.sort((a, b) {
       return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
@@ -67,7 +67,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     return colors.toSet().toList();
   }
 
-  /// Show [PaymentSymbol] selection dialog
+  /// Shows the [PaymentSymbol] selection dialog.
   Future<PaymentSymbol?> showSymbolSelectDialog(BuildContext context) async {
     const list = PaymentSymbol.values;
     return await showDialog(
@@ -98,9 +98,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     );
   }
 
-  /// Show color picker dialog
-  ///
-  /// [color] is selected color on pop up
+  /// Shows a color picker initialized with [color].
   Future<Color> showColorPicker(BuildContext context, Color color) async {
     final Color? result = await showDialog<Color>(
       context: context,
@@ -116,7 +114,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     return result ?? color;
   }
 
-  /// Triggers on negative button pressed
+  /// Deletes the payment in edit mode or cancels creation.
   Future<bool> onNegativeButtonPressed() async {
     if (!isEdit) {
       return true;
@@ -124,7 +122,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     return await provider.deletePayment(ref, editing);
   }
 
-  /// Triggers on confirm button pressed
+  /// Persists the payment being edited.
   Future<bool> onConfirmButtonPressed() async {
     if (isEdit) {
       return await provider.updatePayment(ref, editing);
@@ -132,21 +130,21 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     return await provider.createPayment(ref, editing);
   }
 
-  /// Triggers on name changed
+  /// Updates the payment name.
   void onNameChanged(String name) {
     setState(() {
       editing.name = name;
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the payment serial number.
   void onSerialNumberChanged(String serial) {
     setState(() {
       editing.serialNumber = serial;
     });
   }
 
-  /// Triggers on limitation changed
+  /// Updates the payment limitation when [value] is valid.
   void onLimitationChanged(String value) {
     final currency = provider.getCurrency(ref, editing.currencyId);
     setState(() {
@@ -158,14 +156,14 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the payment description.
   void onDescriptionChanged(String desc) {
     setState(() {
       editing.descriptions = desc;
     });
   }
 
-  /// Triggers on [PaymentIcon] button pressed
+  /// Selects the payment symbol.
   void onPaymentIconButtonPressed() async {
     final icon = await showSymbolSelectDialog(context);
     if (icon != null) {
@@ -175,7 +173,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     }
   }
 
-  /// Triggers on [Currency] button pressed
+  /// Selects the payment currency.
   void onCurrencyButtonPressed() async {
     final currency = await showDialog(
       context: context,
@@ -188,14 +186,14 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     }
   }
 
-  /// Triggers on cash checkboxes value changed
+  /// Updates whether this payment handles credit transactions.
   void onCreditValueChanged(bool value) {
     setState(() {
       editing.isCredit = value;
     });
   }
 
-  /// Triggers on payment date value changed
+  /// Updates the withdrawal day for each payment period.
   void onPayDateChanged(int? day) {
     if (day == null) {
       return;
@@ -205,7 +203,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     });
   }
 
-  /// Triggers on payment range begin value changed
+  /// Updates the beginning of the payment period.
   void onPayRangeBeginChanged(int? month, int? day) {
     if (month == null || day == null) {
       return;
@@ -215,7 +213,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     });
   }
 
-  /// Triggers on payment range end value changed
+  /// Updates the end of the payment period.
   void onPayRangeEndChanged(int? month, int? day) {
     if (month == null || day == null) {
       return;
@@ -225,7 +223,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     });
   }
 
-  /// Triggers on foreground color button pressed
+  /// Selects the foreground color.
   void onForegroundPressed(BuildContext context) async {
     final value = await showColorPicker(context, editing.foreground);
     setState(() {
@@ -233,7 +231,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     });
   }
 
-  /// Triggers on background color button pressed
+  /// Selects the background color.
   void onBackgroundPressed(BuildContext context) async {
     final value = await showColorPicker(context, editing.background);
     setState(() {
@@ -267,13 +265,13 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Basic information
+          // Basic information.
           Text(
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Name
+          // Name and symbol.
           TextField(
             controller: nameController,
             decoration: InputDecoration(
@@ -288,7 +286,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             onChanged: onNameChanged,
           ),
           const SizedBox(height: 8,),
-          // Serial Number
+          // Serial number.
           TextField(
             controller: serialNumberController,
             decoration: InputDecoration(
@@ -298,7 +296,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             onChanged: onSerialNumberChanged,
           ),
           const SizedBox(height: 8,),
-          // Limitation
+          // Payment limitation.
           TextField(
             controller: limitationController,
             keyboardType: TextInputType.numberWithOptions(
@@ -320,7 +318,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             onChanged: onLimitationChanged,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Description.
           TextField(
             controller: descriptionController,
             decoration: InputDecoration(
@@ -331,7 +329,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             maxLength: BaseModel.maxTextLength,
             onChanged: onDescriptionChanged,
           ),
-          // Is cash checkbox
+          // Credit-payment flag.
           Padding(
             padding: const EdgeInsets.all(8),
             child: InkWell(
@@ -355,14 +353,14 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               ),
             ),
           ),
-          // Payment
+          // Credit payment schedule.
           Visibility(
             visible: editing.isCredit,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Date
+                // Withdrawal day.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -390,7 +388,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                   LocaleKeys.payRange.tr(),
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                // From
+                // Period start.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -402,7 +400,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        // Month
+                        // Month offset.
                         DropdownMenu<int>(
                           initialSelection: editing.payBegin.month,
                           label: Text(LocaleKeys.month.tr()),
@@ -415,7 +413,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                           onSelected: (value) => onPayRangeBeginChanged(value, editing.payBegin.day),
                         ),
                         const SizedBox(width: 8,),
-                        // Day
+                        // Day of month.
                         DropdownMenu<int>(
                           initialSelection: editing.payBegin.day,
                           label: Text(LocaleKeys.day.tr()),
@@ -433,7 +431,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                   ],
                 ),
                 const SizedBox(height: 8,),
-                // To
+                // Period end.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -445,7 +443,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        // Month
+                        // Month offset.
                         DropdownMenu<int>(
                           initialSelection: editing.payEnd.month,
                           label: Text(LocaleKeys.month.tr()),
@@ -458,7 +456,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                           onSelected: (value) => onPayRangeEndChanged(value, editing.payEnd.day),
                         ),
                         const SizedBox(width: 8,),
-                        // Day
+                        // Day of month.
                         DropdownMenu<int>(
                           initialSelection: editing.payEnd.day,
                           label: Text(LocaleKeys.day.tr()),
@@ -478,12 +476,12 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               ],
             ),
           ),
-          // Color
+          // Display colors.
           Text(
             LocaleKeys.color.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          // Foreground
+          // Foreground color.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -501,7 +499,7 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
               ),
             ],
           ),
-          // Background
+          // Background color.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

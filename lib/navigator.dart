@@ -11,24 +11,34 @@ import 'package:my_finance/page/restore_items_page.dart';
 
 const String _tag = "Navigator";
 
+/// Defines route paths used by the finance application.
 class FinanceRoutePath extends RoutePath {
 
+  /// Accounts tab and account detail route.
   static final FinanceRoutePath accounts = FinanceRoutePath("accounts", index: 1);
 
+  /// Payments tab and payment detail route.
   static final FinanceRoutePath payments = FinanceRoutePath("payments", index: 2);
 
+  /// Category management route.
   static final FinanceRoutePath categories = FinanceRoutePath("categories");
 
+  /// Deleted-item restoration route.
   static final FinanceRoutePath restores = FinanceRoutePath("restores");
 
+  /// Advanced transaction query route.
   static final FinanceRoutePath advancedQuery = FinanceRoutePath("advanced_query");
 
+  /// CSV import route.
   static final FinanceRoutePath readCsv = FinanceRoutePath("read_csv");
 
+  /// Finance preferences route.
   static final FinanceRoutePath preferences = FinanceRoutePath("preferences");
 
+  /// Search route.
   static final FinanceRoutePath search = FinanceRoutePath("search");
 
+  /// Query key for a route mode.
   static const String keyMode = "mode";
 
   FinanceRoutePath(super.path, {
@@ -39,6 +49,7 @@ class FinanceRoutePath extends RoutePath {
   });
 }
 
+/// Parses finance routes into [FinanceRoutePath] values.
 class FinanceRouteParser extends RouteParser {
 
   @override
@@ -63,22 +74,23 @@ class FinanceRouteParser extends RouteParser {
   ];
 }
 
+/// Builds the page stack for the current finance route.
 class FinanceRouterDelegate extends CoreRouterDelegate {
 
-  /// Home page index
+  /// Selected home-page destination index.
   int _navigationRailIndex = 0;
 
-  /// Set home page index
+  /// Updates the selected home-page destination.
   void _setNavigationRailIndex(int index) {
     _navigationRailIndex = index;
     Log.v(_tag, "Change navigation rail index to $index");
     notifyListeners();
   }
 
-  /// Find page by [configuration] value
+  /// Returns the page represented by [configuration].
   Widget? getPage(RoutePath configuration) {
     if (configuration.path == FinanceRoutePath.accounts.path) {
-      // Accounts
+      // Resolve the accounts tab or an account detail page.
       final uuid = configuration.uuid;
       if (uuid != null) {
         return AccountDetailsPage(uuid: uuid);
@@ -86,7 +98,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       _navigationRailIndex = configuration.index;
       return null;
     } else if (configuration.path == FinanceRoutePath.payments.path) {
-      // Payments
+      // Resolve the payments tab or a payment detail page.
       final uuid = configuration.uuid;
       if (uuid != null) {
         return PaymentDetailsPage(uuid: uuid);
@@ -94,7 +106,6 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       _navigationRailIndex = configuration.index;
       return null;
     } else if (configuration.path == FinanceRoutePath.categories.path) {
-      // Category
       return const CategoriesPage();
     } else if (configuration.path == FinanceRoutePath.restores.path) {
       return const RestoreItemsPage();

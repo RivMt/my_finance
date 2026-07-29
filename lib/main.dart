@@ -8,8 +8,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/my_app.dart';
 
+/// Initializes dependencies and starts the finance application.
 void main() async {
-  // Init
+  // Initialize framework services and the API client.
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   usePathUrlStrategy();
@@ -17,7 +18,7 @@ void main() async {
   await ApiClient().init(preferences);
   EasyLocalization.logger.printer = Log.easyLogger;
 
-  // Run
+  // Start the localized Riverpod application.
   runApp(ProviderScope(
     child: EasyLocalization(
       supportedLocales: const [

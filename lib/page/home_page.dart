@@ -59,6 +59,7 @@ final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((r
   return ValueStateNotifier<String>(ModelKeys.keyUuid);
 });
 
+/// Hosts the main finance tabs and responsive navigation controls.
 class HomePage extends ConsumerStatefulWidget {
 
   const HomePage({
@@ -68,10 +69,13 @@ class HomePage extends ConsumerStatefulWidget {
     required this.onIndexChanged,
   });
 
+  /// Router used for tab and detail navigation.
   final FinanceRouterDelegate router;
 
+  /// Initially selected navigation destination.
   final int index;
 
+  /// Called when the selected destination changes.
   final ValueChanged<int> onIndexChanged;
 
   @override
@@ -111,27 +115,25 @@ class _HomePageState extends ConsumerState<HomePage> {
     return list;
   }
 
-  /// Index of [NavigationRail]
+  /// Selected navigation-rail destination index.
   int navigationRailIndex = 0;
 
-  /// Index of [BottomNavigationBar]
+  /// Selected bottom-navigation destination index.
   int get navigationBarIndex => convertNavigationIndex(navigationRailIndex);
 
-  /// Open [page]
-  ///
-  /// After [page] has been pop, triggers [onPageFinished] if it is not `null`.
+  /// Navigates to [path].
   void setNewRoute(RoutePath path) {
     widget.router.setNewRoutePath(path);
   }
 
-  /// Login
+  /// Starts login when no valid user is available.
   Future<void> tryLogin() async {
     if (!ref.watch(provider.currentUser).user.isValid) {
       provider.login(ref, load);
     }
   }
 
-  /// Load init data
+  /// Loads initial finance models and preferences after login.
   void load() async {
     if (!mounted) {
       Log.w(_tag, "Unable to load initial date due to state disposed");
@@ -147,9 +149,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     fetchTransaction();
   }
 
-  /// Fetch transaction data
+  /// Appends transactions around the current month.
   void fetchTransaction() async {
-    // Request
+    // Query a window that covers summary and detail cards.
     final now = DateTime.now();
     provider.appendTransactions(ref, {
       ModelKeys.keyPaidDate: {
@@ -159,7 +161,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-  /// Convert [NavigationRail] index to [BottomNavigationBar] index
+  /// Converts between rail and bottom-navigation indices.
   int convertNavigationIndex(int index) {
     if (index == 0) {
       return 1;
@@ -169,7 +171,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return index;
   }
 
-  /// Triggers on [navigationRailIndex] changed
+  /// Updates navigation state for the selected rail index.
   void onNavigationIndexChanged(int index) {
     setState(() {
       navigationRailIndex = index;
@@ -178,7 +180,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     widget.onIndexChanged(index);
   }
 
-  /// Triggers on menu button pressed
+  /// Opens the main menu dialog.
   void onMenuButtonPressed() {
     showDialog(
       context: context,
@@ -189,22 +191,20 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  /// Triggers on account item selected
+  /// Opens the selected account detail route.
   void onAccountPressed(Account account) {
     setNewRoute(FinanceRoutePath(FinanceRoutePath.accounts.path, uuid: account.uuid));
   }
 
-  /// Triggers on payment item selected
+  /// Opens the selected payment detail route.
   void onPaymentPressed(Payment payment) {
     setNewRoute(FinanceRoutePath(FinanceRoutePath.payments.path, uuid: payment.uuid));
   }
 
-  /// Get [GridView] cross axis count
-  ///
-  /// Value is always bigger than `0`
+  /// Returns the responsive panel count.
   int getCrossAxisCount(BuildContext context) => ScreenPlanner(context).panelNumber;
 
-  /// Get [GridView] child aspect ratio
+  /// Returns the responsive group-card aspect ratio.
   double getChildAspectRatio(BuildContext context) {
     return (MediaQuery.of(context).size.width / getCrossAxisCount(context)) / GroupCard.height;
   }
@@ -318,6 +318,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 }
 
+/// Associates navigation icons and labels with an application route.
 class _NavigationDestinations {
 
   final Icon icon;

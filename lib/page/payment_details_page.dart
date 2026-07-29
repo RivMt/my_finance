@@ -47,6 +47,7 @@ final _sortFilter = StateNotifierProvider<ValueStateNotifier<bool>, bool>((ref) 
   return ValueStateNotifier<bool>(false);
 });
 
+/// Displays a payment total and its monthly transactions.
 class PaymentDetailsPage extends ConsumerStatefulWidget {
 
   const PaymentDetailsPage({
@@ -54,6 +55,7 @@ class PaymentDetailsPage extends ConsumerStatefulWidget {
     required this.uuid,
   });
 
+  /// UUID of the payment to display.
   final String uuid;
 
   @override
@@ -63,14 +65,17 @@ class PaymentDetailsPage extends ConsumerStatefulWidget {
 
 class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
 
+  /// Whether transactions are shown in reverse order.
   bool get isReverse => ref.watch(_sortFilter);
 
+  /// Month currently displayed.
   DateTime get month => ref.watch(_dateFilter);
 
   set month(DateTime value) {
     ref.read(_dateFilter.notifier).set(value);
   }
 
+  /// Appends transactions for the current payment.
   Future<void> fetchTransactions() async {
     final uuid = ref.watch(_uuid);
     provider.appendTransactions(ref, {
@@ -78,12 +83,13 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     });
   }
 
+  /// Changes the month and requests payment transactions.
   void onMonthChanged(DateTime value) {
     month = value;
     fetchTransactions();
   }
 
-  /// Show payment editing modal
+  /// Shows the payment editing modal and refreshes transactions afterward.
   void showPaymentEditingModal(BuildContext context, [Payment? payment]) async {
     showModalBottomSheet<Payment>(
       context: context,
@@ -103,10 +109,12 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
     });
   }
 
+  /// Toggles transaction ordering.
   void onSortButtonPressed() {
     ref.read(_sortFilter.notifier).set(!isReverse);
   }
 
+  /// Refreshes payment transactions.
   Future<void> onRefreshButtonPressed() => fetchTransactions();
 
 

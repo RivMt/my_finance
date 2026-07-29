@@ -8,8 +8,10 @@ import 'package:my_finance/fragment/categories_fragment.dart';
 import 'package:my_finance/modal/category_edit_modal.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Manages expense and income categories in separate tabs.
 class CategoriesPage extends ConsumerStatefulWidget {
 
+  /// Legacy route name for category management.
   static const String route = "/categories";
 
   const CategoriesPage({super.key});
@@ -26,7 +28,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
     initialPage: 0,
   );
 
-  /// Show [CategoryEditModal]
+  /// Shows the category creation or editing modal.
   void showCategoryEditingModal([Category? category]) {
     showModalBottomSheet(
       context: context,
@@ -42,7 +44,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
     );
   }
 
-  /// On tab page changed
+  /// Synchronizes the page view with the selected tab.
   void onTabChanged(int index) {
     pageController.animateToPage(
       index,
@@ -54,7 +56,7 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
   @override
   void initState() {
     super.initState();
-    // Tab controller
+    // Keep the tab bar and page view in sync.
     tabController = TabController(
       length: 2,
       vsync: this,
@@ -89,12 +91,12 @@ class _CategoriesPageState extends ConsumerState<CategoriesPage> with TickerProv
         child: PageView(
           controller: pageController,
           children: [
-            // Expenses
+            // Expense categories.
             CategoriesFragment(
               categories: expenses,
               onTap: showCategoryEditingModal,
             ),
-            // Incomes
+            // Income categories.
             CategoriesFragment(
               categories: incomes,
               onTap: showCategoryEditingModal,

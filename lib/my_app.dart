@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
 import 'package:my_finance/navigator.dart';
 
+/// Configures the finance application, theme, localization, and router.
 class MyApp extends ConsumerWidget {
   const MyApp({
     super.key,

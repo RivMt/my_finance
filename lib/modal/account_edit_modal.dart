@@ -10,9 +10,11 @@ import 'package:my_finance/dialog/color_picker_dialog.dart';
 import 'package:my_finance/dialog/currency_select_dialog.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Creates, updates, or soft-deletes an [Account].
 class AccountEditModal extends ConsumerStatefulWidget {
   const AccountEditModal(this.base, {super.key});
 
+  /// Account to edit, or `null` when creating one.
   final Account? base;
 
   @override
@@ -29,24 +31,22 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   final TextEditingController descriptionController = TextEditingController();
 
-  /// Is this fragment editing [Account]
-  ///
-  /// This returns `true` when [widget.base] is not `null`
+  /// Whether an existing account is being edited.
   bool get isEdit => widget.base != null;
 
-  /// [Account] which is now editing
+  /// Mutable account being edited.
   Account editing = Account({});
 
-  /// Value of [editing] is ready or not
+  /// Whether the account and limitation input are valid.
   bool get ready {
     return editing.isValid
         && (limitationController.text == editing.limitation.toString());
   }
 
-  /// Build list of colors
+  /// Builds a recent-color list from accounts and payments.
   List<Color> buildColorHistory() {
     List<Color> colors = [];
-    // Colors of accounts
+    // Account colors, newest first.
     final accounts = ref.watch(provider.accounts);
     accounts.sort((a, b) {
       return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
@@ -55,7 +55,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
       colors.add(account.foreground);
       colors.add(account.background);
     }
-    // Colors of payments
+    // Payment colors, newest first.
     final payments = ref.watch(provider.payments);
     payments.sort((a, b) {
       return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
@@ -67,8 +67,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     return colors.toSet().toList();
   }
 
-  /// Show [T] item selection dialog
-  /// Show [AccountSymbol] selection dialog
+  /// Shows the [AccountSymbol] selection dialog.
   Future<AccountSymbol?> showSymbolSelectDialog(BuildContext context) async {
     const list = AccountSymbol.values;
     return await showDialog(
@@ -99,9 +98,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     );
   }
 
-  /// Show color picker dialog
-  ///
-  /// [color] is selected color on pop up
+  /// Shows a color picker initialized with [color].
   Future<Color> showColorPicker(BuildContext context, Color color) async {
     final Color? result = await showDialog<Color>(
       context: context,
@@ -117,7 +114,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     return result ?? color;
   }
 
-  /// Triggers on negative button pressed
+  /// Deletes the account in edit mode or cancels creation.
   Future<bool> onNegativeButtonPressed() async {
     if (!isEdit) {
       return true;
@@ -125,7 +122,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     return await provider.deleteAccount(ref, editing);
   }
 
-  /// Triggers on confirm button pressed
+  /// Persists the account being edited.
   Future<bool> onConfirmButtonPressed() async {
     if (isEdit) {
       return await provider.updateAccount(ref, editing);
@@ -133,21 +130,21 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     return await provider.createAccount(ref, editing);
   }
 
-  /// Triggers on name changed
+  /// Updates the account name.
   void onNameChanged(String text) {
     setState(() {
       editing.name = text;
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the account serial number.
   void onSerialNumberChanged(String serial) {
     setState(() {
       editing.serialNumber = serial;
     });
   }
 
-  /// Triggers on limitation changed
+  /// Updates the account limitation when [value] is valid.
   void onLimitationChanged(String value) {
     final currency = provider.getCurrency(ref, editing.currencyId);
     setState(() {
@@ -159,14 +156,14 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     });
   }
 
-  /// Triggers on description changed
+  /// Updates the account description.
   void onDescriptionChanged(String text) {
     setState(() {
       editing.descriptions = text;
     });
   }
 
-  /// Triggers on [AccountIcon] button pressed
+  /// Selects the account symbol.
   void onAccountIconButtonPressed() async {
     final icon = await showSymbolSelectDialog(context);
     if (icon != null) {
@@ -176,7 +173,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     }
   }
 
-  /// Triggers on [Currency] button pressed
+  /// Selects the account currency.
   void onCurrencyButtonPressed() async {
     final currency = await showDialog(
       context: context,
@@ -189,14 +186,14 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     }
   }
 
-  /// Triggers on cash checkboxes value changed
+  /// Updates whether the account holds cash.
   void onCashValueChanged(bool value) {
     setState(() {
       editing.isCash = value;
     });
   }
 
-  /// Triggers on foreground color button pressed
+  /// Selects the foreground color.
   void onForegroundPressed(BuildContext context) async {
     final value = await showColorPicker(context, editing.foreground);
     setState(() {
@@ -204,7 +201,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     });
   }
 
-  /// Triggers on background color button pressed
+  /// Selects the background color.
   void onBackgroundPressed(BuildContext context) async {
     final value = await showColorPicker(context, editing.background);
     setState(() {
@@ -239,13 +236,13 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Basic information
+          // Basic information.
           Text(
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Name
+          // Name and symbol.
           TextField(
             controller: nameController,
             decoration: InputDecoration(
@@ -260,7 +257,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             onChanged: onNameChanged,
           ),
           const SizedBox(height: 8,),
-          // Serial Number
+          // Serial number.
           TextField(
             controller: serialNumberController,
             decoration: InputDecoration(
@@ -270,7 +267,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             onChanged: onSerialNumberChanged,
           ),
           const SizedBox(height: 8,),
-          // Limitation
+          // Account limitation.
           TextField(
             controller: limitationController,
             keyboardType: TextInputType.numberWithOptions(
@@ -292,7 +289,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             onChanged: onLimitationChanged,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Description.
           TextField(
             controller: descriptionController,
             decoration: InputDecoration(
@@ -303,7 +300,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             maxLength: BaseModel.maxTextLength,
             onChanged: onDescriptionChanged,
           ),
-          // Is cash checkbox
+          // Cash-account flag.
           Padding(
             padding: const EdgeInsets.all(8),
             child: InkWell(
@@ -327,12 +324,12 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
               ),
             ),
           ),
-          // Color
+          // Display colors.
           Text(
             LocaleKeys.color.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          // Foreground
+          // Foreground color.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -350,7 +347,7 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
               ),
             ],
           ),
-          // Background
+          // Background color.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

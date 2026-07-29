@@ -8,12 +8,14 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
 
+/// Displays amounts, related models, and dates for a [Transaction].
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({
     super.key,
     required this.data,
   });
 
+  /// Transaction to display.
   final Transaction data;
 
   @override
@@ -22,17 +24,20 @@ class TransactionDetailsDialog extends ConsumerStatefulWidget {
 
 class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDialog> {
 
+  /// Opens category management.
   void openCategoryPage() {
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => const CategoriesPage(),
     ));
   }
 
+  /// Opens the detail page for [account].
   void openAccountPage(Account account) {
     final delegate = Router.of(context).routerDelegate;
     delegate.setNewRoutePath(FinanceRoutePath.accounts.extend(uuid: account.uuid));
   }
 
+  /// Opens the detail page for [payment].
   void openPaymentPage(Payment payment) {
     final delegate = Router.of(context).routerDelegate;
     delegate.setNewRoutePath(FinanceRoutePath.payments.extend(uuid: payment.uuid));
@@ -53,7 +58,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              // Amount (Primary)
+              // Primary amount, using the alternate currency when present.
               ListTile(
                 leading: CurrencyIcon(primaryCurrency),
                 title: Text(
@@ -61,7 +66,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
-              // Amount (Secondary)
+              // Account-currency amount for foreign-currency transactions.
               Visibility(
                 visible: hasAlt,
                 child: ListTile(
@@ -72,7 +77,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   ),
                 ),
               ),
-              // Category
+              // Category.
               Tooltip(
                 message: category.descriptions,
                 child: ListTile(
@@ -81,7 +86,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   onTap: () => openCategoryPage(),
                 ),
               ),
-              // Descriptions
+              // Transaction description.
               Visibility(
                 visible: widget.data.descriptions.isNotEmpty,
                 child: ListTile(
@@ -89,12 +94,12 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   title: Text(widget.data.descriptions),
                 ),
               ),
-              // UUID
+              // Transaction identifier.
               ListTile(
                 leading: const Icon(Icons.numbers_outlined),
                 title: SelectableText(widget.data.uuid),
               ),
-              // Details
+              // Related account and payment.
               const Divider(),
               Tooltip(
                 message: account.descriptions,
@@ -120,7 +125,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   ),
                 ),
               const Divider(),
-              // Date
+              // Transaction dates.
               Tooltip(
                 message: LocaleKeys.paidDate.tr(),
                 child: ListTile(
@@ -147,7 +152,7 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                   ),
                 ),
               ),
-              // Utility
+              // Effective date range.
               Tooltip(
                 message: LocaleKeys.utilityDays.tr(),
                 child: ListTile(

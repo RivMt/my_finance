@@ -28,12 +28,16 @@ final _categories = StateNotifierProvider<ModelsStateNotifier<Category>, List<Ca
   return ModelsStateNotifier<Category>();
 });
 
+/// Receives transactions generated from the current CSV mapping.
 typedef OnGeneration = void Function(BuildContext context, List<Transaction> list);
 
+/// Maps CSV columns and rows to finance transactions.
 class ReadCsvFragment extends ConsumerStatefulWidget {
 
+  /// Called whenever a transaction preview is generated.
   final Function(List<Transaction>)? onGenerated;
 
+  /// Receives the current generated transactions during a build.
   final OnGeneration? generate;
 
   const ReadCsvFragment({
@@ -48,16 +52,20 @@ class ReadCsvFragment extends ConsumerStatefulWidget {
 
 class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
+  /// Maximum number of rows in the inline preview.
   final int testNumber = 5;
 
   final TextEditingController descriptionController = TextEditingController();
 
   final TextEditingController dateFormatController = TextEditingController();
 
+  /// Name of the selected CSV file.
   String? filename;
 
+  /// Parsed CSV rows, including the header row.
   List<List<dynamic>> csv = [];
 
+  /// Header cells from the first CSV row.
   List<dynamic> get headers {
     if (csv.isNotEmpty) {
       return csv[0];
@@ -65,22 +73,31 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     return [];
   }
 
+  /// Account assigned to generated transactions.
   Account account = Account.unknown;
 
+  /// Payment assigned to generated transactions.
   Payment payment = Payment.unknown;
 
+  /// Category assigned to negative CSV amounts.
   Category minusCategory = Category.unknown;
 
+  /// Category assigned to positive CSV amounts.
   Category plusCategory = Category.unknown;
 
+  /// Inclusive beginning of the imported date range.
   DateTime begin = DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 1)));
 
+  /// Inclusive end of the imported date range.
   DateTime end = DateUtils.dateOnly(DateTime.now());
 
+  /// Index of the CSV date column.
   int columnDate = 0;
 
+  /// Index of the CSV amount column.
   int columnAmount = 1;
 
+  /// Opens and parses a CSV file.
   void openCsv() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     filename = null;
@@ -102,6 +119,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     }
   }
 
+  /// Generates transactions with an optional preview limit of [number].
   List<Transaction> generate([int? number]) {
     if (account == Account.unknown
         || payment == Payment.unknown
@@ -156,6 +174,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     return list;
   }
 
+  /// Parses a CSV amount using the import sign convention.
   Decimal parseAmount(String literal) {
     if (literal.contains(RegExp("[\\-+]"))) {
       return Decimal.parse(literal.replaceAll(RegExp("[^0-9]"), ""));
@@ -164,6 +183,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     }
   }
 
+  /// Expands header placeholders in a description template.
   String parseDescription(String function, List<dynamic> row) {
     final Map<String, int> map = {};
     final RegExp regex = RegExp(r"\$\{[^${}]+\}");
@@ -185,7 +205,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     return function;
   }
 
-  /// Show [T] item selection dialog
+  /// Shows a selection dialog for [list].
   Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
@@ -198,7 +218,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     );
   }
 
-  /// Show [Category] item selection dialog
+  /// Shows the category selection dialog.
   Future<Category?> showCategorySelectDialog(BuildContext context) async {
     return await showDialog(
       context: context,
@@ -210,7 +230,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     );
   }
 
-  /// Show date picker
+  /// Shows a date picker initialized with [base].
   Future<DateTime> showDatePickDialog(BuildContext context, DateTime base) async {
     final DateTime? result = await showDatePicker(
       context: context,
@@ -221,25 +241,25 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     return result ?? base;
   }
 
-  /// Set [editing.accountId] and [editing.currency]
+  /// Selects the account for generated transactions.
   void setAccount(Account account) {
     setState(() {
       this.account = account;
     });
   }
 
-  /// Set [editing.paymentId], [editing.altCurrency], [editing.altAmount] and
-  /// [editing.calculatedDate].
+  /// Selects the payment for generated transactions.
   void setPayment(Payment payment) {
     this.payment = payment;
   }
 
-  /// Set [editing.minusCategory] and [editing.type]
+  /// Selects the category for negative CSV amounts.
   void setMinusCategory(Category category) => minusCategory = category;
 
+  /// Selects the category for positive CSV amounts.
   void setPlusCategory(Category category) => plusCategory = category;
 
-  /// Triggers on category card tapped
+  /// Selects a positive or negative amount category.
   void onCategoryCardTapped(bool isPlus) async {
     final category = await showCategorySelectDialog(context);
     if (category != null) {
@@ -252,7 +272,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     setState(() {});
   }
 
-  /// Triggers on account card tapped
+  /// Selects an account from [accounts].
   void onAccountCardTapped(List<Account> accounts) async {
     final account = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
       "object": LocaleKeys.account.plural(1),
@@ -265,13 +285,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     setState(() {});
   }
 
-  /// Triggers on no payment checkbox changed
+  /// Selects [Payment.none] when no payment handler is requested.
   void onNoPaymentCheckboxChanged(bool value) {
     setPayment(value ? Payment.none : Payment.unknown);
     setState(() {});
   }
 
-  /// Triggers on payment card tapped
+  /// Selects a payment from [payments].
   void onPaymentCardTapped(List<Payment> payments) async {
     final payment = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
       "object": LocaleKeys.payment.plural(1),
@@ -284,7 +304,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     setState(() {});
   }
 
-  /// Triggers on paid date button pressed
+  /// Updates the beginning or end of the import date range.
   void onDateButtonPressed(BuildContext context, bool isBegin) async {
     final date = DateUtils.dateOnly(await showDatePickDialog(context, isBegin ? begin : end));
     setState(() {
@@ -296,29 +316,33 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     });
   }
 
+  /// Selects the CSV date column.
   void onDateColumnChanged(int index) {
     setState(() {
       columnDate = index;
     });
   }
 
+  /// Selects the CSV amount column.
   void onAmountColumnChanged(int index) {
     setState(() {
       columnAmount = index;
     });
   }
 
+  /// Refreshes the preview after the date format changes.
   void onDateFormatChanged(String text) {
     setState(() {});
   }
 
+  /// Refreshes the preview after the description template changes.
   void onDescriptionChanged(String text) {
     setState(() {});
   }
 
-  /// Request
+  /// Fetches selectable accounts, payments, and categories.
   void request() async {
-    // Account
+    // Active, visible accounts.
     await ref.read(_accounts.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
@@ -333,7 +357,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     });
     final account = this.account;
     setAccount(account);
-    // Payment
+    // Active, visible payments.
     await ref.read(_payments.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ModelKeys.keyPriority: {
@@ -348,7 +372,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     });
     final payment = this.payment;
     setPayment(payment);
-    // Category
+    // Active categories.
     await ref.read(_categories.notifier).fetch({
       ModelKeys.keyDeleted: false,
       ApiQuery.keySortField: [
@@ -384,7 +408,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // File
+              // CSV file.
               Text(
                 LocaleKeys.file.tr(),
                 style: Theme.of(context).textTheme.labelMedium,
@@ -411,13 +435,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             ],
           ),
           const SizedBox(height: 8,),
-          // Category
+          // Category mapping.
           Text(
             LocaleKeys.category.plural(1),
             style: Theme.of(context).textTheme.labelMedium,
           ),
           const SizedBox(height: 8,),
-          // Category (Expense)
+          // Negative amount category.
           Text(
             LocaleKeys.transactionTypeExpense.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -429,7 +453,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             }),
             onTap: () => onCategoryCardTapped(false),
           ),
-          // Category (Income)
+          // Positive amount category.
           Text(
             LocaleKeys.transactionTypeIncome.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -442,13 +466,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             onTap: () => onCategoryCardTapped(true),
           ),
           const SizedBox(height: 8,),
-          // Target
+          // Wallet mapping.
           Text(
             LocaleKeys.target.tr(),
             style: Theme.of(context).textTheme.labelMedium,
           ),
           const SizedBox(height: 8,),
-          // Account
+          // Account.
           Text(
             LocaleKeys.account.plural(1),
             style: Theme.of(context).textTheme.labelSmall,
@@ -462,7 +486,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             onTap: () => onAccountCardTapped(ref.watch(_accounts)),
           ),
           const SizedBox(height: 8,),
-          // Payment
+          // Payment.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -505,13 +529,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             ),
           ),
           const SizedBox(height: 8,),
-          // Date
+          // Date mapping.
           Text(
             LocaleKeys.loadOptions.tr(),
             style: Theme.of(context).textTheme.labelMedium,
           ),
           const SizedBox(height: 8,),
-          // Date range
+          // Import date range.
           Text(
             LocaleKeys.range.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -601,7 +625,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             ],
           ),
           const SizedBox(height: 8,),
-          // DateFormat
+          // Date format.
           Text(
             LocaleKeys.dateFormat.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -616,7 +640,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             onChanged: onDateFormatChanged,
           ),
           const SizedBox(height: 8,),
-          // Description
+          // Description template.
           Text(
             LocaleKeys.description.tr(),
             style: Theme.of(context).textTheme.labelSmall,

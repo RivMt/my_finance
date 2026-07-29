@@ -7,6 +7,7 @@ import 'package:my_api/finance.dart';
 import 'package:my_finance/fragment/amount_field.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+/// Creates or edits a target balance preference.
 class TargetBalanceEditModal extends ConsumerStatefulWidget {
   const TargetBalanceEditModal({
     super.key,
@@ -17,14 +18,19 @@ class TargetBalanceEditModal extends ConsumerStatefulWidget {
     required this.onNegativeButtonPressed,
   });
 
+  /// Existing target date, if any.
   final DateTime? date;
 
+  /// Existing target currency, if any.
   final Currency? currency;
 
+  /// Existing target amount, if any.
   final Decimal? amount;
 
+  /// Called when the modal is cancelled or an existing target is removed.
   final Function() onNegativeButtonPressed;
 
+  /// Called with the confirmed target balance.
   final Function(DateTime, Currency, Decimal) onConfirmButtonPressed;
 
   @override
@@ -33,48 +39,46 @@ class TargetBalanceEditModal extends ConsumerStatefulWidget {
 
 class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal> {
 
-  /// Is this fragment editing [Preference]
-  ///
-  /// This returns `true` when [widget.value] is not `null`
+  /// Whether an existing target balance is being edited.
   bool get isEdit => widget.amount != null;
 
-  /// Expired [DateTime] of target balance
+  /// Target date being edited.
   late DateTime date;
 
-  /// UUID of selected [Currency]
+  /// Currency being edited.
   Currency currency = Currency.unknown;
 
-  /// [Decimal] which is now editing
+  /// Target amount being edited.
   Decimal amount = Decimal.zero;
 
-  /// Triggers on date changed
+  /// Updates the target date.
   void onDateChanged(DateTime date) {
     setState(() {
       this.date = date;
     });
   }
 
-  /// Triggers on currency changed
+  /// Updates the target currency.
   void onCurrencyChanged(Currency currency) {
     setState(() {
       this.currency = currency;
     });
   }
 
-  /// Triggers on budget text field changed
+  /// Updates the target amount.
   void onAmountChanged(Decimal value) {
     setState(() {
       amount = value;
     });
   }
 
-  /// Triggers on positive button pressed
+  /// Confirms the target balance.
   Future<bool> onPos() async {
     widget.onConfirmButtonPressed(date, currency, amount);
     return true;
   }
 
-  /// Triggers on negative button pressed
+  /// Cancels creation or removes the existing target.
   Future<bool> onNeg() async {
     widget.onNegativeButtonPressed();
     return true;
@@ -108,7 +112,7 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Date
+          // Target date.
           Text(
             LocaleKeys.date.tr(),
             style: Theme.of(context).textTheme.labelSmall,
@@ -127,13 +131,13 @@ class _TargetBalanceEditModalState extends ConsumerState<TargetBalanceEditModal>
               ),
             ],
           ),
-          // Basic information
+          // Target details.
           Text(
             LocaleKeys.targetBalance.plural(1),
             style: Theme.of(context).textTheme.labelSmall,
           ),
           const SizedBox(height: 8,),
-          // Limitation
+          // Target amount and currency.
           AmountField(
             label: LocaleKeys.amount.tr(),
             currency: currency,

@@ -25,6 +25,7 @@ final _categories = Provider((ref) {
   }).toList(growable: false);
 });
 
+/// Selects a non-deleted [Category] by type and statistics inclusion.
 class CategorySelectDialog extends ConsumerStatefulWidget {
   const CategorySelectDialog({
     super.key,
@@ -33,13 +34,13 @@ class CategorySelectDialog extends ConsumerStatefulWidget {
     this.onTap,
   });
 
-  /// Currently selected [TransactionType]
+  /// Initially selected transaction type.
   final TransactionType selectedType;
 
-  /// Value of including [Transaction.keyIncluded] is `true`
+  /// Whether categories included in statistics are shown initially.
   final bool showIncluded;
 
-  /// Triggers on [CategoryCard] tapped
+  /// Called when a category card is tapped.
   final Function(Category)? onTap;
 
   @override
@@ -48,12 +49,12 @@ class CategorySelectDialog extends ConsumerStatefulWidget {
 
 class _CategorySelectDialogState extends ConsumerState<CategorySelectDialog> {
 
-  /// Triggers on chip selection changed
+  /// Updates the transaction-type filter.
   void onChipSelected(TransactionType type) {
     ref.read(_type.notifier).set(type);
   }
 
-  /// Triggers on included checkbox pressed
+  /// Updates the statistics-inclusion filter.
   void onIncludedPressed(bool value) {
     ref.read(_included.notifier).set(value);
   }
@@ -84,12 +85,12 @@ class _CategorySelectDialogState extends ConsumerState<CategorySelectDialog> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Filters
+            // Category filters.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Type
+                // Transaction type.
                 Wrap(
                   spacing: 4,
                   children: TransactionType.types.map((type) {
@@ -100,7 +101,7 @@ class _CategorySelectDialogState extends ConsumerState<CategorySelectDialog> {
                     );
                   }).toList(growable: false),
                 ),
-                // Included
+                // Statistics inclusion.
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
                   child: InkWell(
@@ -126,7 +127,7 @@ class _CategorySelectDialogState extends ConsumerState<CategorySelectDialog> {
                 ),
               ],
             ),
-            // List of categories
+            // Matching categories.
             Expanded(
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(),
