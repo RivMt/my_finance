@@ -58,7 +58,7 @@ flutter pub get
   "clientId": "my-finance",
   "clientSecret": "replace-with-your-client-secret",
   "redirectUri": "https://app.example.com/redirect.html",
-  "isDevelop": false
+  "mode": "production"
 }
 ```
 
@@ -69,7 +69,7 @@ flutter pub get
 | `clientId` | OIDC에 등록한 클라이언트 ID입니다. |
 | `clientSecret` | OIDC 클라이언트 secret입니다. |
 | `redirectUri` | OIDC 로그인 결과를 받을 URI입니다. OIDC 서버에 등록한 값과 정확히 같아야 합니다. 웹에서는 배포 주소의 `/redirect.html`을 사용할 수 있습니다. |
-| `isDevelop` | `true`이면 REST API에 HTTP를, `false`이면 HTTPS를 사용합니다. 개발 모드 여부도 이 값으로 결정됩니다. |
+| `mode` | 애플리케이션 모드입니다: `production`, `dev`, `demo`. `dev`는 REST API에 HTTP를 사용하고, 나머지 모드는 HTTPS를 사용합니다. |
 
 `assets/key/*`는 `.gitignore`에 포함되어 있어 저장소에 커밋되지 않습니다. 다만 Flutter asset은 빌드 결과물에 패키징되므로 `config.json`의 값은 최종 사용자에게 완전히 비밀로 유지되지 않습니다. 운영 환경에서는 노출되어도 안전한 OIDC 클라이언트 구성을 사용하고, 실제 비밀값을 소스 관리나 배포 가능한 공개 빌드에 넣지 마세요.
 

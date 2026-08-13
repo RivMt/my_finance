@@ -60,7 +60,7 @@ Create the file under `assets/key` using the following structure:
   "clientId": "my-finance",
   "clientSecret": "replace-with-your-client-secret",
   "redirectUri": "https://app.example.com/redirect.html",
-  "isDevelop": false
+  "mode": "production"
 }
 ```
 
@@ -71,7 +71,7 @@ Create the file under `assets/key` using the following structure:
 | `clientId` | The client ID registered with the OIDC provider. |
 | `clientSecret` | The OIDC client secret. |
 | `redirectUri` | The URI that receives the OIDC login result. It must exactly match a redirect URI registered with the OIDC provider. On the web, this can point to `/redirect.html` on the deployed application. |
-| `isDevelop` | Uses HTTP for the REST API when `true` and HTTPS when `false`. This value also controls the application's development mode. |
+| `mode` | Application mode: `production`, `dev`, or `demo`. `dev` uses HTTP for the REST API; the other modes use HTTPS. |
 
 `assets/key/*` is excluded by `.gitignore` and must not be committed. However, Flutter assets are packaged into the build, so values in `config.json` are not completely secret from end users. Use OIDC client settings that are safe to expose in production, and do not place real secrets in source control or publicly distributed builds.
 

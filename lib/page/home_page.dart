@@ -248,7 +248,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final bool isWide = ScreenPlanner(context).isSidePanelVisible;
     final accounts = ref.watch(_filteredAccounts);
     final payments = ref.watch(_filteredPayments);
-    final iconName = ApiClient().isDevelop
+    final iconName = ApiClient().mode == ApiMode.dev
         ? 'assets/icon/icon-dev.png'
         : 'assets/icon/icon-full.png';
     final user = ref.watch(provider.currentUser).user;
