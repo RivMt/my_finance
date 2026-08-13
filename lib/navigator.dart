@@ -4,6 +4,7 @@ import 'package:my_finance/page/account_details_page.dart';
 import 'package:my_finance/page/categories_page.dart';
 import 'package:my_finance/page/advanced_query_page.dart';
 import 'package:my_finance/page/home_page.dart';
+import 'package:my_finance/page/monthly_category_expense_page.dart';
 import 'package:my_finance/page/payment_details_page.dart';
 import 'package:my_finance/page/preference_page.dart';
 import 'package:my_finance/page/read_csv_page.dart';
@@ -13,12 +14,11 @@ const String _tag = "Navigator";
 
 /// Defines route paths used by the finance application.
 class FinanceRoutePath extends RoutePath {
+  static final FinanceRoutePath accounts =
+      FinanceRoutePath("accounts", index: 1);
 
-  /// Accounts tab and account detail route.
-  static final FinanceRoutePath accounts = FinanceRoutePath("accounts", index: 1);
-
-  /// Payments tab and payment detail route.
-  static final FinanceRoutePath payments = FinanceRoutePath("payments", index: 2);
+  static final FinanceRoutePath payments =
+      FinanceRoutePath("payments", index: 2);
 
   /// Category management route.
   static final FinanceRoutePath categories = FinanceRoutePath("categories");
@@ -26,8 +26,8 @@ class FinanceRoutePath extends RoutePath {
   /// Deleted-item restoration route.
   static final FinanceRoutePath restores = FinanceRoutePath("restores");
 
-  /// Advanced transaction query route.
-  static final FinanceRoutePath advancedQuery = FinanceRoutePath("advanced_query");
+  static final FinanceRoutePath advancedQuery =
+      FinanceRoutePath("advanced_query");
 
   /// CSV import route.
   static final FinanceRoutePath readCsv = FinanceRoutePath("read_csv");
@@ -38,10 +38,13 @@ class FinanceRoutePath extends RoutePath {
   /// Search route.
   static final FinanceRoutePath search = FinanceRoutePath("search");
 
-  /// Query key for a route mode.
+  static final FinanceRoutePath monthlyCategoryExpenses =
+      FinanceRoutePath("monthly_category_expenses");
+
   static const String keyMode = "mode";
 
-  FinanceRoutePath(super.path, {
+  FinanceRoutePath(
+    super.path, {
     super.uuid,
     super.queries,
     super.anchor,
@@ -51,33 +54,32 @@ class FinanceRoutePath extends RoutePath {
 
 /// Parses finance routes into [FinanceRoutePath] values.
 class FinanceRouteParser extends RouteParser {
-
   @override
   List<RoutePath> get pathStandalone => [
-    ...super.pathStandalone,
-    FinanceRoutePath.categories,
-    FinanceRoutePath.preferences,
-  ];
+        ...super.pathStandalone,
+        FinanceRoutePath.categories,
+        FinanceRoutePath.preferences,
+        FinanceRoutePath.monthlyCategoryExpenses,
+      ];
 
   @override
   List<RoutePath> get pathDetails => [
-    ...super.pathDetails,
-    FinanceRoutePath.accounts,
-    FinanceRoutePath.payments,
-  ];
+        ...super.pathDetails,
+        FinanceRoutePath.accounts,
+        FinanceRoutePath.payments,
+      ];
 
   @override
   List<RoutePath> get pathIndex => [
-    ...super.pathIndex,
-    FinanceRoutePath.accounts,
-    FinanceRoutePath.payments,
-  ];
+        ...super.pathIndex,
+        FinanceRoutePath.accounts,
+        FinanceRoutePath.payments,
+      ];
 }
 
 /// Builds the page stack for the current finance route.
 class FinanceRouterDelegate extends CoreRouterDelegate {
-
-  /// Selected home-page destination index.
+  /// Home page index
   int _navigationRailIndex = 0;
 
   /// Updates the selected home-page destination.
@@ -115,6 +117,9 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
       return const ReadCsvPage();
     } else if (configuration.path == FinanceRoutePath.preferences.path) {
       return const PreferencePage();
+    } else if (configuration.path ==
+        FinanceRoutePath.monthlyCategoryExpenses.path) {
+      return const MonthlyCategoryExpensePage();
     }
     _navigationRailIndex = configuration.index;
     return home;
@@ -137,7 +142,7 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
         break;
       }
       configuration = prev;
-    } while(true);
+    } while (true);
     return pages.reversed.toList(growable: false);
   }
 
@@ -153,10 +158,8 @@ class FinanceRouterDelegate extends CoreRouterDelegate {
 
   @override
   Widget get home => HomePage(
-    router: this,
-    index: _navigationRailIndex,
-    onIndexChanged: _setNavigationRailIndex,
-  );
-
-
+        router: this,
+        index: _navigationRailIndex,
+        onIndexChanged: _setNavigationRailIndex,
+      );
 }

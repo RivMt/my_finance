@@ -190,6 +190,7 @@
   "currencyTypeZAR": "South African Rand",
 
   "currentMonthExpense": "Expenses of current month",
+  "monthlyCategoryExpense": "Monthly expenses by category",
   "amountBePaid": "Amount due to be paid",
   "targetBalance": "Target balance",
 
