@@ -7,22 +7,19 @@ import 'package:my_finance/card/expense_chart_card.dart';
 import 'package:my_finance/card/target_balance_card.dart';
 
 class HomeFragment extends ConsumerStatefulWidget {
+  const HomeFragment({
+    super.key,
+    required this.onExpenseChartPressed,
+  });
 
-  const HomeFragment({super.key});
+  final VoidCallback onExpenseChartPressed;
 
   @override
   ConsumerState createState() => _HomePageState();
 }
 
 class _HomePageState extends ConsumerState<HomeFragment> {
-
   final GlobalKey<DueToPaidCardState> _dueToPaidKey = GlobalKey();
-
-  final List<Widget> children = [
-    const ExpenseChartCard(),
-    const DueToPaidCard(),
-    const TargetBalanceCard(),
-  ];
 
   /// Triggers on scroll down
   Future<void> refresh() {
@@ -32,6 +29,11 @@ class _HomePageState extends ConsumerState<HomeFragment> {
 
   @override
   Widget build(BuildContext context) {
+    final children = [
+      ExpenseChartCard(onOpenPressed: widget.onExpenseChartPressed),
+      DueToPaidCard(key: _dueToPaidKey),
+      const TargetBalanceCard(),
+    ];
     return RefreshIndicator(
       onRefresh: refresh,
       child: Padding(

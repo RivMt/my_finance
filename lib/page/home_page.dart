@@ -13,19 +13,36 @@ import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
 
+int _compareNullableValues(Object? first, Object? second) {
+  if (identical(first, second)) {
+    return 0;
+  }
+  if (first == null) {
+    return 1;
+  }
+  if (second == null) {
+    return -1;
+  }
+  if (first.runtimeType == second.runtimeType && first is Comparable) {
+    return first.compareTo(second);
+  }
+  return first.toString().compareTo(second.toString());
+}
+
 final _filteredAccounts = Provider<List<Account>>((ref) {
   final min = ref.watch(_minPriorityFilter);
   final max = ref.watch(_maxPriorityFilter);
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.accounts);
   List<Account> result = list.where((account) {
-    return account.priority >= min
-        && account.priority <= max
-        && !account.deleted;
+    return account.priority >= min &&
+        account.priority <= max &&
+        !account.deleted;
   }).toList();
   if (Account.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+    result.sort(
+      (a1, a2) => _compareNullableValues(a1.map[sort], a2.map[sort]),
+    );
   }
   return result;
 });
@@ -36,31 +53,34 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.payments);
   List<Payment> result = list.where((payment) {
-    return payment.priority >= min
-        && payment.priority <= max
-        && !payment.deleted;
+    return payment.priority >= min &&
+        payment.priority <= max &&
+        !payment.deleted;
   }).toList();
-  if ( Payment.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  if (Payment.unknown.map.containsKey(sort)) {
+    result.sort(
+      (a1, a2) => _compareNullableValues(a1.map[sort], a2.map[sort]),
+    );
   }
   return result;
 });
 
-final _minPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+final _minPriorityFilter =
+    StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
   return ValueStateNotifier<int>(0);
 });
 
-final _maxPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+final _maxPriorityFilter =
+    StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
   return ValueStateNotifier<int>(1000);
 });
 
-final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+final _sortFilter =
+    StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
   return ValueStateNotifier<String>(ModelKeys.keyUuid);
 });
 
 class HomePage extends ConsumerStatefulWidget {
-
   const HomePage({
     super.key,
     required this.router,
@@ -79,7 +99,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-
   static const String _tag = "HomePage";
 
   final List<_NavigationDestinations> railDestinations = [
@@ -105,7 +124,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   List<_NavigationDestinations> get barDestinations {
     final List<_NavigationDestinations> list = [];
-    for(int i=0; i < railDestinations.length; i++) {
+    for (int i = 0; i < railDestinations.length; i++) {
       list.add(railDestinations[convertNavigationIndex(i)]);
     }
     return list;
@@ -153,8 +172,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     final now = DateTime.now();
     provider.appendTransactions(ref, {
       ModelKeys.keyPaidDate: {
-        ApiQuery.keyQueryRangeBegin: DateTime(now.year, now.month - 3, 1).toIso8601String(),
-        ApiQuery.keyQueryRangeEnd: DateTime(now.year, now.month + 2, 0).toIso8601String(),
+        ApiQuery.keyQueryRangeBegin:
+            DateTime(now.year, now.month - 3, 1).toIso8601String(),
+        ApiQuery.keyQueryRangeEnd:
+            DateTime(now.year, now.month + 2, 0).toIso8601String(),
       }
     });
   }
@@ -191,22 +212,26 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// Triggers on account item selected
   void onAccountPressed(Account account) {
-    setNewRoute(FinanceRoutePath(FinanceRoutePath.accounts.path, uuid: account.uuid));
+    setNewRoute(
+        FinanceRoutePath(FinanceRoutePath.accounts.path, uuid: account.uuid));
   }
 
   /// Triggers on payment item selected
   void onPaymentPressed(Payment payment) {
-    setNewRoute(FinanceRoutePath(FinanceRoutePath.payments.path, uuid: payment.uuid));
+    setNewRoute(
+        FinanceRoutePath(FinanceRoutePath.payments.path, uuid: payment.uuid));
   }
 
   /// Get [GridView] cross axis count
   ///
   /// Value is always bigger than `0`
-  int getCrossAxisCount(BuildContext context) => ScreenPlanner(context).panelNumber;
+  int getCrossAxisCount(BuildContext context) =>
+      ScreenPlanner(context).panelNumber;
 
   /// Get [GridView] child aspect ratio
   double getChildAspectRatio(BuildContext context) {
-    return (MediaQuery.of(context).size.width / getCrossAxisCount(context)) / GroupCard.height;
+    return (MediaQuery.of(context).size.width / getCrossAxisCount(context)) /
+        GroupCard.height;
   }
 
   @override
@@ -223,7 +248,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     final bool isWide = ScreenPlanner(context).isSidePanelVisible;
     final accounts = ref.watch(_filteredAccounts);
     final payments = ref.watch(_filteredPayments);
-    final iconName = ApiClient().isDevelop ? 'assets/icon/icon-dev.png' : 'assets/icon/icon-full.png';
+    final iconName = ApiClient().isDevelop
+        ? 'assets/icon/icon-dev.png'
+        : 'assets/icon/icon-full.png';
     final user = ref.watch(provider.currentUser).user;
     return Scaffold(
       appBar: AppBar(
@@ -233,10 +260,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           title: "MyFinance",
         ),
         centerTitle: !isWide,
-        leading: isWide ? null : IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: onMenuButtonPressed,
-        ),
+        leading: isWide
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: onMenuButtonPressed,
+              ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_outlined),
@@ -258,11 +287,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 16),
                   child: TransactionAddButton(),
                 ),
-                destinations: List.generate(railDestinations.length, (index) => NavigationRailDestination(
-                  icon: railDestinations[index].icon,
-                  selectedIcon: railDestinations[index].selectedIcon,
-                  label: Text(railDestinations[index].label),
-                )),
+                destinations: List.generate(
+                    railDestinations.length,
+                    (index) => NavigationRailDestination(
+                          icon: railDestinations[index].icon,
+                          selectedIcon: railDestinations[index].selectedIcon,
+                          label: Text(railDestinations[index].label),
+                        )),
                 trailing: Expanded(
                   child: Container(
                     alignment: Alignment.bottomCenter,
@@ -276,13 +307,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                 selectedIndex: navigationRailIndex,
                 onDestinationSelected: onNavigationIndexChanged,
                 labelType: NavigationRailLabelType.all,
-              )
-            ,
+              ),
             Expanded(
               child: IndexedStack(
                 index: navigationRailIndex,
                 children: [
-                  const HomeFragment(),
+                  HomeFragment(
+                    onExpenseChartPressed: () => setNewRoute(
+                      FinanceRoutePath.monthlyCategoryExpenses,
+                    ),
+                  ),
                   AccountsFragment(
                     accounts: accounts,
                     onItemTap: onAccountPressed,
@@ -297,29 +331,33 @@ class _HomePageState extends ConsumerState<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: isWide ? null : Theme(
-        data: Theme.of(context).copyWith(
-          splashFactory: NoSplash.splashFactory,
-        ),
-        child: BottomNavigationBar(
-          currentIndex: convertNavigationIndex(navigationRailIndex),
-          onTap: (index) {
-            return onNavigationIndexChanged(convertNavigationIndex(index));
-          },
-          items: List.generate(barDestinations.length, (index) => BottomNavigationBarItem(
-            icon: barDestinations[index].icon,
-            activeIcon: barDestinations[index].selectedIcon,
-            label: barDestinations[index].label,
-          )),
-        ),
-      ),
+      bottomNavigationBar: isWide
+          ? null
+          : Theme(
+              data: Theme.of(context).copyWith(
+                splashFactory: NoSplash.splashFactory,
+              ),
+              child: BottomNavigationBar(
+                currentIndex: convertNavigationIndex(navigationRailIndex),
+                onTap: (index) {
+                  return onNavigationIndexChanged(
+                      convertNavigationIndex(index));
+                },
+                items: List.generate(
+                    barDestinations.length,
+                    (index) => BottomNavigationBarItem(
+                          icon: barDestinations[index].icon,
+                          activeIcon: barDestinations[index].selectedIcon,
+                          label: barDestinations[index].label,
+                        )),
+              ),
+            ),
       floatingActionButton: isWide ? null : const TransactionAddButton(),
     );
   }
 }
 
 class _NavigationDestinations {
-
   final Icon icon;
 
   final Icon selectedIcon;
