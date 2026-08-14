@@ -30,7 +30,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
@@ -55,6 +55,18 @@ jobs:
       # Install flutter
       - name: Install Flutter
         uses: subosito/flutter-action@v2.16.0
+
+      # Configure Flutter and Docker versions from the pushed ref
+      - name: Configure build metadata
+        id: build-metadata
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "build_version=${GITHUB_REF_NAME#v}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "build_version=0.0.0" >> "${GITHUB_OUTPUT}"
+          fi
+          echo "docker_tag=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
 
       # Clone my_api if ref is not master
       - name: Clone my_api
@@ -92,12 +104,39 @@ jobs:
       # Build web
       - name: Build web
         run: |
-          flutter build web --release --base-href "/"
+          flutter build web --release --base-href "/" \
+            --build-name "${{ steps.build-metadata.outputs.build_version }}" \
+            --build-number "${{ github.run_number }}"
 
       # Copy assets
       - name: Copy assets
         run: |
           cp ./assets/icon/icon.svg ./build/web/icons/Icon.svg
+
+      # Attach the web build to the GitHub release for tag builds
+      - name: Package web build
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          artifact="my_finance-web-${GITHUB_REF_NAME}.zip"
+          cd build/web
+          zip -r "../../${artifact}" .
+
+      - name: Attach web build to GitHub release
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact="my_finance-web-${GITHUB_REF_NAME}.zip"
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${artifact}" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "${artifact}" \
+              --verify-tag \
+              --generate-notes \
+              --title "${GITHUB_REF_NAME}"
+          fi
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -120,6 +159,8 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.build-metadata.outputs.docker_tag }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
