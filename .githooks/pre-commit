@@ -1,0 +1,6 @@
+#!/bin/sh
+mv pubspec_overrides.yaml pubspec_overrides.yaml.tmp
+flutter pub upgrade
+mv pubspec_overrides.yaml.tmp pubspec_overrides.yaml
+
+git add pubspec.lock
