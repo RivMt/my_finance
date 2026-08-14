@@ -311,23 +311,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                 labelType: NavigationRailLabelType.all,
               ),
             Expanded(
-              child: IndexedStack(
-                index: navigationRailIndex,
-                children: [
-                  HomeFragment(
-                    onExpenseChartPressed: () => setNewRoute(
-                      FinanceRoutePath.monthlyCategoryExpenses,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
+                child: IndexedStack(
+                  index: navigationRailIndex,
+                  children: [
+                    const HomeFragment(),
+                    AccountsFragment(
+                      accounts: accounts,
+                      onItemTap: onAccountPressed,
                     ),
-                  ),
-                  AccountsFragment(
-                    accounts: accounts,
-                    onItemTap: onAccountPressed,
-                  ),
-                  PaymentsFragment(
-                    payments: payments,
-                    onItemTap: onPaymentPressed,
-                  ),
-                ],
+                    PaymentsFragment(
+                      payments: payments,
+                      onItemTap: onPaymentPressed,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
