@@ -161,6 +161,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ steps.build-metadata.outputs.docker_tag }}
+            type=raw,value=release,enable=${{ github.ref_type == 'tag' }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
