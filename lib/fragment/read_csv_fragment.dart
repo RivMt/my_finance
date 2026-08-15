@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:decimal/decimal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_api/core.dart';
@@ -99,22 +97,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
   /// Opens and parses a CSV file.
   void openCsv() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    PlatformFile? file = await FilePicker.pickFile();
     filename = null;
-    if (result != null) {
-      const converter = CsvToListConverter(
-        eol: "\n",
-      );
-      filename = result.files.single.name;
-      if (foundation.kIsWeb) {
-        final raw = result.files.single.bytes;
-        if (raw != null) {
-          csv = converter.convert(utf8.decode(raw));
-        }
-      } else {
-        csv = await File(result.files.single.path!).openRead().transform(utf8.decoder).transform(
-            converter).toList();
-      }
+    if (file != null) {
+      const converter = CsvDecoder();
+      filename = file.name;
+      final raw = await file.readAsBytes();
+      csv = converter.convert(utf8.decode(raw));
       setState(() {});
     }
   }
@@ -135,38 +124,47 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
         break;
       }
       final item = Transaction();
+      late DateTime date;
+      final dateFormat = dateFormatController.text;
+      final dateValue = row[columnDate];
       try {
-        late DateTime date;
-        if (dateFormatController.text.isNotEmpty) {
-          final formatter = DateFormat(dateFormatController.text);
-          date = formatter.parse(row[columnDate]);
+        if (dateFormat.isNotEmpty) {
+          final formatter = DateFormat(dateFormat);
+          date = formatter.parse(dateValue);
         } else {
-          date = DateTime.parse(row[columnDate]);
+          date = DateTime.parse(dateValue);
         }
-        item.paidDate = date;
-        if (begin.compareTo(item.paidDate) > 0 || end.compareTo(item.paidDate) < 0) {
-          continue;
-        }
-        item.setAccount(account);
-        item.currencyId = account.currencyId;
-        item.setPayment(payment);
-        item.calculatedDate = payment.getCalculatedDate(item.paidDate);
-        item.amount = parseAmount(row[columnAmount]);
-        if (item.amount < Decimal.zero) {
-          item.categoryId = minusCategory.uuid;
-          item.type = minusCategory.type;
-          item.isIncluded = minusCategory.isIncluded;
-          item.amount *= Decimal.fromInt(-1);
-        } else {
-          item.categoryId = plusCategory.uuid;
-          item.type = plusCategory.type;
-          item.isIncluded = plusCategory.isIncluded;
-        }
-        item.descriptions = parseDescription(descriptionController.text, row);
-        list.add(item);
-      } on Exception {
-        Log.e(_tag, "Failed to parse csv row: ${row.join(", ")}");
+      } on FormatException {
+        Log.e(_tag, "Unable to parse date: `$dateValue` by format `$dateFormat`");
+        // TODO: Show error on DateFormat input field
+        continue;
       }
+      item.paidDate = date;
+      if (begin.compareTo(item.paidDate) > 0 || end.compareTo(item.paidDate) < 0) {
+        continue;
+      }
+      item.setAccount(account);
+      item.currencyId = account.currencyId;
+      item.setPayment(payment);
+      item.calculatedDate = payment.getCalculatedDate(item.paidDate);
+      try {
+        item.amount = parseAmount(row[columnAmount]);
+      } on FormatException {
+        Log.e(_tag, "Unable to parse amount: `${row[columnAmount]}` as BigInt");
+        continue;
+      }
+      if (item.amount < Decimal.zero) {
+        item.categoryId = minusCategory.uuid;
+        item.type = minusCategory.type;
+        item.isIncluded = minusCategory.isIncluded;
+        item.amount *= Decimal.fromInt(-1);
+      } else {
+        item.categoryId = plusCategory.uuid;
+        item.type = plusCategory.type;
+        item.isIncluded = plusCategory.isIncluded;
+      }
+      item.descriptions = parseDescription(descriptionController.text, row);
+      list.add(item);
     }
     if (widget.onGenerated != null) {
       widget.onGenerated!(list);

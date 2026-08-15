@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -164,10 +166,20 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
       newLine: "\r\n",
       escape: '"',
     );
+    final Uint8List bytes = Uint8List.fromList(utf8.encode(raw));
+    Uri? path = await FilePicker.saveFile(
+      dialogTitle: LocaleKeys.msgExportCsv.tr(),
+      fileName: 'data.csv',
+      allowedExtensions: ['csv'],
+      bytes: bytes,
+    );
+    if (path == null) {
+      return;
+    }
     // Save the CSV to the selected path.
     try {
-      final file = File(path);
-      file.writeAsString(raw);
+      final file = File.fromUri(path);
+      file.writeAsBytes(bytes);
     } on Exception catch(e, s) {
       Log.e(_tag, "Exception: $e on $s");
     }
