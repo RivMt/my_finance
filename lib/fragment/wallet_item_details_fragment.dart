@@ -117,13 +117,6 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
                   ),
                   MonthPicker(
                     date: month,
-                    displayText: (date) {
-                      final now = DateTime.now();
-                      if (date.year == now.year) {
-                        return DateFormat.MMM().format(date);
-                      }
-                      return DateFormat.yMMM().format(date);
-                    },
                     onDateChanged: onMonthChanged,
                   ),
                   TextButton.icon(
