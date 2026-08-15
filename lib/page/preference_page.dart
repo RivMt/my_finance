@@ -154,27 +154,29 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
 
   /// Opens the target-balance creation or editing modal.
   void addOrEditTargetBalance({
-    required BuildContext context,
     DateTime? date,
     Currency? currency,
     Decimal? amount,
-  }) async {
+  }) {
     // Configure callbacks for create, update, and remove actions.
+    final oldDate = date;
+    final oldCurrency = currency;
     showModal(
       child: TargetBalanceEditModal(
         date: date,
         currency: currency,
         amount: amount,
         onConfirmButtonPressed: (date, currency, amount) {
+          if (oldDate != null && oldCurrency != null) {
+            removeTargetBalance(oldDate, oldCurrency);
+          }
           setTargetBalance(date, currency, amount);
-          Navigator.pop(context);
         },
         onNegativeButtonPressed: () {
           // Only existing targets can be removed.
           if (date != null && currency != null) {
             removeTargetBalance(date, currency);
           }
-          Navigator.pop(context);
         },
       ),
     );
@@ -227,7 +229,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     trailing: IconButton(
                       icon: const Icon(Icons.add_circle_outline_outlined),
                       color: Theme.of(context).primaryColor,
-                      onPressed: () => addOrEditTargetBalance(context: context),
+                      onPressed: addOrEditTargetBalance,
                     ),
                   ),
                   ListView.builder(
@@ -248,7 +250,6 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                         subtitle: currency.format(amount ?? Decimal.zero),
                         trailing: Text(LocaleKeys.nToDate.tr(args: [DateFormat.yMd().format(date)])),
                         onTap: () => addOrEditTargetBalance(
-                          context: context,
                           date: date,
                           currency: currency,
                           amount: amount,

@@ -198,6 +198,17 @@ class TargetBalanceCard extends ConsumerWidget {
     });
   }
 
+  PreferenceElement? getTarget(PreferenceElement? targets, DateTime end) {
+    if (targets == null) {
+      return null;
+    }
+    final key = end.toIso8601String();
+    if (!targets.containsKey(key)) {
+      return null;
+    }
+    return targets.get(key, null);
+  }
+
   /// Scales [value] into chart space while preserving its sign.
   double scaleValue({
     required double value,
@@ -226,14 +237,14 @@ class TargetBalanceCard extends ConsumerWidget {
     final balance = data[dateEnd]![4];
     final currency = ref.watch(provider.defaultCurrency);
     final targets = ref.watch(_target);
-    final target = targets?.get(dateEnd.toIso8601String(), null);
+    final target = getTarget(targets, dateEnd);
     // Normalize balance, income, and expense series together.
     final maxes = ref.watch(_max);
     final deltaMax = math.max(maxes[0], maxes[1]);
     final globalMax = math.max(deltaMax, maxes[4]);
     return HomeCard(
       title: LocaleKeys.targetBalance.tr(),
-      subtitle: target == null ? "" : getSubtitle(
+      subtitle: (target == null) ? "" : getSubtitle(
         currency: currency,
         target: target.value,
         balance: balance,

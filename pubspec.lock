@@ -584,9 +584,11 @@ packages:
   my_api:
     dependency: "direct main"
     description:
-      path: "../my_api"
-      relative: true
-    source: path
+      path: "."
+      ref: master
+      resolved-ref: fa4c38e8d3843f62aacddf1db8a4f3d0789fda2c
+      url: "https://github.com/RivMt/my_api"
+    source: git
     version: "0.0.1"
   nonce:
     dependency: transitive
