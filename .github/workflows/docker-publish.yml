@@ -192,11 +192,17 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-      - id: 'auth'
+      - name: Authenticate GCP
+        if: github.ref_type == 'tag'
+        id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ env.GCP_SA_KEY }}'
+
       - name: Setup Google Cloud SDK
+        if: github.ref_type == 'tag'
         uses: google-github-actions/setup-gcloud@v2
+
       - name: Pull and Up docker container in GCP
+        if: github.ref_type == 'tag'
         run: gcloud compute ssh ${{ env.GCP_SSH_USERNAME }}@${{ env.GCP_INSTANCE }} --zone=us-west1-a --command="${{ env.GCP_SSH_COMMAND }}"
