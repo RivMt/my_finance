@@ -137,6 +137,9 @@
   "msgUnknownDefaultCurrency": "기본 통화가 설정되지 않았습니다",
   "msgTargetBalance": "{target}까지 {residual} {judge}",
   "msgInputSearchQuery": "검색어를 입력해주세요",
+  "msgDemoDisclaimer": "데모 버전은 접속 종료, 새로고침 등의 사유로 언제든지 데이터가 삭제, 수정될 수 있습니다. 중요한 데이터와 개인정보는 입력하지 마세요.",
+  "msgDevDisclaimer": "개발 버전은 불안정합니다. 중요한 데이터는 항상 백업하여 복원할수 있게 하고, 개인정보는 부득이한 오류로 유출될수 있으니 입력하지 마세요.",
+  "msgCommonDisclaimer": "이 애플리케이션은 통제된 환경에 설치된 신뢰할 수 있는 서버에서 사용하는 것을 전제로 개발되었습니다. 중요 데이터나 개인정보의 유출, 소실 등의 사고에 대해서 개발자는 일절 책임지지 않습니다.",
 
   "accountTypeSaving": "저축",
   "accountTypeAccount": "예금",
