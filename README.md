@@ -8,6 +8,8 @@
 
 ## Introduction
 
+[Demo Page](https://rivmt.github.io/my_finance/)
+
 MyFinance is a Flutter-based personal finance application for managing accounts, payment methods, income, and expenses in one place. It stores data through `kyro`, a separate backend project that provides API endpoints for multiple applications, and uses an OIDC (OpenID Connect) authentication server. Its interface adapts to mobile, desktop, and web screen sizes.
 
 - Cross-platform client built with Flutter and Dart
