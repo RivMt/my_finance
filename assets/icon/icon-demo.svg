@@ -22,10 +22,14 @@
             <rect x="52.912" y="-35.484" width="54.592" height="13.562" style="fill:rgb(179,229,252);"/>
         </g>
     </g>
-    <g id="Label-DEV" serif:id="Label DEV" transform="matrix(9.44882,0,0,9.44882,-0.000029,-0.000037)">
-        <path id="Label" d="M122.072,100.972L122.072,122.25C122.072,123.281 121.236,124.117 120.205,124.117L66.364,124.117C65.333,124.117 64.497,123.281 64.497,122.25L64.497,100.972C64.497,99.941 65.333,99.105 66.364,99.105L120.205,99.105C121.236,99.105 122.072,99.941 122.072,100.972Z" style="fill:rgb(118,255,3);"/>
+    <g id="Label-DEMO" serif:id="Label DEMO" transform="matrix(9.44882,0,0,9.44882,-55.040087,-0.000037)">
+        <g id="Label" transform="matrix(1.2763,0,0,1,-28.337038,-0.011294)">
+            <path d="M122.072,100.972L122.072,122.25C122.072,123.281 121.417,124.117 120.609,124.117L65.959,124.117C65.152,124.117 64.497,123.281 64.497,122.25L64.497,100.972C64.497,99.941 65.152,99.105 65.959,99.105L120.609,99.105C121.417,99.105 122.072,99.941 122.072,100.972Z" style="fill:rgb(255,3,85);"/>
+        </g>
         <g transform="matrix(1,0,0,1,92.211975,120.02119)">
-            <text x="-22.6px" y="0px" style="font-family:'NotoSansCJKjp-Black', 'Noto Sans CJK JP', sans-serif;font-weight:900;font-size:22.578px;">DEV</text>
+            <g transform="matrix(22.5778,0,0,22.5778,34.115056,0)">
+            </g>
+            <text x="-34.115px" y="0px" style="font-family:'NotoSansCJKjp-Black', 'Noto Sans CJK JP', sans-serif;font-weight:900;font-size:22.578px;">DEMO</text>
         </g>
     </g>
 </svg>
