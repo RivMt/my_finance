@@ -1,6 +1,7 @@
 {
     "name": "MyFinance",
     "short_name": "MyFinance",
+    "id": "myfinance.release",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#FFFFFF",

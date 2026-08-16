@@ -109,6 +109,12 @@ jobs:
         shell: bash
         run: |
           bash assets/script/icongen.sh "${{ steps.build-metadata.outputs.mode }}"
+
+      # Configure the PWA and HTML names for the selected mode
+      - name: Configure app name
+        shell: bash
+        run: |
+          bash assets/script/appname.sh "${{ steps.build-metadata.outputs.mode }}"
       
       # Build web
       - name: Build web
