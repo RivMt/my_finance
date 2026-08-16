@@ -22,6 +22,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Create demo config
+        shell: bash
+        run: |
+          mkdir -p assets/key
+          printf '{}' > assets/key/config.json
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2.16.0
         with:
