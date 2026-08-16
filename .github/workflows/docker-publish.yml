@@ -10,7 +10,6 @@ on:
     tags: [ 'v*.*.*' ]
     branches:
       - "dev"
-      - "demo"
       - "docker"
       - "master"
 
