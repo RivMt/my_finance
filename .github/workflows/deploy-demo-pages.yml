@@ -53,6 +53,8 @@ jobs:
         run: |
           flutter build web --release \
             --base-href "/${GITHUB_REPOSITORY#*/}/" \
+            --build-name "0.0.0" \
+            --build-number "${{ github.run_number }}" \
             --dart-define="MYSUITE_MODE=demo"
 
       - name: Copy generated SVG icon
