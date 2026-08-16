@@ -250,13 +250,11 @@ class _HomePageState extends ConsumerState<HomePage> {
     final bool isWide = ScreenPlanner(context).isSidePanelVisible;
     final accounts = ref.watch(_filteredAccounts);
     final payments = ref.watch(_filteredPayments);
-    final iconName = ApiClient().mode == ApiMode.dev
-        ? 'assets/icon/icon-dev.png'
-        : 'assets/icon/icon-full.png';
+    const iconName = 'assets/icon/icon-full.png';
     final user = ref.watch(provider.currentUser).user;
     return Scaffold(
       appBar: AppBar(
-        title: AppLogo(
+        title: AppTitle(
           iconName: iconName,
           isWide: isWide,
           title: "MyFinance",

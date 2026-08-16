@@ -199,10 +199,6 @@ class _ExpenseChartFragmentCard extends ConsumerState<ExpenseChartCard> {
               opacity: expansionProgress,
               child: MonthPicker(
                 date: date,
-                displayText: (date) {
-                  final month = date.month.toString().padLeft(2, '0');
-                  return '${date.year}년 $month월';
-                },
                 onDateChanged: widget.onDateChanged ?? (_) {},
               ),
             ),

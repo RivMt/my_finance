@@ -40,6 +40,7 @@
   "undo": "Undo",
   "choose": "Choose",
   "sort": "Sort",
+  "reset": "Reset",
 
   "object_action": "{action} {object}",
   "full_name": "{first} {last}",
@@ -140,6 +141,9 @@
   "msgUnknownDefaultCurrency": "Default currency is unknown",
   "msgTargetBalance": "{residual} {judge}ed to {target}",
   "msgInputSearchQuery": "Input words to search",
+  "msgDemoDisclaimer": "In the demo version, data may be deleted or modified at any time due to ending the session, refreshing the page, or other reasons. Do not enter important data or personal information.",
+  "msgDevDisclaimer": "Development versions are unstable. Always back up important data so it can be restored, and do not enter personal information because it may be exposed due to unexpected errors.",
+  "msgCommonDisclaimer": "This application was developed for use with trusted servers installed in controlled environments. The developer assumes no responsibility for incidents such as the disclosure or loss of important data or personal information.",
 
   "accountTypeSaving": "Savings",
   "accountTypeAccount": "Normal",

@@ -1,0 +1,10 @@
+[
+  {
+    "uuid": "USD",
+    "region_code": "US",
+    "currency_code": "D",
+    "symbol": "$",
+    "icon_url": "",
+    "decimal_point": 2
+  }
+]

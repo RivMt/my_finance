@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -27,7 +29,6 @@ final _columns = [
   ModelKeys.keyAltAmount,
   ModelKeys.keyPaidDate,
   ModelKeys.keyCalculatedDate,
-  ModelKeys.keyUtilityEnd,
   ModelKeys.keyDescription,
   ModelKeys.keyIncluded,
 ];
@@ -104,7 +105,6 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
         ),
         DataCell(Text(DateFormat.yMd().format(item.paidDate))),
         DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),
-        DataCell(Text(DateFormat.yMd().format(item.utilityEnd))),
         DataCell(Text(item.descriptions)),
         DataCell(Text(item.isIncluded.toString())),
       ],
@@ -113,14 +113,9 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
 
   /// Exports the queried transactions through [DataFrame].
   void onDownloadButtonPressed() async {
-    String? path = await FilePicker.platform.saveFile(
-      dialogTitle: LocaleKeys.msgExportCsv.tr(),
-      fileName: 'data.csv',
-      allowedExtensions: ['csv'],
-    );
-    if (path == null) {
-      return;
-    }
+    final accounts = ref.watch(provider.accounts);
+    final payments = ref.watch(provider.payments);
+    final categories = ref.watch(provider.categories);
     // Convert model fields to localized CSV values.
     final DataFrame<Transaction> df = DataFrame(
       columns: _columns,
@@ -143,17 +138,26 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
           final currency = provider.getCurrency(ref, alt);
           return currency.key.tr();
         },
-        ModelKeys.keyPaidDate: (date) {
-          assert(date is int);
-          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        ModelKeys.keyCategoryName: (item) {
+          assert(item is Transaction);
+          final category = categories.firstWhere((element) {
+            return element.uuid == item.categoryId;
+          }, orElse: () => Category.unknown);
+          return category.name;
         },
-        ModelKeys.keyCalculatedDate: (date) {
-          assert(date is int);
-          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        ModelKeys.keyAccountName: (item) {
+          assert(item is Transaction);
+          final account = accounts.firstWhere((element) {
+            return element.uuid == item.accountId;
+          }, orElse: () => Account.unknown);
+          return account.name;
         },
-        ModelKeys.keyUtilityEnd: (date) {
-          assert(date is int);
-          return DateFormat.yMd().format(DateTime.fromMillisecondsSinceEpoch(date));
+        ModelKeys.keyPaymentName: (item) {
+          assert(item is Transaction);
+          final payment = payments.firstWhere((element) {
+            return element.uuid == item.paymentId;
+          }, orElse: () => Payment.unknown);
+          return payment.name;
         },
       }
     );
@@ -162,10 +166,20 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
       newLine: "\r\n",
       escape: '"',
     );
+    final Uint8List bytes = Uint8List.fromList(utf8.encode(raw));
+    Uri? path = await FilePicker.saveFile(
+      dialogTitle: LocaleKeys.msgExportCsv.tr(),
+      fileName: 'data.csv',
+      allowedExtensions: ['csv'],
+      bytes: bytes,
+    );
+    if (path == null) {
+      return;
+    }
     // Save the CSV to the selected path.
     try {
-      final file = File(path);
-      file.writeAsString(raw);
+      final file = File.fromUri(path);
+      file.writeAsBytes(bytes);
     } on Exception catch(e, s) {
       Log.e(_tag, "Exception: $e on $s");
     }

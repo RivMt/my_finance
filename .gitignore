@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+*.tmp
 
 # IntelliJ related
 *.iml
@@ -50,3 +51,13 @@ app.*.map.json
 # Generated files
 /lib/generated/*
 /assets/Output
+
+# Generated icons (run assets/script/icongen.sh)
+/.venv/
+/assets/icon/icon-desktop.png
+/assets/icon/icon-dev.png
+/assets/icon/icon-full.png
+/web/favicon.png
+/web/icons/Icon*.png
+/web/icons/Icon.svg
+/web/splashes/*.png
