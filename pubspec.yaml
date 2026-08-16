@@ -36,6 +36,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/demo/
     - assets/key/
     - assets/locale/
     - assets/icon/

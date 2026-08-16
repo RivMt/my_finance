@@ -1,0 +1,93 @@
+[
+  {
+    "uuid": "demo-category-groceries",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Groceries",
+    "description": "Food and household supplies",
+    "type": 0,
+    "included": true,
+    "icon": 42
+  },
+  {
+    "uuid": "demo-category-dining",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Dining",
+    "description": "Restaurants and cafes",
+    "type": 0,
+    "included": true,
+    "icon": 75
+  },
+  {
+    "uuid": "demo-category-housing",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Housing",
+    "description": "Rent and home expenses",
+    "type": 0,
+    "included": true,
+    "icon": 8
+  },
+  {
+    "uuid": "demo-category-transport",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Transportation",
+    "description": "Transit and local travel",
+    "type": 0,
+    "included": true,
+    "icon": 46
+  },
+  {
+    "uuid": "demo-category-entertainment",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Entertainment",
+    "description": "Movies, games, and events",
+    "type": 0,
+    "included": true,
+    "icon": 15
+  },
+  {
+    "uuid": "demo-category-salary",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Salary",
+    "description": "Employment income",
+    "type": 1,
+    "included": true,
+    "icon": 38
+  },
+  {
+    "uuid": "demo-category-interest",
+    "last_used": "2026-08-15T09:00:00Z",
+    "owner_id": "demo",
+    "editors_id": [],
+    "viewers_id": [],
+    "deleted": false,
+    "name": "Interest",
+    "description": "Savings interest",
+    "type": 1,
+    "included": true,
+    "icon": 35
+  }
+]

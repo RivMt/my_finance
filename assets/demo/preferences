@@ -1,0 +1,14 @@
+[
+  {
+    "section": "finance",
+    "owner_id": "demo",
+    "pref_key": "finance.default_currency",
+    "pref_value": "SUSD"
+  },
+  {
+    "section": "finance",
+    "owner_id": "demo",
+    "pref_key": "finance.target_balance",
+    "pref_value": "M{SUSD:M{S2026-12-31T00:00:00.000:D3000}}"
+  }
+]

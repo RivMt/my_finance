@@ -36,6 +36,7 @@
   "undo": "실행 취소",
   "choose": "선택",
   "sort": "정렬",
+  "reset": "초기화",
 
   "object_action": "{object} {action}",
   "full_name": "{last}{first}",

@@ -36,6 +36,7 @@
   "undo": "元に戻す",
   "choose": "選択",
   "sort": "並び替え",
+  "reset": "リセット",
 
   "object_action": "{object} {action}",
   "full_name": "{last}{first}",
