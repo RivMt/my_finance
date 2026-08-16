@@ -254,7 +254,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final user = ref.watch(provider.currentUser).user;
     return Scaffold(
       appBar: AppBar(
-        title: AppLogo(
+        title: AppTitle(
           iconName: iconName,
           isWide: isWide,
           title: "MyFinance",
