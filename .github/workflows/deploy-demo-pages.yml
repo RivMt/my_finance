@@ -34,8 +34,11 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install dependencies
-        run: flutter pub get && flutter pub upgrade
+      - name: Resolve dependencies from scratch
+        shell: bash
+        run: |
+          rm -f pubspec.lock
+          flutter pub get
 
       - name: Generate locale keys
         run: dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
