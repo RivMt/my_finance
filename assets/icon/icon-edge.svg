@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1280 1280" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Back" transform="matrix(9.44882,0,0,9.44882,-0.000029,-0.000037)">
+        <path id="path944" d="M55.942,20.493L103.407,47.463L103.407,101.403L55.942,74.433L55.942,20.493Z" style="fill:rgb(129,212,250);fill-rule:nonzero;"/>
+        <path id="path941" d="M115.198,40.763L115.198,94.703L103.407,101.403L103.407,47.463L115.198,40.763Z" style="fill:rgb(79,195,247);fill-rule:nonzero;"/>
+        <g id="rect937" transform="matrix(0.869443,0.494033,-0.869443,0.494033,0,0)">
+            <rect x="52.912" y="-24.992" width="54.592" height="13.562" style="fill:rgb(179,229,252);"/>
+        </g>
+    </g>
+    <g id="Middle" transform="matrix(9.44882,0,0,9.44882,-211.631668,120.25286)">
+        <path id="path2254" d="M60.503,17.901L107.968,44.871L107.968,98.812L60.503,71.842L60.503,17.901Z" style="fill:rgb(129,212,250);fill-rule:nonzero;"/>
+        <path id="path2256" d="M119.759,38.172L119.759,92.112L107.968,98.812L107.968,44.871L119.759,38.172Z" style="fill:rgb(79,195,247);fill-rule:nonzero;"/>
+        <g id="rect2258" transform="matrix(0.869443,0.494033,-0.869443,0.494033,0,0)">
+            <rect x="52.912" y="-30.238" width="54.592" height="13.562" style="fill:rgb(179,229,252);"/>
+        </g>
+    </g>
+    <g id="Front" transform="matrix(9.44882,0,0,9.44882,-423.263306,240.505786)">
+        <path id="path947" d="M65.064,15.31L112.529,42.28L112.529,96.22L65.064,69.25L65.064,15.31Z" style="fill:rgb(129,212,250);fill-rule:nonzero;"/>
+        <path id="path949" d="M124.32,35.58L124.32,89.52L112.529,96.22L112.529,42.28L124.32,35.58Z" style="fill:rgb(79,195,247);fill-rule:nonzero;"/>
+        <g id="rect951" transform="matrix(0.869443,0.494033,-0.869443,0.494033,0,0)">
+            <rect x="52.912" y="-35.484" width="54.592" height="13.562" style="fill:rgb(179,229,252);"/>
+        </g>
+    </g>
+    <g id="Label-EDGE" serif:id="Label EDGE" transform="matrix(9.44882,0,0,9.44882,-55.040087,-0.000037)">
+        <g id="Label" transform="matrix(1.112252,0,0,1,-8.311467,-0.011294)">
+            <path d="M122.072,100.972L122.072,122.25C122.072,123.281 121.32,124.117 120.394,124.117L66.175,124.117C65.249,124.117 64.497,123.281 64.497,122.25L64.497,100.972C64.497,99.941 65.249,99.105 66.175,99.105L120.394,99.105C121.32,99.105 122.072,99.941 122.072,100.972Z" style="fill:rgb(255,46,235);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,92.211975,120.02119)">
+            <g transform="matrix(22.5778,0,0,22.5778,34.115056,0)">
+            </g>
+            <text x="-27.342px" y="0px" style="font-family:'NotoSansCJKjp-Black', 'Noto Sans CJK JP', sans-serif;font-weight:900;font-size:22.578px;">EDGE</text>
+        </g>
+    </g>
+</svg>

@@ -7,16 +7,17 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 MODE="${1:-production}"
 
 if [[ $# -gt 1 ]]; then
-  echo "Usage: $0 [production|dev|demo]" >&2
+  echo "Usage: $0 [production|edge|dev|demo]" >&2
   exit 2
 fi
 
 case "${MODE}" in
   production) SVG_NAME="icon.svg" ;;
+  edge) SVG_NAME="icon-edge.svg" ;;
   dev) SVG_NAME="icon-dev.svg" ;;
   demo) SVG_NAME="icon-demo.svg" ;;
   *)
-    echo "Unknown mode '${MODE}'. Use production, dev, or demo." >&2
+    echo "Unknown mode '${MODE}'. Use production, edge, dev, or demo." >&2
     exit 2
     ;;
 esac
