@@ -10,6 +10,7 @@ on:
     tags: [ 'v*.*.*' ]
     branches:
       - "dev"
+      - "demo"
       - "docker"
       - "master"
 
@@ -95,11 +96,16 @@ jobs:
         run: |
           dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
 
-      # Generate icons if ref is dev
-      - name: Generate DEV icons
-        if: ${{ github.ref_name == 'dev' }}
+      # Generate branch-specific icons
+      - name: Generate icons
+        shell: bash
         run: |
-          dart run flutter_launcher_icons -v -f flutter_launcher_icons_dev.yaml
+          case "${GITHUB_REF_NAME}" in
+            dev) icon_mode="dev" ;;
+            demo) icon_mode="demo" ;;
+            *) icon_mode="production" ;;
+          esac
+          bash assets/script/icongen.sh "${icon_mode}"
       
       # Build web
       - name: Build web
@@ -108,10 +114,10 @@ jobs:
             --build-name "${{ steps.build-metadata.outputs.build_version }}" \
             --build-number "${{ github.run_number }}"
 
-      # Copy assets
-      - name: Copy assets
+      # Copy the SVG selected by the icon generation mode
+      - name: Copy generated SVG icon
         run: |
-          cp ./assets/icon/icon.svg ./build/web/icons/Icon.svg
+          cp ./web/icons/Icon.svg ./build/web/icons/Icon.svg
 
       # Attach the web build to the GitHub release for tag builds
       - name: Package web build
