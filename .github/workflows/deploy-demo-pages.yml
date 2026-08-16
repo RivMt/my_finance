@@ -29,7 +29,7 @@ jobs:
           cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get && flutter pub upgrade
 
       - name: Generate locale keys
         run: dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
