@@ -1,0 +1,96 @@
+name: Build Flutter Web
+
+on:
+  workflow_call:
+    inputs:
+      base_href:
+        description: Base URL path used by the Flutter web app
+        required: true
+        type: string
+      build_name:
+        description: Version passed to flutter build
+        required: true
+        type: string
+      mode:
+        description: App mode used for branding and runtime configuration
+        required: false
+        default: production
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Pull LFS objects
+        run: git lfs pull
+
+      - name: Create demo config
+        if: inputs.mode == 'demo'
+        shell: bash
+        run: |
+          mkdir -p assets/key
+          printf '{}' > assets/key/config.json
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.16.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Clone development API
+        if: inputs.mode == 'dev'
+        shell: bash
+        run: git clone "https://${{ vars.GIT_MYAPI }}" ../my_api
+
+      - name: Configure development API
+        if: inputs.mode == 'dev'
+        shell: bash
+        run: |
+          git -C ../my_api switch dev
+          git -C ../my_api show -q dev
+          mv pubspec_overrides_dev.yaml pubspec_overrides.yaml
+
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          if [[ "${{ inputs.mode }}" == "demo" ]]; then
+            rm -f pubspec.lock
+          fi
+          flutter pub get
+
+      - name: Generate locale keys
+        run: dart run easy_localization:generate -S assets/locale -f keys -o locale_keys.g.dart
+
+      - name: Generate icons
+        shell: bash
+        run: bash assets/script/icongen.sh "${{ inputs.mode }}"
+
+      - name: Configure app name
+        shell: bash
+        run: bash assets/script/appname.sh "${{ inputs.mode }}"
+
+      - name: Build web app
+        shell: bash
+        run: |
+          BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          flutter build web --release \
+            --base-href "${{ inputs.base_href }}" \
+            --build-name "${{ inputs.build_name }}" \
+            --build-number "${{ github.run_number }}" \
+            --dart-define="MYSUITE_MODE=${{ inputs.mode }}" \
+            --dart-define="BUILD_DATE=${BUILD_DATE}"
+
+      - name: Copy generated SVG icon
+        run: cp web/icons/Icon.svg build/web/icons/Icon.svg
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-web-build
+          path: build/web
+          if-no-files-found: error
+          retention-days: 1
