@@ -12,6 +12,7 @@ import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/search_page.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/generated/locale_keys.g.dart';
+import 'package:my_finance/widget/app_disclaimer.dart';
 
 int _compareNullableValues(Object? first, Object? second) {
   if (identical(first, second)) {
@@ -258,6 +259,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           iconName: iconName,
           isWide: isWide,
           title: "MyFinance",
+          disclaimer: AppDisclaimer(mode: ApiClient().mode),
         ),
         centerTitle: !isWide,
         leading: isWide
