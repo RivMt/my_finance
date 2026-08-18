@@ -1,0 +1,50 @@
+name: Sync dev to master
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: sync-dev-to-master
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Push dev to master
+        id: push
+        shell: bash
+        run: |
+          git fetch origin master
+
+          if ! git merge-base --is-ancestor origin/master HEAD; then
+            echo "master cannot be fast-forwarded to dev." >&2
+            exit 1
+          fi
+
+          if [[ "$(git rev-parse origin/master)" == "$(git rev-parse HEAD)" ]]; then
+            echo "updated=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          git push origin HEAD:master
+          echo "updated=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Trigger Docker publish
+        if: steps.push.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docker-publish.yml --ref master
