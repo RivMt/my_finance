@@ -22,11 +22,10 @@ class PaymentEditModal extends ConsumerStatefulWidget {
 }
 
 class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
-
   final TextEditingController nameController = TextEditingController();
 
   final TextEditingController serialNumberController = TextEditingController();
-  
+
   final TextEditingController limitationController = TextEditingController();
 
   final TextEditingController descriptionController = TextEditingController();
@@ -39,8 +38,8 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
 
   /// Whether the payment and limitation input are valid.
   bool get ready {
-    return editing.isValid
-        && (limitationController.text == editing.limitation.toString());
+    return editing.isValid &&
+        (limitationController.text == editing.limitation.toString());
   }
 
   /// Builds a recent-color list from accounts and payments.
@@ -49,7 +48,8 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     // Account colors, newest first.
     final accounts = ref.watch(provider.accounts);
     accounts.sort((a, b) {
-      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+      return b.modifiedAt.millisecondsSinceEpoch -
+          a.modifiedAt.millisecondsSinceEpoch;
     });
     for (Account account in accounts) {
       colors.add(account.foreground);
@@ -58,7 +58,8 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
     // Payment colors, newest first.
     final payments = ref.watch(provider.payments);
     payments.sort((a, b) {
-      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+      return b.modifiedAt.millisecondsSinceEpoch -
+          a.modifiedAt.millisecondsSinceEpoch;
     });
     for (Payment payment in payments) {
       colors.add(payment.foreground);
@@ -101,16 +102,15 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
   /// Shows a color picker initialized with [color].
   Future<Color> showColorPicker(BuildContext context, Color color) async {
     final Color? result = await showDialog<Color>(
-      context: context,
-      builder: (context) {
-        Color selected = color;
-        return ColorPickerDialog(
-          color: selected,
-          onColorChanged: (value) => selected = value,
-          palettes: buildColorHistory(),
-        );
-      }
-    );
+        context: context,
+        builder: (context) {
+          Color selected = color;
+          return ColorPickerDialog(
+            color: selected,
+            onColorChanged: (value) => selected = value,
+            palettes: buildColorHistory(),
+          );
+        });
     return result ?? color;
   }
 
@@ -258,7 +258,8 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
         "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
       }),
       positiveButtonTitle: LocaleKeys.confirm.tr(),
-      negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+      negativeButtonTitle:
+          isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
       onPositiveButtonPressed: onConfirmButtonPressed,
       onNegativeButtonPressed: onNegativeButtonPressed,
       child: Column(
@@ -270,7 +271,9 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Name and symbol.
           TextField(
             controller: nameController,
@@ -285,17 +288,20 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             maxLength: BaseModel.maxTextLength,
             onChanged: onNameChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Serial number.
           TextField(
             controller: serialNumberController,
             decoration: InputDecoration(
                 labelText: LocaleKeys.serialNumber.tr(),
-                prefixIcon: const Icon(Icons.numbers_outlined)
-            ),
+                prefixIcon: const Icon(Icons.numbers_outlined)),
             onChanged: onSerialNumberChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Payment limitation.
           TextField(
             controller: limitationController,
@@ -308,7 +314,8 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                 icon: CurrencyIcon(currency),
                 onPressed: () => onCurrencyButtonPressed(),
               ),
-              errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)
+              errorText: WalletItem.getAmountRegex(currency)
+                      .hasMatch(limitationController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput.tr(),
             ),
@@ -317,7 +324,9 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
             ],
             onChanged: onLimitationChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Description.
           TextField(
             controller: descriptionController,
@@ -372,18 +381,22 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                     DropdownMenu<int>(
                       initialSelection: editing.payDate,
                       label: Text(LocaleKeys.day.tr()),
-                      dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                      dropdownMenuEntries:
+                          List.generate(Payment.payDayMax, (index) {
                         final int value = index + 1;
                         return DropdownMenuEntry<int>(
                           value: value,
-                          label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
+                          label: LocaleKeys.nthDay
+                              .plural(value % 10, args: [value.toString()]),
                         );
                       }).toList(growable: false),
                       onSelected: onPayDateChanged,
                     ),
                   ],
                 ),
-                const SizedBox(height: 8,),
+                const SizedBox(
+                  height: 8,
+                ),
                 Text(
                   LocaleKeys.payRange.tr(),
                   style: Theme.of(context).textTheme.labelSmall,
@@ -407,30 +420,39 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                           dropdownMenuEntries: List.generate(4, (index) {
                             return DropdownMenuEntry<int>(
                               value: index,
-                              label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
+                              label: LocaleKeys.nMonthBefore
+                                  .plural(index, args: [index.toString()]),
                             );
                           }).toList(growable: false),
-                          onSelected: (value) => onPayRangeBeginChanged(value, editing.payBegin.day),
+                          onSelected: (value) => onPayRangeBeginChanged(
+                              value, editing.payBegin.day),
                         ),
-                        const SizedBox(width: 8,),
+                        const SizedBox(
+                          width: 8,
+                        ),
                         // Day of month.
                         DropdownMenu<int>(
                           initialSelection: editing.payBegin.day,
                           label: Text(LocaleKeys.day.tr()),
-                          dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                          dropdownMenuEntries:
+                              List.generate(Payment.payDayMax, (index) {
                             final int value = index + 1;
                             return DropdownMenuEntry<int>(
                               value: value,
-                              label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
+                              label: LocaleKeys.nthDay
+                                  .plural(value % 10, args: [value.toString()]),
                             );
                           }).toList(growable: false),
-                          onSelected: (value) => onPayRangeBeginChanged(editing.payBegin.month, value),
+                          onSelected: (value) => onPayRangeBeginChanged(
+                              editing.payBegin.month, value),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 8,),
+                const SizedBox(
+                  height: 8,
+                ),
                 // Period end.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -450,24 +472,31 @@ class _PaymentEditModalState extends ConsumerState<PaymentEditModal> {
                           dropdownMenuEntries: List.generate(4, (index) {
                             return DropdownMenuEntry<int>(
                               value: index,
-                              label: LocaleKeys.nMonthBefore.plural(index, args: [index.toString()]),
+                              label: LocaleKeys.nMonthBefore
+                                  .plural(index, args: [index.toString()]),
                             );
                           }).toList(growable: false),
-                          onSelected: (value) => onPayRangeEndChanged(value, editing.payEnd.day),
+                          onSelected: (value) =>
+                              onPayRangeEndChanged(value, editing.payEnd.day),
                         ),
-                        const SizedBox(width: 8,),
+                        const SizedBox(
+                          width: 8,
+                        ),
                         // Day of month.
                         DropdownMenu<int>(
                           initialSelection: editing.payEnd.day,
                           label: Text(LocaleKeys.day.tr()),
-                          dropdownMenuEntries: List.generate(Payment.payDayMax, (index) {
+                          dropdownMenuEntries:
+                              List.generate(Payment.payDayMax, (index) {
                             final int value = index + 1;
                             return DropdownMenuEntry<int>(
                               value: value,
-                              label: LocaleKeys.nthDay.plural(value%10, args: [value.toString()]),
+                              label: LocaleKeys.nthDay
+                                  .plural(value % 10, args: [value.toString()]),
                             );
                           }).toList(growable: false),
-                          onSelected: (value) => onPayRangeEndChanged(editing.payEnd.month, value),
+                          onSelected: (value) =>
+                              onPayRangeEndChanged(editing.payEnd.month, value),
                         ),
                       ],
                     ),

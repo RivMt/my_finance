@@ -16,13 +16,13 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.accounts);
   List<Account> result = list.where((account) {
-        return account.priority >= min
-            && account.priority <= max
-            && !account.deleted;
+    return account.priority >= min &&
+        account.priority <= max &&
+        !account.deleted;
   }).toList();
   if (Account.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+    result
+        .sort((a1, a2) => (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
   }
   return result;
 });
@@ -33,27 +33,30 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.payments);
   List<Payment> result = list.where((payment) {
-        return payment.priority >= min
-            && payment.priority <= max
-            && !payment.deleted;
+    return payment.priority >= min &&
+        payment.priority <= max &&
+        !payment.deleted;
   }).toList();
   if (Payment.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+    result
+        .sort((a1, a2) => (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
   }
   return result;
 });
 
-final _minPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+final _minPriorityFilter =
+    StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
   return ValueStateNotifier<int>(0);
 });
 
-final _maxPriorityFilter = StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
+final _maxPriorityFilter =
+    StateNotifierProvider<ValueStateNotifier<int>, int>((ref) {
   return ValueStateNotifier<int>(1000);
 });
 
-final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
-  return ValueStateNotifier<String>(ModelKeys.keyLastUsed);
+final _sortFilter =
+    StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier<String>(ModelKeys.keyModifiedAt);
 });
 
 /// Creates, updates, or soft-deletes a [Transaction].
@@ -79,7 +82,6 @@ class TransactionEditModal extends ConsumerStatefulWidget {
 }
 
 class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
-
   final TextEditingController descriptionController = TextEditingController();
 
   final TextEditingController amountController = TextEditingController();
@@ -96,21 +98,26 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Whether the transaction and text inputs are valid.
   bool get ready {
-    return editing.isValid
-        && (amountController.text == editing.amount.toString())
-        && (altAmountController.text == editing.altAmount.toString() || editing.altAmount == null)
-        && (descriptionController.text == editing.descriptions)
-        && (utilityDaysController.text == editing.utilityDays.toString());
+    return editing.isValid &&
+        (amountController.text == editing.amount.toString()) &&
+        (altAmountController.text == editing.altAmount.toString() ||
+            editing.altAmount == null) &&
+        (descriptionController.text == editing.descriptions) &&
+        (utilityDaysController.text == editing.utilityDays.toString());
   }
 
   /// Currently selected account, or [Account.unknown].
   Account get selectedAccount {
-    return ref.watch(_filteredAccounts).firstWhere((item) => item.uuid == editing.accountId, orElse: () => Account.unknown);
+    return ref.watch(_filteredAccounts).firstWhere(
+        (item) => item.uuid == editing.accountId,
+        orElse: () => Account.unknown);
   }
 
   /// Currently selected payment, including [Payment.none].
   Payment get selectedPayment {
-    return ref.watch(_filteredPayments).firstWhere((item) => item.uuid == editing.paymentId, orElse: () {
+    return ref
+        .watch(_filteredPayments)
+        .firstWhere((item) => item.uuid == editing.paymentId, orElse: () {
       if (editing.paymentId == Payment.none.uuid) {
         return Payment.none;
       }
@@ -120,14 +127,17 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Currently selected category, or [Category.unknown].
   Category get selectedCategory {
-    return ref.watch(provider.categories).firstWhere((item) => item.uuid == editing.categoryId, orElse: () => Category.unknown);
+    return ref.watch(provider.categories).firstWhere(
+        (item) => item.uuid == editing.categoryId,
+        orElse: () => Category.unknown);
   }
 
   /// Whether the transaction uses a payment handler.
   bool get hasPayment => editing.paymentId != Payment.noneUuid;
 
   /// Shows a selection dialog for [list].
-  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  Future<T?> showSelectDialog<T>(
+      BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -152,9 +162,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
       },
     );
   }
-  
+
   /// Shows a date picker initialized with [base].
-  Future<DateTime> showDatePickDialog(BuildContext context, DateTime base) async {
+  Future<DateTime> showDatePickDialog(
+      BuildContext context, DateTime base) async {
     final DateTime? result = await showDatePicker(
       context: context,
       initialDate: base,
@@ -234,13 +245,16 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
       });
     }
   }
-  
+
   /// Selects an account and reconciles payment currencies.
   void onAccountCardTapped(List<Account> accounts) async {
-    final account = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
-      "object": LocaleKeys.account.plural(1),
-      "action": LocaleKeys.select.tr(),
-    }), accounts);
+    final account = await showSelectDialog(
+        context,
+        LocaleKeys.object_action.tr(namedArgs: {
+          "object": LocaleKeys.account.plural(1),
+          "action": LocaleKeys.select.tr(),
+        }),
+        accounts);
     if (account != null) {
       setAccount(account);
     }
@@ -256,10 +270,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Selects a payment and reconciles account currencies.
   void onPaymentCardTapped(List<Payment> payments) async {
-    final payment = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
-      "object": LocaleKeys.payment.plural(1),
-      "action": LocaleKeys.select.tr(),
-    }), payments);
+    final payment = await showSelectDialog(
+        context,
+        LocaleKeys.object_action.tr(namedArgs: {
+          "object": LocaleKeys.payment.plural(1),
+          "action": LocaleKeys.select.tr(),
+        }),
+        payments);
     if (payment != null) {
       setPayment(payment);
     }
@@ -366,7 +383,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
         "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
       }),
       positiveButtonTitle: LocaleKeys.confirm.tr(),
-      negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+      negativeButtonTitle:
+          isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
       onPositiveButtonPressed: onConfirmButtonPressed,
       onNegativeButtonPressed: onNegativeButtonPressed,
       child: Column(
@@ -394,7 +412,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ),
             ],
           ),
-          const SizedBox(width: 8,),
+          const SizedBox(
+            width: 8,
+          ),
           Visibility(
             visible: payment.isCredit,
             child: Row(
@@ -412,7 +432,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ],
             ),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Transaction category.
           Text(
             LocaleKeys.category.plural(1),
@@ -425,7 +447,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             }),
             onTap: onCategoryCardTapped,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Source account.
           Text(
             LocaleKeys.account.plural(1),
@@ -439,7 +463,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             }),
             onTap: () => onAccountCardTapped(ref.watch(_filteredAccounts)),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Payment handler.
           Visibility(
             visible: editing.type == TransactionType.expense,
@@ -480,29 +506,36 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                   visible: hasPayment,
                   child: PaymentCard(
                     data: payment,
-                    unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                    unknownMessage:
+                        LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                       "object": LocaleKeys.payment.plural(1),
                     }),
-                    onTap: () => onPaymentCardTapped(ref.watch(_filteredPayments)),
+                    onTap: () =>
+                        onPaymentCardTapped(ref.watch(_filteredPayments)),
                   ),
                 )
               ],
             ),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Amount and description.
           Text(
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Alternate payment-currency amount.
           Visibility(
             visible: useAlt,
             child: TextField(
               controller: altAmountController,
               keyboardType: TextInputType.numberWithOptions(
-                decimal: (altCurrency == Currency.unknown) || (altCurrency.decimalPoint > 0),
+                decimal: (altCurrency == Currency.unknown) ||
+                    (altCurrency.decimalPoint > 0),
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.paidAmount.tr(),
@@ -510,7 +543,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                   padding: const EdgeInsets.all(4),
                   child: CurrencyIcon(altCurrency),
                 ),
-                errorText: Transaction.getAmountRegex(altCurrency).hasMatch(altAmountController.text)
+                errorText: Transaction.getAmountRegex(altCurrency)
+                        .hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput,
               ),
@@ -520,7 +554,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               onChanged: onAltAmountChanged,
             ),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Account-currency amount.
           TextField(
             controller: amountController,
@@ -528,12 +564,15 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               decimal: currency.decimalPoint > 0,
             ),
             decoration: InputDecoration(
-              labelText: useAlt ? LocaleKeys.withdrawAmount.tr() : LocaleKeys.paidAmount.tr(),
+              labelText: useAlt
+                  ? LocaleKeys.withdrawAmount.tr()
+                  : LocaleKeys.paidAmount.tr(),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(4),
                 child: CurrencyIcon(currency),
               ),
-              errorText: Transaction.getAmountRegex(currency).hasMatch(amountController.text)
+              errorText: Transaction.getAmountRegex(currency)
+                      .hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput.tr(),
             ),
@@ -542,7 +581,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             ],
             onChanged: onAmountChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Description.
           TextField(
             controller: descriptionController,
@@ -554,7 +595,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             maxLength: BaseModel.maxTextLength,
             onChanged: onDescriptionChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Effective date range.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -577,10 +620,11 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                     labelText: LocaleKeys.utilityDays.tr(),
                     prefixIcon: IconButton(
                       icon: const Icon(Icons.calendar_month_outlined),
-                      onPressed: () => onUtilityDaysCalculateButtonPressed(context),
+                      onPressed: () =>
+                          onUtilityDaysCalculateButtonPressed(context),
                     ),
                     suffixText: LocaleKeys.day.plural(
-                      editing.utilityDays%10,
+                      editing.utilityDays % 10,
                       args: [editing.utilityDays.toString()],
                     ),
                   ),
@@ -593,7 +637,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               ),
             ],
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Statistics-inclusion flag.
           Padding(
             padding: const EdgeInsets.all(8),

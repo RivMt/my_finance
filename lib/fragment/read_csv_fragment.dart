@@ -14,24 +14,27 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 
 const String _tag = "ReadCsvFragment";
 
-final _accounts = StateNotifierProvider<ModelsStateNotifier<Account>, List<Account>>((ref) {
+final _accounts =
+    StateNotifierProvider<ModelsStateNotifier<Account>, List<Account>>((ref) {
   return ModelsStateNotifier<Account>();
 });
 
-final _payments = StateNotifierProvider<ModelsStateNotifier<Payment>, List<Payment>>((ref) {
+final _payments =
+    StateNotifierProvider<ModelsStateNotifier<Payment>, List<Payment>>((ref) {
   return ModelsStateNotifier<Payment>();
 });
 
-final _categories = StateNotifierProvider<ModelsStateNotifier<Category>, List<Category>>((ref) {
+final _categories =
+    StateNotifierProvider<ModelsStateNotifier<Category>, List<Category>>((ref) {
   return ModelsStateNotifier<Category>();
 });
 
 /// Receives transactions generated from the current CSV mapping.
-typedef OnGeneration = void Function(BuildContext context, List<Transaction> list);
+typedef OnGeneration = void Function(
+    BuildContext context, List<Transaction> list);
 
 /// Maps CSV columns and rows to finance transactions.
 class ReadCsvFragment extends ConsumerStatefulWidget {
-
   /// Called whenever a transaction preview is generated.
   final Function(List<Transaction>)? onGenerated;
 
@@ -49,7 +52,6 @@ class ReadCsvFragment extends ConsumerStatefulWidget {
 }
 
 class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
-
   /// Maximum number of rows in the inline preview.
   final int testNumber = 5;
 
@@ -84,7 +86,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   Category plusCategory = Category.unknown;
 
   /// Inclusive beginning of the imported date range.
-  DateTime begin = DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 1)));
+  DateTime begin =
+      DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 1)));
 
   /// Inclusive end of the imported date range.
   DateTime end = DateUtils.dateOnly(DateTime.now());
@@ -110,16 +113,15 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
   /// Generates transactions with an optional preview limit of [number].
   List<Transaction> generate([int? number]) {
-    if (account == Account.unknown
-        || payment == Payment.unknown
-        || minusCategory == Category.unknown
-        || payment.currencyId != account.currencyId
-    ) {
+    if (account == Account.unknown ||
+        payment == Payment.unknown ||
+        minusCategory == Category.unknown ||
+        payment.currencyId != account.currencyId) {
       return [];
     }
     final int limit = number ?? csv.length;
     final List<Transaction> list = [];
-    for(List<dynamic> row in csv) {
+    for (List<dynamic> row in csv) {
       if (list.length > limit) {
         break;
       }
@@ -135,12 +137,14 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
           date = DateTime.parse(dateValue);
         }
       } on FormatException {
-        Log.e(_tag, "Unable to parse date: `$dateValue` by format `$dateFormat`");
+        Log.e(
+            _tag, "Unable to parse date: `$dateValue` by format `$dateFormat`");
         // TODO: Show error on DateFormat input field
         continue;
       }
       item.paidDate = date;
-      if (begin.compareTo(item.paidDate) > 0 || end.compareTo(item.paidDate) < 0) {
+      if (begin.compareTo(item.paidDate) > 0 ||
+          end.compareTo(item.paidDate) < 0) {
         continue;
       }
       item.setAccount(account);
@@ -186,16 +190,17 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
     final Map<String, int> map = {};
     final RegExp regex = RegExp(r"\$\{[^${}]+\}");
     final finds = regex.allMatches(function);
-    for(RegExpMatch item in finds) {
+    for (RegExpMatch item in finds) {
       if (item.group(0) != null) {
         final String key = item.group(0)!;
-        final int value = headers.indexWhere((element) => (element.toString() == key.replaceAll(RegExp(r"[${}]"), "")));
+        final int value = headers.indexWhere((element) =>
+            (element.toString() == key.replaceAll(RegExp(r"[${}]"), "")));
         if (value >= 0) {
           map[key] = value;
         }
       }
     }
-    for(String pattern in map.keys) {
+    for (String pattern in map.keys) {
       if (map[pattern] != null) {
         function = function.replaceAll(pattern, row[map[pattern]!].toString());
       }
@@ -204,7 +209,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   }
 
   /// Shows a selection dialog for [list].
-  Future<T?> showSelectDialog<T>(BuildContext context, String title, List<T> list) async {
+  Future<T?> showSelectDialog<T>(
+      BuildContext context, String title, List<T> list) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -229,7 +235,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
   }
 
   /// Shows a date picker initialized with [base].
-  Future<DateTime> showDatePickDialog(BuildContext context, DateTime base) async {
+  Future<DateTime> showDatePickDialog(
+      BuildContext context, DateTime base) async {
     final DateTime? result = await showDatePicker(
       context: context,
       initialDate: base,
@@ -272,10 +279,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
   /// Selects an account from [accounts].
   void onAccountCardTapped(List<Account> accounts) async {
-    final account = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
-      "object": LocaleKeys.account.plural(1),
-      "action": LocaleKeys.select.tr(),
-    }), accounts);
+    final account = await showSelectDialog(
+        context,
+        LocaleKeys.object_action.tr(namedArgs: {
+          "object": LocaleKeys.account.plural(1),
+          "action": LocaleKeys.select.tr(),
+        }),
+        accounts);
     if (account != null) {
       setAccount(account);
     }
@@ -291,10 +301,13 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
   /// Selects a payment from [payments].
   void onPaymentCardTapped(List<Payment> payments) async {
-    final payment = await showSelectDialog(context, LocaleKeys.object_action.tr(namedArgs: {
-      "object": LocaleKeys.payment.plural(1),
-      "action": LocaleKeys.select.tr(),
-    }), payments);
+    final payment = await showSelectDialog(
+        context,
+        LocaleKeys.object_action.tr(namedArgs: {
+          "object": LocaleKeys.payment.plural(1),
+          "action": LocaleKeys.select.tr(),
+        }),
+        payments);
     if (payment != null) {
       setPayment(payment);
     }
@@ -304,7 +317,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
 
   /// Updates the beginning or end of the import date range.
   void onDateButtonPressed(BuildContext context, bool isBegin) async {
-    final date = DateUtils.dateOnly(await showDatePickDialog(context, isBegin ? begin : end));
+    final date = DateUtils.dateOnly(
+        await showDatePickDialog(context, isBegin ? begin : end));
     setState(() {
       if (isBegin) {
         begin = date;
@@ -347,7 +361,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
         ApiQuery.keyQueryRangeBegin: 0,
       },
       ApiQuery.keySortField: [
-        ModelKeys.keyLastUsed,
+        ModelKeys.keyModifiedAt,
       ],
       ApiQuery.keySortOrder: [
         SortOrder.desc,
@@ -362,7 +376,7 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
         ApiQuery.keyQueryRangeBegin: 0,
       },
       ApiQuery.keySortField: [
-        ModelKeys.keyLastUsed,
+        ModelKeys.keyModifiedAt,
       ],
       ApiQuery.keySortOrder: [
         SortOrder.desc,
@@ -422,23 +436,28 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
                       const Icon(
                         Icons.description_outlined,
                       ),
-                      Text(filename ?? LocaleKeys.object_action.tr(namedArgs: {
-                        "action": LocaleKeys.choose.tr(),
-                        "object": LocaleKeys.file.tr(),
-                      })),
+                      Text(filename ??
+                          LocaleKeys.object_action.tr(namedArgs: {
+                            "action": LocaleKeys.choose.tr(),
+                            "object": LocaleKeys.file.tr(),
+                          })),
                     ],
                   ),
                 ),
               )
             ],
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Category mapping.
           Text(
             LocaleKeys.category.plural(1),
             style: Theme.of(context).textTheme.labelMedium,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Negative amount category.
           Text(
             LocaleKeys.transactionTypeExpense.tr(),
@@ -463,13 +482,17 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             }),
             onTap: () => onCategoryCardTapped(true),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Wallet mapping.
           Text(
             LocaleKeys.target.tr(),
             style: Theme.of(context).textTheme.labelMedium,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Account.
           Text(
             LocaleKeys.account.plural(1),
@@ -483,7 +506,9 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             }),
             onTap: () => onAccountCardTapped(ref.watch(_accounts)),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Payment.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -495,7 +520,8 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
               ),
               InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => onNoPaymentCheckboxChanged(payment != Payment.none),
+                onTap: () =>
+                    onNoPaymentCheckboxChanged(payment != Payment.none),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                   child: Wrap(
@@ -526,19 +552,25 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
               onTap: () => onPaymentCardTapped(ref.watch(_payments)),
             ),
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Date mapping.
           Text(
             LocaleKeys.loadOptions.tr(),
             style: Theme.of(context).textTheme.labelMedium,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Import date range.
           Text(
             LocaleKeys.range.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -547,7 +579,9 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
                 Icons.date_range_outlined,
                 color: Theme.of(context).primaryColor,
               ),
-              const SizedBox(width: 8,),
+              const SizedBox(
+                width: 8,
+              ),
               InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () => onDateButtonPressed(context, true),
@@ -559,7 +593,9 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16,),
+              const SizedBox(
+                width: 16,
+              ),
               InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () => onDateButtonPressed(context, false),
@@ -573,7 +609,9 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
               ),
             ],
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -593,12 +631,15 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
                       child: Text(e.$2.toString()),
                     );
                   }).toList(growable: false),
-                  onChanged: (index) => onDateColumnChanged(index ?? columnDate),
+                  onChanged: (index) =>
+                      onDateColumnChanged(index ?? columnDate),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -617,18 +658,23 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
                       child: Text(e.$2.toString()),
                     );
                   }).toList(growable: false),
-                  onChanged: (index) => onAmountColumnChanged(index ?? columnAmount),
+                  onChanged: (index) =>
+                      onAmountColumnChanged(index ?? columnAmount),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Date format.
           Text(
             LocaleKeys.dateFormat.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 4,),
+          const SizedBox(
+            height: 4,
+          ),
           TextField(
             controller: dateFormatController,
             decoration: InputDecoration(
@@ -637,13 +683,17 @@ class _ReadCsvFragmentState extends ConsumerState<ReadCsvFragment> {
             ),
             onChanged: onDateFormatChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Description template.
           Text(
             LocaleKeys.description.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 4,),
+          const SizedBox(
+            height: 4,
+          ),
           TextField(
             controller: descriptionController,
             decoration: InputDecoration(

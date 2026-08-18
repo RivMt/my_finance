@@ -13,8 +13,8 @@ final _filteredAccounts = Provider<List<Account>>((ref) {
   final list = ref.watch(provider.accounts);
   List<Account> result = list.where((account) => account.deleted).toList();
   if (Account.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+    result
+        .sort((a1, a2) => (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
   }
   return result;
 });
@@ -23,20 +23,20 @@ final _filteredPayments = Provider<List<Payment>>((ref) {
   final sort = ref.watch(_sortFilter);
   final list = ref.watch(provider.payments);
   List<Payment> result = list.where((payment) => payment.deleted).toList();
-  if ( Payment.unknown.map.containsKey(sort)) {
-    result.sort((a1, a2) =>
-        (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
+  if (Payment.unknown.map.containsKey(sort)) {
+    result
+        .sort((a1, a2) => (a1.map[sort] as Comparable).compareTo(a2.map[sort]));
   }
   return result;
 });
 
-final _sortFilter = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
-  return ValueStateNotifier<String>(ModelKeys.keyLastUsed);
+final _sortFilter =
+    StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
+  return ValueStateNotifier<String>(ModelKeys.keyModifiedAt);
 });
 
 /// Lists and restores soft-deleted accounts and payments.
 class RestoreItemsPage extends ConsumerStatefulWidget {
-
   /// Legacy route name for deleted items.
   static const String routeTrash = "/trash";
 
@@ -48,25 +48,30 @@ class RestoreItemsPage extends ConsumerStatefulWidget {
   ConsumerState createState() => _RestoreItemsPageState();
 }
 
-class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with TickerProviderStateMixin {
-
+class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage>
+    with TickerProviderStateMixin {
   late final TabController tabController;
 
   final PageController pageController = PageController(
     initialPage: 0,
   );
 
-  final List<Map<String, dynamic>> conditions = [{
-    ModelKeys.keyDeleted: true,
-  }];
+  final List<Map<String, dynamic>> conditions = [
+    {
+      ModelKeys.keyDeleted: true,
+    }
+  ];
 
   /// Restores a soft-deleted wallet [item].
   Future<bool> restoreItem<T extends WalletItem>(T item) async {
     item.deleted = false;
-    switch(T) {
-      case Account: return await provider.updateAccount(ref, item as Account);
-      case Payment: return await provider.updatePayment(ref, item as Payment);
-      default: throw UnimplementedError();
+    switch (T) {
+      case Account:
+        return await provider.updateAccount(ref, item as Account);
+      case Payment:
+        return await provider.updatePayment(ref, item as Payment);
+      default:
+        throw UnimplementedError();
     }
   }
 
@@ -100,8 +105,12 @@ class _RestoreItemsPageState extends ConsumerState<RestoreItemsPage> with Ticker
         bottom: TabBar(
           controller: tabController,
           tabs: [
-            Tab(text: LocaleKeys.account.plural(1),),
-            Tab(text: LocaleKeys.payment.plural(1),),
+            Tab(
+              text: LocaleKeys.account.plural(1),
+            ),
+            Tab(
+              text: LocaleKeys.payment.plural(1),
+            ),
           ],
           splashBorderRadius: const BorderRadius.all(Radius.circular(8)),
           onTap: onTabChanged,

@@ -22,34 +22,47 @@ class TransactionDetailsDialog extends ConsumerStatefulWidget {
   ConsumerState createState() => _TransactionDetailsDialogState();
 }
 
-class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDialog> {
-
+class _TransactionDetailsDialogState
+    extends ConsumerState<TransactionDetailsDialog> {
   /// Opens category management.
   void openCategoryPage() {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => const CategoriesPage(),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CategoriesPage(),
+        ));
   }
 
   /// Opens the detail page for [account].
   void openAccountPage(Account account) {
     final delegate = Router.of(context).routerDelegate;
-    delegate.setNewRoutePath(FinanceRoutePath.accounts.extend(uuid: account.uuid));
+    delegate
+        .setNewRoutePath(FinanceRoutePath.accounts.extend(uuid: account.uuid));
   }
 
   /// Opens the detail page for [payment].
   void openPaymentPage(Payment payment) {
     final delegate = Router.of(context).routerDelegate;
-    delegate.setNewRoutePath(FinanceRoutePath.payments.extend(uuid: payment.uuid));
+    delegate
+        .setNewRoutePath(FinanceRoutePath.payments.extend(uuid: payment.uuid));
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = ref.watch(provider.categories).where((item) => item.uuid == widget.data.categoryId).first;
-    final account = ref.watch(provider.accounts).where((item) => item.uuid == widget.data.accountId).first;
-    final payments = ref.watch(provider.payments).where((item) => item.uuid == widget.data.paymentId);
+    final category = ref
+        .watch(provider.categories)
+        .where((item) => item.uuid == widget.data.categoryId)
+        .first;
+    final account = ref
+        .watch(provider.accounts)
+        .where((item) => item.uuid == widget.data.accountId)
+        .first;
+    final payments = ref
+        .watch(provider.payments)
+        .where((item) => item.uuid == widget.data.paymentId);
     final hasAlt = widget.data.hasAlt;
-    final primaryCurrency = provider.getCurrency(ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
+    final primaryCurrency = provider.getCurrency(
+        ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
     final secondaryCurrency = provider.getCurrency(ref, widget.data.currencyId);
     return AlertDialog(
       content: SizedBox(
@@ -62,7 +75,8 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
               ListTile(
                 leading: CurrencyIcon(primaryCurrency),
                 title: Text(
-                  (hasAlt ? widget.data.altAmount : widget.data.amount).toString(),
+                  (hasAlt ? widget.data.altAmount : widget.data.amount)
+                      .toString(),
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
@@ -112,8 +126,8 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
               ),
               if (payments.isNotEmpty)
                 Visibility(
-                  visible: widget.data.paymentId != Payment.unknown.uuid
-                      && widget.data.paymentId != Payment.none.uuid,
+                  visible: widget.data.paymentId != Payment.unknown.uuid &&
+                      widget.data.paymentId != Payment.none.uuid,
                   child: Tooltip(
                     message: payments.first.descriptions,
                     child: ListTile(
@@ -137,18 +151,24 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                 message: LocaleKeys.editedDate.tr(),
                 child: ListTile(
                   leading: const Icon(Icons.edit_outlined),
-                  title: Text(DateFormat.yMd().format(widget.data.lastUsed)),
+                  title: Text(
+                    DateFormat.yMd().format(widget.data.modifiedAt),
+                  ),
                 ),
               ),
               Tooltip(
                 message: LocaleKeys.calculatedDate.tr(),
                 child: Visibility(
-                  visible: (widget.data.paidDate.year != widget.data.calculatedDate.year)
-                      || (widget.data.paidDate.month == widget.data.calculatedDate.month)
-                      || (widget.data.paidDate.day != widget.data.calculatedDate.day),
+                  visible: (widget.data.paidDate.year !=
+                          widget.data.calculatedDate.year) ||
+                      (widget.data.paidDate.month ==
+                          widget.data.calculatedDate.month) ||
+                      (widget.data.paidDate.day !=
+                          widget.data.calculatedDate.day),
                   child: ListTile(
                     leading: const Icon(Icons.credit_score_outlined),
-                    title: Text(DateFormat.yMd().format(widget.data.calculatedDate)),
+                    title: Text(
+                        DateFormat.yMd().format(widget.data.calculatedDate)),
                   ),
                 ),
               ),
@@ -158,7 +178,8 @@ class _TransactionDetailsDialogState extends ConsumerState<TransactionDetailsDia
                 child: ListTile(
                   leading: const Icon(Icons.date_range_outlined),
                   title: Text(LocaleKeys.nDay.plural(widget.data.utilityDays)),
-                  subtitle: Text(DateFormat.yMd().format(widget.data.utilityEnd)),
+                  subtitle:
+                      Text(DateFormat.yMd().format(widget.data.utilityEnd)),
                 ),
               ),
             ],

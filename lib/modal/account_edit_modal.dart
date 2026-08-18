@@ -22,11 +22,10 @@ class AccountEditModal extends ConsumerStatefulWidget {
 }
 
 class _AccountEditModalState extends ConsumerState<AccountEditModal> {
-
   final TextEditingController nameController = TextEditingController();
 
   final TextEditingController serialNumberController = TextEditingController();
-  
+
   final TextEditingController limitationController = TextEditingController();
 
   final TextEditingController descriptionController = TextEditingController();
@@ -39,8 +38,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
 
   /// Whether the account and limitation input are valid.
   bool get ready {
-    return editing.isValid
-        && (limitationController.text == editing.limitation.toString());
+    return editing.isValid &&
+        (limitationController.text == editing.limitation.toString());
   }
 
   /// Builds a recent-color list from accounts and payments.
@@ -49,7 +48,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     // Account colors, newest first.
     final accounts = ref.watch(provider.accounts);
     accounts.sort((a, b) {
-      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+      return b.modifiedAt.millisecondsSinceEpoch -
+          a.modifiedAt.millisecondsSinceEpoch;
     });
     for (Account account in accounts) {
       colors.add(account.foreground);
@@ -58,7 +58,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
     // Payment colors, newest first.
     final payments = ref.watch(provider.payments);
     payments.sort((a, b) {
-      return b.lastUsed.millisecondsSinceEpoch - a.lastUsed.millisecondsSinceEpoch;
+      return b.modifiedAt.millisecondsSinceEpoch -
+          a.modifiedAt.millisecondsSinceEpoch;
     });
     for (Payment payment in payments) {
       colors.add(payment.foreground);
@@ -101,16 +102,15 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
   /// Shows a color picker initialized with [color].
   Future<Color> showColorPicker(BuildContext context, Color color) async {
     final Color? result = await showDialog<Color>(
-      context: context,
-      builder: (context) {
-        Color selected = color;
-        return ColorPickerDialog(
-          color: selected,
-          onColorChanged: (value) => selected = value,
-          palettes: buildColorHistory(),
-        );
-      }
-    );
+        context: context,
+        builder: (context) {
+          Color selected = color;
+          return ColorPickerDialog(
+            color: selected,
+            onColorChanged: (value) => selected = value,
+            palettes: buildColorHistory(),
+          );
+        });
     return result ?? color;
   }
 
@@ -229,7 +229,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
         "action": isEdit ? LocaleKeys.edit.tr() : LocaleKeys.add.tr(),
       }),
       positiveButtonTitle: LocaleKeys.confirm.tr(),
-      negativeButtonTitle: isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
+      negativeButtonTitle:
+          isEdit ? LocaleKeys.delete.tr() : LocaleKeys.cancel.tr(),
       onPositiveButtonPressed: onConfirmButtonPressed,
       onNegativeButtonPressed: onNegativeButtonPressed,
       child: Column(
@@ -241,7 +242,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             LocaleKeys.basicInfo.tr(),
             style: Theme.of(context).textTheme.labelSmall,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Name and symbol.
           TextField(
             controller: nameController,
@@ -256,17 +259,20 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             maxLength: BaseModel.maxTextLength,
             onChanged: onNameChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Serial number.
           TextField(
             controller: serialNumberController,
             decoration: InputDecoration(
                 labelText: LocaleKeys.serialNumber.tr(),
-                prefixIcon: const Icon(Icons.numbers_outlined)
-            ),
+                prefixIcon: const Icon(Icons.numbers_outlined)),
             onChanged: onSerialNumberChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Account limitation.
           TextField(
             controller: limitationController,
@@ -279,7 +285,8 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
                 icon: CurrencyIcon(currency),
                 onPressed: () => onCurrencyButtonPressed(),
               ),
-              errorText: WalletItem.getAmountRegex(currency).hasMatch(limitationController.text)
+              errorText: WalletItem.getAmountRegex(currency)
+                      .hasMatch(limitationController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput.tr(),
             ),
@@ -288,7 +295,9 @@ class _AccountEditModalState extends ConsumerState<AccountEditModal> {
             ],
             onChanged: onLimitationChanged,
           ),
-          const SizedBox(height: 8,),
+          const SizedBox(
+            height: 8,
+          ),
           // Description.
           TextField(
             controller: descriptionController,
