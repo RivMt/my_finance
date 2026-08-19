@@ -100,8 +100,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   bool get ready {
     return editing.isValid &&
         (amountController.text == editing.amount.toString()) &&
-        (altAmountController.text == editing.altAmount.toString() ||
-            editing.altAmount == null) &&
+        (altAmountController.text == editing.altAmount.toString()) &&
         (descriptionController.text == editing.descriptions) &&
         (utilityDaysController.text == editing.utilityDays.toString());
   }
@@ -357,7 +356,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     editing = widget.base ?? Transaction.init();
     descriptionController.text = editing.descriptions;
     amountController.text = editing.amount.toString();
-    altAmountController.text = (editing.altAmount ?? Decimal.zero).toString();
+    altAmountController.text = editing.altAmount.toString();
     utilityDaysController.text = editing.utilityDays.toString();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.account != null) setAccount(widget.account!);
@@ -372,8 +371,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     final payment = selectedPayment;
     final bool useAlt = (payment != Payment.none) &&
         (account != Account.unknown) &&
-        (editing.altCurrencyId != null) &&
-        (editing.altCurrencyId != editing.currencyId);
+        (account.currencyId != payment.currencyId);
     final currency = provider.getCurrency(ref, editing.currencyId);
     final altCurrency = provider.getCurrency(ref, editing.altCurrencyId);
     return Modal(

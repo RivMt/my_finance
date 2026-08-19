@@ -95,13 +95,9 @@ class _AdvancedQueryPageState extends ConsumerState<AdvancedQueryPage> {
         DataCell(Text(payment.name)),
         DataCell(Text(item.currencyId)),
         DataCell(Text(currency.format(item.amount))),
-        DataCell(Text(item.altCurrencyId == null
-            ? ""
-            : item.altCurrencyId!)
+        DataCell(Text(item.altCurrencyId)
         ),
-        DataCell(Text(item.altAmount == null || item.altCurrencyId == null
-            ? ""
-            : altCurrency.format(item.altAmount!))
+        DataCell(Text(altCurrency.format(item.altAmount))
         ),
         DataCell(Text(DateFormat.yMd().format(item.paidDate))),
         DataCell(Text(DateFormat.yMd().format(item.calculatedDate))),

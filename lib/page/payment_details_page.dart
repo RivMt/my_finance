@@ -8,6 +8,7 @@ import 'package:my_finance/modal/payment_edit_modal.dart';
 import 'package:my_finance/fragment/transaction_add_button.dart';
 import 'package:my_finance/fragment/wallet_item_details_fragment.dart';
 
+// ignore: unused_element
 const _tag = "PaymentDetailsPage";
 
 final _uuid = StateNotifierProvider<ValueStateNotifier<String>, String>((ref) {
@@ -134,10 +135,7 @@ class _PaymentDetailsPageState extends ConsumerState<PaymentDetailsPage> {
       if (payment.currencyId == element.currencyId) {
         return previousValue + element.amount;
       } else if (payment.currencyId == element.altCurrencyId) {
-        if (element.altAmount == null) {
-          Log.w(_tag, "Transaction ${element.uuid} - Null AltAmount");
-        }
-        return previousValue + (element.altAmount ?? Decimal.zero);
+        return previousValue + element.altAmount;
       }
       return previousValue;
     });

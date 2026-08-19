@@ -62,7 +62,7 @@ class _TransactionDetailsDialogState
         .where((item) => item.uuid == widget.data.paymentId);
     final hasAlt = widget.data.hasAlt;
     final primaryCurrency = provider.getCurrency(
-        ref, hasAlt ? widget.data.altCurrencyId! : widget.data.currencyId);
+        ref, widget.data.nominalCurrencyId);
     final secondaryCurrency = provider.getCurrency(ref, widget.data.currencyId);
     return AlertDialog(
       content: SizedBox(
@@ -75,8 +75,7 @@ class _TransactionDetailsDialogState
               ListTile(
                 leading: CurrencyIcon(primaryCurrency),
                 title: Text(
-                  (hasAlt ? widget.data.altAmount : widget.data.amount)
-                      .toString(),
+                  widget.data.nominalAmount.toString(),
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
