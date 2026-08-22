@@ -9,6 +9,24 @@ import 'package:my_api/provider.dart' as provider;
 import 'package:my_finance/dialog/transaction_details_dialog.dart';
 import 'package:my_finance/modal/transaction_edit_modal.dart';
 
+final _category = Provider.family<Category, Transaction>((ref, transaction) {
+  final categories = [
+    Category.transferTo,
+    Category.transferFrom,
+    ...ref.watch(provider.categories).where(
+          (category) =>
+              category.uuid != Category.transferTo.uuid &&
+              category.uuid != Category.transferFrom.uuid,
+        ),
+  ];
+  return categories.firstWhere(
+    (category) =>
+        category.uuid == transaction.categoryId &&
+        category.type == transaction.type,
+    orElse: () => Category.unknown,
+  );
+});
+
 /// Displays transactions grouped by paid or calculated date.
 class TransactionsFragment extends ConsumerWidget {
   const TransactionsFragment({
@@ -50,7 +68,8 @@ class TransactionsFragment extends ConsumerWidget {
   }
 
   /// Shows the transaction creation or editing modal.
-  void showTransactionEditingModal(BuildContext context, [Transaction? transaction]) async {
+  void showTransactionEditingModal(BuildContext context,
+      [Transaction? transaction]) async {
     Transaction? editing = transaction;
     showModalBottomSheet<Transaction>(
       context: context,
@@ -76,22 +95,21 @@ class TransactionsFragment extends ConsumerWidget {
 
   /// Builds the label for a transaction date group.
   Widget groupSeparatorBuilder(BuildContext context, DateTime date) => Text(
-    groupSeparator == null
-        ? DateFormat.yMd().format(date.toLocal())
-        : groupSeparator!(date.toLocal()),
-    style: Theme.of(context).textTheme.titleSmall,
-  );
+        groupSeparator == null
+            ? DateFormat.yMd().format(date.toLocal())
+            : groupSeparator!(date.toLocal()),
+        style: Theme.of(context).textTheme.titleSmall,
+      );
 
   /// Compares transaction paid dates using the selected order.
-  int itemComparator(Transaction item1, Transaction item2) => item1.paidDate.compareTo(item2.paidDate) * (isReverse ? -1 : 1);
+  int itemComparator(Transaction item1, Transaction item2) =>
+      item1.paidDate.compareTo(item2.paidDate) * (isReverse ? -1 : 1);
 
   /// Builds a transaction card with its matching category.
-  Widget itemBuilder(BuildContext context, Transaction data, List<Category> categories) {
+  Widget itemBuilder(BuildContext context, WidgetRef ref, Transaction data) {
     return TransactionCard(
       data: data,
-      category: categories.firstWhere((element) {
-        return element.type == data.type && element.uuid == data.categoryId;
-      }, orElse: () => Category.unknown),
+      category: ref.watch(_category(data)),
       isPaid: data.calculatedDate.compareTo(DateTime.now()) <= 0,
       onTap: () => showTransactionDetailsDialog(context, data),
       onLongPress: () => showTransactionEditingModal(context, data),
@@ -100,7 +118,6 @@ class TransactionsFragment extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categories = ref.watch(provider.categories);
     // Use a sliver list when embedded in a custom scroll view.
     if (useSliver) {
       return SliverGroupedListView<Transaction, DateTime>(
@@ -109,7 +126,7 @@ class TransactionsFragment extends ConsumerWidget {
         order: isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
         groupSeparatorBuilder: (date) => groupSeparatorBuilder(context, date),
         itemComparator: itemComparator,
-        itemBuilder: (context, data) => itemBuilder(context, data, categories),
+        itemBuilder: (context, data) => itemBuilder(context, ref, data),
       );
     }
     return GroupedListView<Transaction, DateTime>(
@@ -120,7 +137,7 @@ class TransactionsFragment extends ConsumerWidget {
       order: isReverse ? GroupedListOrder.ASC : GroupedListOrder.DESC,
       groupSeparatorBuilder: (date) => groupSeparatorBuilder(context, date),
       itemComparator: itemComparator,
-      itemBuilder: (context, data) => itemBuilder(context, data, categories),
+      itemBuilder: (context, data) => itemBuilder(context, ref, data),
     );
   }
 }

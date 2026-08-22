@@ -19,6 +19,7 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
     required this.onMonthChanged,
     required this.onSortButtonPressed,
     required this.onRefreshButtonPressed,
+    this.headerActions,
     this.isReverse = false,
     this.sortByCalculatedDate = false,
   });
@@ -28,6 +29,9 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
 
   /// Balance or aggregate amount shown in the header.
   final Decimal content;
+
+  /// Optional actions displayed between the wallet summary and filters.
+  final Widget? headerActions;
 
   /// Called when the displayed month changes.
   final void Function(DateTime) onMonthChanged;
@@ -85,8 +89,8 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
                     SelectableText(
                       item.serialNumber,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AppTheme.swatches.contentSecondary,
-                      ),
+                            color: AppTheme.swatches.contentSecondary,
+                          ),
                     ),
                     SelectableText(
                       currency.format(content),
@@ -96,14 +100,18 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
                     SelectableText(
                       item.descriptions,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.swatches.contentSecondary,
-                      ),
+                            color: AppTheme.swatches.contentSecondary,
+                          ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
+          if (headerActions != null)
+            SliverToBoxAdapter(
+              child: headerActions!,
+            ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(8),
@@ -111,7 +119,9 @@ class WalletItemDetailsFragment<T extends WalletItem> extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton.icon(
-                    icon: Icon(isReverse ? Icons.arrow_upward_outlined : Icons.arrow_downward),
+                    icon: Icon(isReverse
+                        ? Icons.arrow_upward_outlined
+                        : Icons.arrow_downward),
                     onPressed: onSortButtonPressed,
                     label: Text(LocaleKeys.sort.tr()),
                   ),

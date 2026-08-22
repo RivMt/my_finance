@@ -95,6 +95,13 @@
   "short": "short",
   "amount": "Amount",
   "delta": "Delta",
+  "transfer": "Transfer",
+  "transferFrom": "Send",
+  "transferTo": "Receive",
+  "accountTransferFrom": "Sending account",
+  "accountTransferTo": "Receiving account",
+  "amountTransferFrom": "Amount to send",
+  "amountTransferTo": "Amount to receive",
 
   "month": "Month",
   "nMonthBefore": {
@@ -192,6 +199,9 @@
   "currencyTypeUSD": "United States Dollar",
   "currencyTypeXXX": "No Currency",
   "currencyTypeZAR": "South African Rand",
+
+  "categoryNameTransferFrom": "Transfer (Receive)",
+  "categoryNameTransferTo": "Transfer (Send)",
 
   "currentMonthExpense": "Expenses of current month",
   "monthlyCategoryExpense": "Monthly expenses by category",

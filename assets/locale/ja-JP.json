@@ -91,6 +91,13 @@
   "short": "不足",
   "amount": "金額",
   "delta": "変動",
+  "transfer": "振込",
+  "transferFrom": "送る",
+  "transferTo": "受け取る",
+  "accountTransferFrom": "送る口座",
+  "accountTransferTo": "受け取る口座",
+  "amountTransferFrom": "送る金額",
+  "amountTransferTo": "受け取る金額",
 
   "month": "月",
   "nMonthBefore": {
@@ -188,6 +195,9 @@
   "currencyTypeUSD": "米ドル",
   "currencyTypeXXX": "通貨なし",
   "currencyTypeZAR": "南アフリカランド",
+
+  "categoryNameTransferFrom": "振込（受取）",
+  "categoryNameTransferTo": "振込（送金）",
 
   "currentMonthExpense": "今月の支出",
   "monthlyCategoryExpense": "月間カテゴリ別支出",

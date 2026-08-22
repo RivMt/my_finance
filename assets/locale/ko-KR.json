@@ -91,6 +91,13 @@
   "short": "부족",
   "amount": "금액",
   "delta": "변동",
+  "transfer": "이체",
+  "transferFrom": "보내기",
+  "transferTo": "받기",
+  "accountTransferFrom": "보낼 계좌",
+  "accountTransferTo": "받을 계좌",
+  "amountTransferFrom": "보낼 금액",
+  "amountTransferTo": "받을 금액",
 
   "month": "월",
   "nMonthBefore": {
@@ -188,6 +195,9 @@
   "currencyTypeUSD": "미국 달러",
   "currencyTypeXXX": "통화 없음",
   "currencyTypeZAR": "남아프리카 랜드",
+
+  "categoryNameTransferFrom": "이체 (받기)",
+  "categoryNameTransferTo": "이체 (보내기)",
 
   "currentMonthExpense": "이번 달 지출",
   "monthlyCategoryExpense": "월간 카테고리별 지출",

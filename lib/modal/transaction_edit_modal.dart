@@ -134,6 +134,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   /// Whether the transaction uses a payment handler.
   bool get hasPayment => editing.paymentId != Payment.noneUuid;
 
+  /// Whether both sides of a transfer must use the same amount.
+  bool get synchronizeTransferAmounts =>
+      editing.isTransfer && editing.currencyId == editing.altCurrencyId;
+
   /// Shows a selection dialog for [list].
   Future<T?> showSelectDialog<T>(
       BuildContext context, String title, List<T> list) async {
@@ -290,6 +294,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
       if (Transaction.getAmountRegex(currency).hasMatch(value)) {
         if (value != "") {
           editing.altAmount = Decimal.parse(value);
+          if (synchronizeTransferAmounts) {
+            editing.amount = editing.altAmount;
+            amountController.text = value;
+          }
         }
       }
     });
@@ -302,6 +310,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
       if (Transaction.getAmountRegex(currency).hasMatch(value)) {
         if (value != "") {
           editing.amount = Decimal.parse(value);
+          if (synchronizeTransferAmounts) {
+            editing.altAmount = editing.amount;
+            altAmountController.text = value;
+          }
         }
       }
     });
@@ -433,21 +445,21 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           const SizedBox(
             height: 8,
           ),
-          // Transaction category.
-          Text(
-            LocaleKeys.category.plural(1),
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-          CategoryCard(
-            category: category,
-            unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
-              "object": LocaleKeys.category.plural(1),
-            }),
-            onTap: onCategoryCardTapped,
-          ),
-          const SizedBox(
-            height: 8,
-          ),
+          if (!editing.isTransfer) ...[
+            // Transaction category.
+            Text(
+              LocaleKeys.category.plural(1),
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            CategoryCard(
+              category: category,
+              unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
+                "object": LocaleKeys.category.plural(1),
+              }),
+              onTap: onCategoryCardTapped,
+            ),
+            const SizedBox(height: 8),
+          ],
           // Source account.
           Text(
             LocaleKeys.account.plural(1),
@@ -464,10 +476,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           const SizedBox(
             height: 8,
           ),
-          // Payment handler.
-          Visibility(
-            visible: editing.type == TransactionType.expense,
-            child: Column(
+          if (!editing.isTransfer &&
+              editing.type == TransactionType.expense) ...[
+            // Payment handler.
+            Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -500,9 +512,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                     ),
                   ],
                 ),
-                Visibility(
-                  visible: hasPayment,
-                  child: PaymentCard(
+                if (hasPayment)
+                  PaymentCard(
                     data: payment,
                     unknownMessage:
                         LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
@@ -511,13 +522,10 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                     onTap: () =>
                         onPaymentCardTapped(ref.watch(_filteredPayments)),
                   ),
-                )
               ],
             ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
+            const SizedBox(height: 8),
+          ],
           // Amount and description.
           Text(
             LocaleKeys.basicInfo.tr(),
@@ -596,72 +604,72 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           const SizedBox(
             height: 8,
           ),
-          // Effective date range.
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  LocaleKeys.utilityDays.tr(),
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: TextField(
-                  controller: utilityDaysController,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.end,
-                  decoration: InputDecoration(
-                    labelText: LocaleKeys.utilityDays.tr(),
-                    prefixIcon: IconButton(
-                      icon: const Icon(Icons.calendar_month_outlined),
-                      onPressed: () =>
-                          onUtilityDaysCalculateButtonPressed(context),
-                    ),
-                    suffixText: LocaleKeys.day.plural(
-                      editing.utilityDays % 10,
-                      args: [editing.utilityDays.toString()],
-                    ),
+          if (!editing.isTransfer) ...[
+            // Effective date range.
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    LocaleKeys.utilityDays.tr(),
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(5),
-                    FilteringTextInputFormatter(RegExp(r"\d"), allow: true),
-                  ],
-                  onChanged: onUtilityDaysValueChanged,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          // Statistics-inclusion flag.
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () => onIncludedValueChanged(!editing.isIncluded),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Checkbox(
-                      value: editing.isIncluded,
-                      onChanged: null,
+                Expanded(
+                  flex: 1,
+                  child: TextField(
+                    controller: utilityDaysController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.end,
+                    decoration: InputDecoration(
+                      labelText: LocaleKeys.utilityDays.tr(),
+                      prefixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_month_outlined),
+                        onPressed: () =>
+                            onUtilityDaysCalculateButtonPressed(context),
+                      ),
+                      suffixText: LocaleKeys.day.plural(
+                        editing.utilityDays % 10,
+                        args: [editing.utilityDays.toString()],
+                      ),
                     ),
-                    Text(
-                      LocaleKeys.included.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(5),
+                      FilteringTextInputFormatter(RegExp(r"\d"), allow: true),
+                    ],
+                    onChanged: onUtilityDaysValueChanged,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Statistics-inclusion flag.
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () => onIncludedValueChanged(!editing.isIncluded),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Checkbox(
+                        value: editing.isIncluded,
+                        onChanged: null,
+                      ),
+                      Text(
+                        LocaleKeys.included.tr(),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

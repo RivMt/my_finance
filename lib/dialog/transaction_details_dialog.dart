@@ -8,6 +8,24 @@ import 'package:my_finance/generated/locale_keys.g.dart';
 import 'package:my_finance/navigator.dart';
 import 'package:my_finance/page/categories_page.dart';
 
+final _category = Provider.family<Category, Transaction>((ref, transaction) {
+  final categories = [
+    Category.transferTo,
+    Category.transferFrom,
+    ...ref.watch(provider.categories).where(
+          (category) =>
+              category.uuid != Category.transferTo.uuid &&
+              category.uuid != Category.transferFrom.uuid,
+        ),
+  ];
+  return categories.firstWhere(
+    (category) =>
+        category.uuid == transaction.categoryId &&
+        category.type == transaction.type,
+    orElse: () => Category.unknown,
+  );
+});
+
 /// Displays amounts, related models, and dates for a [Transaction].
 class TransactionDetailsDialog extends ConsumerStatefulWidget {
   const TransactionDetailsDialog({
@@ -49,10 +67,7 @@ class _TransactionDetailsDialogState
 
   @override
   Widget build(BuildContext context) {
-    final category = ref
-        .watch(provider.categories)
-        .where((item) => item.uuid == widget.data.categoryId)
-        .first;
+    final category = ref.watch(_category(widget.data));
     final account = ref
         .watch(provider.accounts)
         .where((item) => item.uuid == widget.data.accountId)
@@ -61,9 +76,10 @@ class _TransactionDetailsDialogState
         .watch(provider.payments)
         .where((item) => item.uuid == widget.data.paymentId);
     final hasAlt = widget.data.hasAlt;
-    final primaryCurrency = provider.getCurrency(
-        ref, widget.data.nominalCurrencyId);
-    final secondaryCurrency = provider.getCurrency(ref, widget.data.currencyId);
+    final primaryCurrency =
+        provider.getCurrency(ref, widget.data.primaryCurrencyId);
+    final secondaryCurrency =
+        provider.getCurrency(ref, widget.data.secondaryCurrencyId);
     return AlertDialog(
       content: SizedBox(
         width: ScreenPlanner(context).dialogWidth,
@@ -71,21 +87,21 @@ class _TransactionDetailsDialogState
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-              // Primary amount, using the alternate currency when present.
+              // Primary amount.
               ListTile(
                 leading: CurrencyIcon(primaryCurrency),
                 title: Text(
-                  widget.data.nominalAmount.toString(),
+                  widget.data.primaryAmount.toString(),
                   style: Theme.of(context).textTheme.displayLarge,
                 ),
               ),
-              // Account-currency amount for foreign-currency transactions.
+              // Secondary amount for transactions with an alternate currency.
               Visibility(
                 visible: hasAlt,
                 child: ListTile(
                   leading: CurrencyIcon(secondaryCurrency),
                   title: Text(
-                    widget.data.amount.toString(),
+                    widget.data.secondaryAmount.toString(),
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),
