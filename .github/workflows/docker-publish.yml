@@ -55,6 +55,7 @@ jobs:
       base_href: /
       build_name: ${{ needs.metadata.outputs.build_version }}
       mode: ${{ needs.metadata.outputs.mode }}
+      override_my_api: true
 
   build:
     runs-on: ubuntu-latest

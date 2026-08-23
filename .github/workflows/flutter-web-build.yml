@@ -16,6 +16,11 @@ on:
         required: false
         default: production
         type: string
+      override_my_api:
+        description: Use the locally cloned my_api dependency
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -42,18 +47,22 @@ jobs:
           cache: false
           flutter-version: 3.47.0
 
-      - name: Clone development API
-        if: inputs.mode == 'dev'
+      - name: Clone API
+        if: inputs.override_my_api
         shell: bash
         run: git clone "https://${{ vars.GIT_MYAPI }}" ../my_api
 
-      - name: Configure development API
-        if: inputs.mode == 'dev'
+      - name: Use development API branch
+        if: inputs.override_my_api && inputs.mode == 'dev'
         shell: bash
         run: |
           git -C ../my_api switch dev
           git -C ../my_api show -q dev
-          mv pubspec_overrides_dev.yaml pubspec_overrides.yaml
+
+      - name: Override API dependency
+        if: inputs.override_my_api
+        shell: bash
+        run: mv pubspec_overrides_dev.yaml pubspec_overrides.yaml
 
       - name: Resolve dependencies
         shell: bash

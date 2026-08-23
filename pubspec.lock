@@ -586,7 +586,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: b32075981edef599d6bc87844ef0d9246f1438a0
+      resolved-ref: "12c68565e975e16d2651128f0c32786706edd6a4"
       url: "https://github.com/RivMt/my_api"
     source: git
     version: "0.0.1"
