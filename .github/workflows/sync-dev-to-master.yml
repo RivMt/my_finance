@@ -25,14 +25,12 @@ jobs:
           fetch-depth: 0
 
       - name: Merge dev into master
-        id: push
         shell: bash
         run: |
           git fetch origin dev
 
           if git merge-base --is-ancestor origin/dev HEAD; then
             echo "master already contains dev."
-            echo "updated=false" >> "${GITHUB_OUTPUT}"
             exit 0
           fi
 
@@ -40,10 +38,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git merge --no-edit origin/dev
           git push origin HEAD:master
-          echo "updated=true" >> "${GITHUB_OUTPUT}"
 
       - name: Trigger Docker publish
-        if: steps.push.outputs.updated == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run docker-publish.yml --ref master
