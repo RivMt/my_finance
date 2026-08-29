@@ -153,7 +153,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
     final transactions = ref.watch(_filteredTransactions);
     final fillTransferButtonWidth = ScreenPlanner(context).panelNumber == 1;
     final sendButton = FilledButton.tonalIcon(
-      icon: const Icon(Icons.arrow_upward_outlined),
+      icon: const Icon(Icons.file_upload_outlined),
       label: Text(LocaleKeys.transferFrom.tr()),
       onPressed: account == Account.unknown
           ? null
@@ -163,7 +163,7 @@ class _AccountDetailsPageState extends ConsumerState<AccountDetailsPage> {
               ),
     );
     final receiveButton = FilledButton.tonalIcon(
-      icon: const Icon(Icons.arrow_downward_outlined),
+      icon: const Icon(Icons.file_download_outlined),
       label: Text(LocaleKeys.transferTo.tr()),
       onPressed: account == Account.unknown
           ? null
