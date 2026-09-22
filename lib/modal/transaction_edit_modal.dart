@@ -98,9 +98,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   /// Whether the transaction and text inputs are valid.
   bool get ready {
+    final amountRegex = Transaction.getAmountRegex(selectedCurrency);
+    final altAmountRegex = Transaction.getAmountRegex(selectedAltCurrency);
     return editing.isValid &&
         (amountController.text == editing.amount.toString()) &&
         (altAmountController.text == editing.altAmount.toString()) &&
+        amountRegex.hasMatch(editing.amount.toString()) &&
+        altAmountRegex.hasMatch(editing.altAmount.toString()) &&
         (descriptionController.text == editing.descriptions) &&
         (utilityDaysController.text == editing.utilityDays.toString());
   }
@@ -131,12 +135,25 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
         orElse: () => Category.unknown);
   }
 
+  Currency get selectedCurrency => provider.getCurrency(ref, editing.currencyId);
+
+  Currency get selectedAltCurrency => provider.getCurrency(ref, editing.altCurrencyId);
+
   /// Whether the transaction uses a payment handler.
   bool get hasPayment => editing.paymentId != Payment.noneUuid;
 
   /// Whether both sides of a transfer must use the same amount.
   bool get synchronizeTransferAmounts =>
       editing.isTransfer && editing.currencyId == editing.altCurrencyId;
+
+  bool get useAlt {
+    if (isEdit) {
+      return editing.hasAlt;
+    }
+    return (selectedPayment != Payment.none) &&
+        (selectedAccount != Account.unknown) &&
+        (selectedAccount.currencyId != selectedPayment.currencyId);
+  }
 
   /// Shows a selection dialog for [list].
   Future<T?> showSelectDialog<T>(
@@ -218,6 +235,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   void setAccount(Account account) {
     setState(() {
       editing.setAccount(account);
+      setTextController();
     });
   }
 
@@ -226,6 +244,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     setState(() {
       editing.setPayment(payment);
       setCalculatedDate();
+      setTextController();
     });
   }
 
@@ -237,6 +256,13 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
     if (editing.type != TransactionType.expense) {
       onNoPaymentCheckboxChanged(true);
     }
+  }
+
+  void setTextController() {
+    descriptionController.text = editing.descriptions;
+    amountController.text = editing.amount.toString();
+    altAmountController.text = editing.altAmount.toString();
+    utilityDaysController.text = editing.utilityDays.toString();
   }
 
   /// Selects a category.
@@ -260,9 +286,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
         accounts);
     if (account != null) {
       setAccount(account);
+      setPayment(selectedPayment);
+      setState(() {});
     }
-    setPayment(selectedPayment);
-    setState(() {});
   }
 
   /// Selects [Payment.none] when no payment handler is requested.
@@ -365,11 +391,8 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
   @override
   void initState() {
     super.initState();
-    editing = widget.base ?? Transaction.init();
-    descriptionController.text = editing.descriptions;
-    amountController.text = editing.amount.toString();
-    altAmountController.text = editing.altAmount.toString();
-    utilityDaysController.text = editing.utilityDays.toString();
+    editing = widget.base?.copy() ?? Transaction.init();
+    setTextController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.account != null) setAccount(widget.account!);
       if (widget.payment != null) setPayment(widget.payment!);
@@ -378,14 +401,6 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
 
   @override
   Widget build(BuildContext context) {
-    final category = selectedCategory;
-    final account = selectedAccount;
-    final payment = selectedPayment;
-    final bool useAlt = (payment != Payment.none) &&
-        (account != Account.unknown) &&
-        (account.currencyId != payment.currencyId);
-    final currency = provider.getCurrency(ref, editing.currencyId);
-    final altCurrency = provider.getCurrency(ref, editing.altCurrencyId);
     return Modal(
       ready: ready,
       title: LocaleKeys.object_action.tr(namedArgs: {
@@ -411,7 +426,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                payment.isCredit
+                selectedPayment.isCredit
                     ? LocaleKeys.transactionDate.tr()
                     : LocaleKeys.paidDate.tr(),
                 style: Theme.of(context).textTheme.labelMedium,
@@ -426,7 +441,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             width: 8,
           ),
           Visibility(
-            visible: payment.isCredit,
+            visible: selectedPayment.isCredit,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -452,7 +467,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
               style: Theme.of(context).textTheme.labelSmall,
             ),
             CategoryCard(
-              category: category,
+              category: selectedCategory,
               unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                 "object": LocaleKeys.category.plural(1),
               }),
@@ -466,7 +481,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             style: Theme.of(context).textTheme.labelSmall,
           ),
           AccountCard(
-            data: account,
+            data: selectedAccount,
             showBalance: false,
             unknownMessage: LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
               "object": LocaleKeys.account.plural(1),
@@ -514,7 +529,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                 ),
                 if (hasPayment)
                   PaymentCard(
-                    data: payment,
+                    data: selectedPayment,
                     unknownMessage:
                         LocaleKeys.msgPleaseSelect_object.tr(namedArgs: {
                       "object": LocaleKeys.payment.plural(1),
@@ -540,16 +555,16 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
             child: TextField(
               controller: altAmountController,
               keyboardType: TextInputType.numberWithOptions(
-                decimal: (altCurrency == Currency.unknown) ||
-                    (altCurrency.decimalPoint > 0),
+                decimal: (selectedAltCurrency == Currency.unknown) ||
+                    (selectedAltCurrency.decimalPoint > 0),
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.paidAmount.tr(),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: CurrencyIcon(altCurrency),
+                  child: CurrencyIcon(selectedAltCurrency),
                 ),
-                errorText: Transaction.getAmountRegex(altCurrency)
+                errorText: Transaction.getAmountRegex(selectedAltCurrency)
                         .hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput,
@@ -567,7 +582,7 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
           TextField(
             controller: amountController,
             keyboardType: TextInputType.numberWithOptions(
-              decimal: currency.decimalPoint > 0,
+              decimal: selectedCurrency.decimalPoint > 0,
             ),
             decoration: InputDecoration(
               labelText: useAlt
@@ -575,9 +590,9 @@ class _TransactionEditModalState extends ConsumerState<TransactionEditModal> {
                   : LocaleKeys.paidAmount.tr(),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(4),
-                child: CurrencyIcon(currency),
+                child: CurrencyIcon(selectedCurrency),
               ),
-              errorText: Transaction.getAmountRegex(currency)
+              errorText: Transaction.getAmountRegex(selectedCurrency)
                       .hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput.tr(),

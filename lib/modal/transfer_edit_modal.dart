@@ -44,11 +44,16 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
 
   Transfer editing = Transfer.init();
 
-  bool get ready =>
-      editing.isValid &&
-      amountController.text == editing.amount.toString() &&
-      altAmountController.text == editing.altAmount.toString() &&
-      descriptionController.text == editing.descriptions;
+  bool get ready {
+    final amountRegex = Transaction.getAmountRegex(selectedCurrency);
+    final altAmountRegex = Transaction.getAmountRegex(selectedAltCurrency);
+    return editing.isValid &&
+        amountController.text == editing.amount.toString() &&
+        altAmountController.text == editing.altAmount.toString() &&
+        amountRegex.hasMatch(editing.amount.toString()) &&
+        altAmountRegex.hasMatch(editing.altAmount.toString()) &&
+        descriptionController.text == editing.descriptions;
+  }
 
   Account get selectedAccountFrom => ref.watch(_transferAccounts).firstWhere(
         (account) => account.uuid == editing.accountId,
@@ -59,6 +64,10 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
         (account) => account.uuid == editing.accountTo,
         orElse: () => Account.unknown,
       );
+
+  Currency get selectedCurrency => provider.getCurrency(ref, editing.currencyId);
+
+  Currency get selectedAltCurrency => provider.getCurrency(ref, editing.altCurrencyId);
 
   Future<Account?> showAccountSelectDialog(
     List<Account> accounts,
@@ -74,6 +83,12 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
         list: accounts,
       ),
     );
+  }
+
+  void setTextControllers() {
+    descriptionController.text = editing.descriptions;
+    amountController.text = editing.amount.toString();
+    altAmountController.text = editing.altAmount.toString();
   }
 
   Future<void> onAccountFromCardTapped(List<Account> accounts) async {
@@ -162,9 +177,7 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
   @override
   void initState() {
     super.initState();
-    descriptionController.text = editing.descriptions;
-    amountController.text = editing.amount.toString();
-    altAmountController.text = editing.altAmount.toString();
+    setTextControllers();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         if (widget.accountFrom != null) {
@@ -192,10 +205,7 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
   Widget build(BuildContext context) {
     final accountFrom = selectedAccountFrom;
     final accountTo = selectedAccountTo;
-    final currency = provider.getCurrency(ref, editing.currencyId);
-    final altCurrency = provider.getCurrency(ref, editing.altCurrencyId);
     final accounts = ref.watch(_transferAccounts);
-
     return Modal(
       ready: ready,
       title: LocaleKeys.object_action.tr(namedArgs: {
@@ -249,15 +259,15 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
             controller: amountController,
             keyboardType: TextInputType.numberWithOptions(
               decimal:
-                  currency == Currency.unknown || currency.decimalPoint > 0,
+                  selectedCurrency == Currency.unknown || selectedCurrency.decimalPoint > 0,
             ),
             decoration: InputDecoration(
               labelText: LocaleKeys.amountTransferFrom.tr(),
               prefixIcon: Padding(
                 padding: const EdgeInsets.all(4),
-                child: CurrencyIcon(currency),
+                child: CurrencyIcon(selectedCurrency),
               ),
-              errorText: Transaction.getAmountRegex(currency)
+              errorText: Transaction.getAmountRegex(selectedCurrency)
                       .hasMatch(amountController.text)
                   ? null
                   : LocaleKeys.msgInvalidInput.tr(),
@@ -272,16 +282,16 @@ class _TransferEditModalState extends ConsumerState<TransferEditModal> {
             TextField(
               controller: altAmountController,
               keyboardType: TextInputType.numberWithOptions(
-                decimal: altCurrency == Currency.unknown ||
-                    altCurrency.decimalPoint > 0,
+                decimal: selectedAltCurrency == Currency.unknown ||
+                    selectedAltCurrency.decimalPoint > 0,
               ),
               decoration: InputDecoration(
                 labelText: LocaleKeys.amountTransferTo.tr(),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: CurrencyIcon(altCurrency),
+                  child: CurrencyIcon(selectedAltCurrency),
                 ),
-                errorText: Transaction.getAmountRegex(altCurrency)
+                errorText: Transaction.getAmountRegex(selectedAltCurrency)
                         .hasMatch(altAmountController.text)
                     ? null
                     : LocaleKeys.msgInvalidInput.tr(),
